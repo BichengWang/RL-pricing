@@ -65,6 +65,55 @@ SAC_PARAMS = {
 
 ########################################################
 ############## Stock Ticker Setup starts ##############
+SP500_TICKER = ["SPY"]
+NAS_TICKER = ["NDAQ"]
+
+SP500_20_TICKER = [
+        "AAPL",
+        "MSFT",
+        "AMZN",
+        "FB",
+        "GOOGL",
+        "GOOG",
+        "BRK-B",
+        "JPM",
+        "JNJ",
+        "TSLA",
+        "UNH",
+        "V",
+        "HD",
+        "PG",
+        "NVDA",
+        "DIS",
+        "BAC",
+        "MA",
+        "PYPL",
+        "CMCSA"
+]
+
+NAS_20_TICKER = [
+        "AAPL",
+        "MSFT",
+        "AMZN",
+        "FB",
+        "GOOG",
+        "TSLA",
+        "GOOGL",
+        "NVDA",
+        "PYPL",
+        "CMCSA",
+        "ADBE",
+        "INTC",
+        "CSCO",
+        "NFLX",
+        "PEP",
+        "AVGO",
+        "TMUS",
+        "COST",
+        "TXN",
+        "QCOM"
+]
+
 SINGLE_TICKER = ["AAPL"]
 
 # self defined
