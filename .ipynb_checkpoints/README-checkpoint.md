@@ -126,12 +126,12 @@ $ ./docker/bin/start_notebook.sh
 
 Build the container:
 ```bash
-$ docker build -f docker/Dockerfile -t finrl docker/
+$ docker build -f docker/Dockerfile -t rl docker/
 ```
 
 Start the container:
 ```bash
-$ docker run -it --rm -v ${PWD}:/home -p 8888:8888 finrl
+$ docker run -it --rm -v ${PWD}:/home -p 8888:8888 rl
 ```
 Note: The default container run starts jupyter lab in the root directory, allowing you to run scripts, notebooks, etc.
 
