@@ -66,7 +66,7 @@ SAC_PARAMS = {
 ########################################################
 ############## Stock Ticker Setup starts ##############
 SP500_TICKER = ["SPY"]
-NAS_TICKER = ["NDAQ"]
+QQQ_TICKER = ["QQQ"]
 
 SP500_20_TICKER = [
         "AAPL",
