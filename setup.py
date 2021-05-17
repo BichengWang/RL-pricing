@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
-# Read requirements.txt, ignore comments
+# Read requirements.in, ignore comments
 try:
     REQUIRES = list()
-    f = open("requirements.txt", "rb")
+    f = open("requirements.in", "rb")
     for line in f.read().decode("utf-8").split("\n"):
         line = line.strip()
         if "#" in line:
@@ -11,7 +11,7 @@ try:
         if line:
             REQUIRES.append(line)
 except:
-    print("'requirements.txt' not found!")
+    print("'requirements.in' not found!")
     REQUIRES = list()
 
 setup(

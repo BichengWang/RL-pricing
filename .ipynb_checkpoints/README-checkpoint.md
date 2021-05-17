@@ -197,7 +197,7 @@ venv\Scripts\activate
 The script has been tested running under **Python >= 3.6.0**, with the following packages installed:
 
 ```shell
-pip install -r requirements.txt
+pip install -r requirements.in
 ```
 
 #### Stable-Baselines3 using Pytorch
