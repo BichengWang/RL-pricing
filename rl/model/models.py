@@ -17,9 +17,9 @@ from stable_baselines3.common.noise import (
     OrnsteinUhlenbeckActionNoise,
 )
 
-from finrl.config import config
-from finrl.preprocessing.data import data_split
-from finrl.env.env_stocktrading import StockTradingEnv
+from rl.config import config
+from rl.preprocessing.data import data_split
+from rl.env.env_stocktrading import StockTradingEnv
 
 from stable_baselines3 import A2C
 from stable_baselines3 import PPO
