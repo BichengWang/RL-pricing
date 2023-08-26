@@ -1,4 +1,4 @@
-# RL_stock_trading
+# Reinforcement Learning on Stock Trading
 
 ## Full document:
 
