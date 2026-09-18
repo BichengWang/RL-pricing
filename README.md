@@ -1,4 +1,4 @@
-# Reinforcement Learning on Stock Trading
+# Reinforcement Learning on Pricing Market
 
 ## Full document:
 
