@@ -5,7 +5,7 @@
 We beat 90% portfolio managers.   
 https://drive.google.com/file/d/1-ogSAAA5L0sdy1iLt8HQKwV2kcN1UuCc/view?usp=sharing
 
-Local copy: [docs/Wang_Zhang_2021_Deep_Learning_Stock_Trading_arxiv.pdf](docs/Wang_Zhang_2021_Deep_Learning_Stock_Trading_arxiv.pdf)
+Paper Copy: [Applying Deep Learning to Stock Trading](docs/Wang_Zhang_2021_Deep_Learning_Stock_Trading_arxiv.pdf)
 
 ## YouTube detail explanation:
 https://www.youtube.com/watch?v=bE8MFq4sB2k
