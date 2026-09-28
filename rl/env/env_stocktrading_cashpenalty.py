@@ -4,12 +4,10 @@ import random
 from copy import deepcopy
 import gym
 import time
-from gym.utils import seeding
 from gym import spaces
 import matplotlib
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 from stable_baselines3.common import logger
 

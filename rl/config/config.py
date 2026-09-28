@@ -1,10 +1,5 @@
-import pathlib
-
 # import rl
 
-import pandas as pd
-import datetime
-import os
 
 # pd.options.display.max_rows = 10
 # pd.options.display.max_columns = 10
@@ -13,7 +8,7 @@ import os
 # PACKAGE_ROOT = pathlib.Path(rl.__file__).resolve().parent
 # PACKAGE_ROOT = pathlib.Path().resolve().parent
 
-TRAINED_MODEL_DIR = f"trained_models"
+TRAINED_MODEL_DIR = "trained_models"
 # DATASET_DIR = PACKAGE_ROOT / "data"
 
 # data
@@ -23,10 +18,10 @@ TRAINED_MODEL_DIR = f"trained_models"
 
 # now = datetime.datetime.now()
 # TRAINED_MODEL_DIR = f"trained_models/{now}"
-DATA_SAVE_DIR = f"datasets"
-TRAINED_MODEL_DIR = f"trained_models"
-TENSORBOARD_LOG_DIR = f"tensorboard_log"
-RESULTS_DIR = f"results"
+DATA_SAVE_DIR = "datasets"
+TRAINED_MODEL_DIR = "trained_models"
+TENSORBOARD_LOG_DIR = "tensorboard_log"
+RESULTS_DIR = "results"
 # os.makedirs(TRAINED_MODEL_DIR)
 
 
