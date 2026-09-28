@@ -1,6 +1,3 @@
-from time import time
-
-
 def get_buy_and_hold_sharpe(test):
     test["daily_return"] = test["close"].pct_change(1)
     sharpe = (252 ** 0.5) * test["daily_return"].mean() / test["daily_return"].std()
