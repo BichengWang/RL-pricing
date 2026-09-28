@@ -6,7 +6,6 @@ from gym import spaces
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import pickle
 from stable_baselines3.common.vec_env import DummyVecEnv
 from stable_baselines3.common import logger
 
@@ -157,7 +156,6 @@ class StockTradingEnv(gym.Env):
                 buy_num_shares = _do_buy()
             else:
                 buy_num_shares = 0
-                pass
 
         return buy_num_shares
 

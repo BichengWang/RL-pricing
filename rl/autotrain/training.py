@@ -1,8 +1,5 @@
 import pandas as pd
-import numpy as np
 import matplotlib
-import matplotlib.pyplot as plt
-from sklearn import preprocessing
 
 matplotlib.use("Agg")
 import datetime
@@ -13,7 +10,6 @@ from rl.preprocessing.preprocessors import FeatureEngineer
 from rl.preprocessing.data import data_split
 from rl.env.env_stocktrading import StockTradingEnv
 from rl.model.models import DRLAgent
-from rl.trade.backtest import backtest_stats, backtest_plot, get_daily_return, get_baseline
 
 
 

@@ -1,12 +1,10 @@
 import numpy as np
 import pandas as pd
 from copy import deepcopy
-from gym.utils import seeding
 import gym
 from gym import spaces
 import matplotlib
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import random
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 from stable_baselines3.common import logger

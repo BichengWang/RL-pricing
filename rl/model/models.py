@@ -2,13 +2,11 @@
 import pandas as pd
 import numpy as np
 import time
-import gym
 
 # RL models from stable-baselines
 # from stable_baselines import SAC
 # from stable_baselines import TD3
 
-from stable_baselines3.ppo import MlpPolicy
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from stable_baselines3 import DDPG
@@ -24,11 +22,6 @@ from rl.env.env_stocktrading import StockTradingEnv
 from stable_baselines3 import A2C
 from stable_baselines3 import PPO
 from stable_baselines3 import TD3
-from stable_baselines3.td3.policies import MlpPolicy
-from stable_baselines3.common.noise import (
-    NormalActionNoise,
-    OrnsteinUhlenbeckActionNoise,
-)
 
 from stable_baselines3 import SAC
 
