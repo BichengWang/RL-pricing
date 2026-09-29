@@ -13,3 +13,7 @@ https://www.youtube.com/watch?v=bE8MFq4sB2k
 ## File description:
 rl_portfolio_trading.ipynb is the running results
 
+
+## License
+
+This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
