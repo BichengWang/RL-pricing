@@ -10,6 +10,7 @@ from rl.preprocessing.preprocessors import FeatureEngineer
 from rl.preprocessing.data import data_split
 from rl.env.env_stocktrading import StockTradingEnv
 from rl.model.models import DRLAgent
+from rl.trade.backtest import backtest_stats
 
 
 
@@ -83,6 +84,6 @@ def train_one():
     df_actions.to_csv("./" + config.RESULTS_DIR + "/df_actions_" + now + ".csv")
 
     print("==============Get Backtest Results===========")
-    perf_stats_all = BackTestStats(df_account_value)
+    perf_stats_all = backtest_stats(df_account_value)
     perf_stats_all = pd.DataFrame(perf_stats_all)
     perf_stats_all.to_csv("./" + config.RESULTS_DIR + "/perf_stats_all_" + now + ".csv")
