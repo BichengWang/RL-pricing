@@ -18,22 +18,20 @@ setup(
     name="rl",
     version="0.3.0",
     include_package_data=True,
-    author="Hongyang Yang, Xiaoyang Liu",
-    author_email="hy2500@columbia.edu",
-    url="https://github.com/finrl/finrl-library",
+    author="Bicheng Wang",
+    url="https://github.com/BichengWang/RL-pricing",
     license="MIT",
     packages=find_packages(),
     #install_requires=REQUIRES,
     install_requires=REQUIRES
     + ["pyfolio @ git+https://github.com/quantopian/pyfolio.git#egg=pyfolio-0.9.2"],
     # dependency_links=['git+https://github.com/quantopian/pyfolio.git#egg=pyfolio-0.9.2'],
-    description="FinRL library, a Deep Reinforcement Learning library designed specifically for automated stock trading.",
-    long_description="""rl is a Python library for that facilitates beginners to expose themselves to quantitative finance 
-    and to develop their own trading strategies, it is developed by `AI4Finance`_. 
-    
-    FinRL has been developed under three primary principles: completeness, hands-on tutorial and reproducibility. 
-    
-    .. _AI4Finance: https://github.com/AI4Finance-LLC
+    description="Deep reinforcement learning for stock portfolio trading, adapted from the FinRL library.",
+    long_description="""RL-pricing applies deep reinforcement learning (A2C, PPO, DDPG, SAC,
+    TD3) to multi-stock portfolio trading and benchmarks the results against SPY.
+
+    The environment, preprocessing, and training code are adapted from FinRL
+    (https://github.com/AI4Finance-Foundation/FinRL), which is MIT-licensed.
     """,
     classifiers=[
         # Trove classifiers
