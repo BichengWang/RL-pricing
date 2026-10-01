@@ -1,18 +1,15 @@
 from setuptools import setup, find_packages
 
 # Read requirements.in, ignore comments
+REQUIRES = []
 try:
-    REQUIRES = list()
-    f = open("requirements.in", "rb")
-    for line in f.read().decode("utf-8").split("\n"):
-        line = line.strip()
-        if "#" in line:
-            line = line[: line.find("#")].strip()
-        if line:
-            REQUIRES.append(line)
-except:
+    with open("requirements.in", encoding="utf-8") as f:
+        for line in f:
+            line = line.split("#", 1)[0].strip()
+            if line:
+                REQUIRES.append(line)
+except FileNotFoundError:
     print("'requirements.in' not found!")
-    REQUIRES = list()
 
 setup(
     name="rl",
@@ -22,10 +19,8 @@ setup(
     url="https://github.com/BichengWang/RL-pricing",
     license="MIT",
     packages=find_packages(),
-    #install_requires=REQUIRES,
     install_requires=REQUIRES
     + ["pyfolio @ git+https://github.com/quantopian/pyfolio.git#egg=pyfolio-0.9.2"],
-    # dependency_links=['git+https://github.com/quantopian/pyfolio.git#egg=pyfolio-0.9.2'],
     description="Deep reinforcement learning for stock portfolio trading, adapted from the FinRL library.",
     long_description="""RL-pricing applies deep reinforcement learning (A2C, PPO, DDPG, SAC,
     TD3) to multi-stock portfolio trading and benchmarks the results against SPY.
@@ -45,7 +40,7 @@ setup(
         "Programming Language :: Python :: Implementation :: CPython",
         "Programming Language :: Python :: Implementation :: PyPy",
     ],
-    keywords="Reinforcment Learning",
-    platform=["any"],
+    keywords="reinforcement learning, stock trading",
+    platforms=["any"],
     python_requires=">=3.6",
 )
