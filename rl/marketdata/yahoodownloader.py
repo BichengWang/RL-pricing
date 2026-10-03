@@ -40,39 +40,57 @@ class YahooDownloader:
         Returns
         -------
         `pd.DataFrame`
-            7 columns: A date, open, high, low, close, volume and tick symbol
-            for the specified stock ticker
+            date, open, high, low, close, volume, tic and day columns.
+            The close column contains the adjusted closing price. Empty
+            downloads are skipped; if none succeed, the same columns are
+            returned in an empty frame.
         """
         # Download and save the data in a pandas DataFrame:
-        data_df = pd.DataFrame()
+        columns = ["date", "open", "high", "low", "close", "volume", "tic", "day"]
+        price_columns = {
+            "Open": "open",
+            "High": "high",
+            "Low": "low",
+            "Adj Close": "close",
+            "Volume": "volume",
+        }
+        frames = []
         for tic in self.ticker_list:
-            temp_df = yf.download(tic, start=self.start_date, end=self.end_date)
+            # Keep raw OHLC and adjusted close separate, as in the original
+            # downloader, regardless of yfinance's auto_adjust default.
+            temp_df = yf.download(
+                tic, start=self.start_date, end=self.end_date, auto_adjust=False
+            )
+            if temp_df is None or temp_df.empty:
+                continue
+            temp_df = temp_df.copy()
+            # Recent yfinance releases return (price, ticker) columns even
+            # for one ticker. Older releases return a flat column index.
+            if isinstance(temp_df.columns, pd.MultiIndex):
+                if len(temp_df.columns.get_level_values(-1).unique()) != 1:
+                    raise ValueError("Expected one Yahoo Finance ticker for {}".format(tic))
+                # Yahoo normalizes ticker case; retain the requested tic in
+                # the output without using its spelling as a column key.
+                temp_df.columns = temp_df.columns.droplevel(-1)
+            missing = set(price_columns).difference(temp_df.columns)
+            if missing:
+                raise ValueError(
+                    "Missing Yahoo Finance columns for {}: {}".format(
+                        tic, ", ".join(sorted(missing))
+                    )
+                )
+            temp_df = temp_df[list(price_columns)].rename(columns=price_columns)
+            temp_df.columns.name = None
+            temp_df = temp_df.rename_axis("date").reset_index()
             temp_df["tic"] = tic
-            data_df = data_df.append(temp_df)
-        # reset the index, we want to use numbers as index instead of dates
-        data_df = data_df.reset_index()
-        try:
-            # convert the column names to standardized names
-            data_df.columns = [
-                "date",
-                "open",
-                "high",
-                "low",
-                "close",
-                "adjcp",
-                "volume",
-                "tic",
-            ]
-            # use adjusted close price instead of close price
-            data_df["close"] = data_df["adjcp"]
-            # drop the adjusted close price column
-            data_df = data_df.drop("adjcp", 1)
-        except NotImplementedError:
-            print("the features are not supported currently")
+            frames.append(temp_df)
+        if not frames:
+            return pd.DataFrame(columns=columns)
+        data_df = pd.concat(frames, ignore_index=True)
         # create day of the week column (monday = 0)
         data_df["day"] = data_df["date"].dt.dayofweek
         # convert date to standard string format, easy to filter
-        data_df["date"] = data_df.date.apply(lambda x: x.strftime("%Y-%m-%d"))
+        data_df["date"] = data_df["date"].dt.strftime("%Y-%m-%d")
         # drop missing data
         data_df = data_df.dropna()
         data_df = data_df.reset_index(drop=True)
@@ -81,7 +99,7 @@ class YahooDownloader:
 
         data_df = data_df.sort_values(by=['date','tic']).reset_index(drop=True)
 
-        return data_df
+        return data_df[columns]
 
     def select_equal_rows_stock(self, df):
         df_check = df.tic.value_counts()
