@@ -53,6 +53,18 @@ Trained models, TensorBoard logs, datasets and results are written to `trained_m
 
 To change the agent, date range, tickers or hyperparameters, edit `rl/config/config.py` and `rl/autotrain/training.py`. To explore the results interactively, open `rl_portfolio_trading.ipynb` in Jupyter.
 
+## Downloader tests
+
+The downloader accepts legacy flat and current yfinance price/ticker columns,
+preserves adjusted closing prices, and returns an empty frame with the usual
+columns when no ticker has data. Its regression tests use offline fixtures and
+can run separately from the legacy training dependencies:
+
+```bash
+python -m pip install pandas yfinance pytest
+python -m pytest tests/test_yahoodownloader.py
+```
+
 ## License
 
 This project is licensed under the MIT License — see [LICENSE](LICENSE) for details.
