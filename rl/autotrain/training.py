@@ -23,6 +23,9 @@ logger = logging.getLogger(__name__)
 
 DATA_SOURCES = ("yahoo", "csv", "synthetic")
 AGENTS = ("a2c", "ppo", "ddpg", "td3", "sac")
+# trading: buy and sell whole shares (StockTradingEnv);
+# portfolio: choose long-only portfolio weights each day (StockPortfolioEnv).
+TASKS = ("trading", "portfolio")
 
 
 @dataclass
@@ -31,8 +34,14 @@ class TrainConfig:
 
     ``ticker_list`` defaults to the Dow 30 for the Yahoo and synthetic data
     sources and to every ticker in the file for the CSV source.
+
+    With ``task="portfolio"`` the agent allocates the portfolio across the
+    tickers instead of trading share counts; ``hmax`` and the turbulence
+    settings do not apply, and the first ``cov_lookback`` days of data are
+    used to warm up the covariance features.
     """
 
+    task: str = "trading"
     agent: str = "sac"
     total_timesteps: int = 80_000
     data_source: str = "yahoo"
@@ -54,6 +63,8 @@ class TrainConfig:
     sell_cost_pct: float = 0.001
     reward_scaling: float = 1e-4
     reward_type: str = "asset_change"
+    # portfolio task: days of returns in each covariance matrix
+    cov_lookback: int = 252
     normalize_observations: bool = True
     model_kwargs: Optional[dict] = None
     seed: Optional[int] = None
@@ -67,6 +78,12 @@ class TrainConfig:
     verbose: int = 0
 
     def validate(self):
+        if self.task not in TASKS:
+            raise ValueError("task must be one of {}".format(TASKS))
+        if self.task == "portfolio" and self.agent == "ensemble":
+            raise ValueError("The ensemble strategy supports only the trading task")
+        if self.cov_lookback < 2:
+            raise ValueError("cov_lookback must be at least 2")
         if self.data_source not in DATA_SOURCES:
             raise ValueError("data_source must be one of {}".format(DATA_SOURCES))
         if self.data_source == "csv" and not self.data_file:
@@ -122,7 +139,7 @@ def prepare_data(cfg, tickers=None):
     tickers (used when reloading a trained model).
     """
     from rl.preprocessing.data import data_split
-    from rl.preprocessing.preprocessors import FeatureEngineer
+    from rl.preprocessing.preprocessors import FeatureEngineer, add_covariance_matrix
 
     raw = load_market_data(cfg)
     if tickers is not None:
@@ -130,10 +147,12 @@ def prepare_data(cfg, tickers=None):
     fe = FeatureEngineer(
         use_technical_indicator=True,
         tech_indicator_list=cfg.tech_indicator_list,
-        use_turbulence=cfg.use_turbulence,
+        use_turbulence=cfg.use_turbulence and cfg.task == "trading",
         user_defined_feature=False,
     )
     processed = fe.preprocess_data(raw)
+    if cfg.task == "portfolio":
+        processed = add_covariance_matrix(processed, lookback=cfg.cov_lookback)
     if tickers is not None:
         found = sorted(processed["tic"].unique())
         if found != sorted(tickers):
@@ -143,11 +162,30 @@ def prepare_data(cfg, tickers=None):
     train = data_split(processed, cfg.start_date, cfg.start_trade_date)
     trade = data_split(processed, cfg.start_trade_date, cfg.end_date)
     if train.empty or trade.index.nunique() < 2:
-        raise ValueError("Not enough data on one side of start_trade_date")
+        hint = ""
+        if cfg.task == "portfolio":
+            hint = " (the portfolio task uses the first {} days for covariances)".format(
+                cfg.cov_lookback
+            )
+        raise ValueError("Not enough data on one side of start_trade_date" + hint)
     return processed, train, trade
 
 
 def env_kwargs(cfg, stock_dim):
+    if cfg.task == "portfolio":
+        return {
+            "hmax": cfg.hmax,
+            "initial_amount": cfg.initial_amount,
+            # Rebalancing buys and sells in equal measure.
+            "transaction_cost_pct": (cfg.buy_cost_pct + cfg.sell_cost_pct) / 2,
+            "reward_scaling": cfg.reward_scaling,
+            "reward_type": cfg.reward_type,
+            "state_space": stock_dim,
+            "stock_dim": stock_dim,
+            "action_space": stock_dim,
+            "tech_indicator_list": cfg.tech_indicator_list,
+            "lookback": cfg.cov_lookback,
+        }
     return {
         "hmax": cfg.hmax,
         "initial_amount": cfg.initial_amount,
@@ -162,9 +200,22 @@ def env_kwargs(cfg, stock_dim):
     }
 
 
+def make_env(cfg, df, kwargs, turbulence_threshold=None, results_dir=config.RESULTS_DIR):
+    """The environment for ``cfg.task`` over ``df``."""
+    if cfg.task == "portfolio":
+        from rl.env.env_portfolio import StockPortfolioEnv
+
+        return StockPortfolioEnv(df=df, results_dir=results_dir, **kwargs)
+    from rl.env.env_stocktrading import StockTradingEnv
+
+    return StockTradingEnv(
+        df=df, turbulence_threshold=turbulence_threshold, results_dir=results_dir, **kwargs
+    )
+
+
 def resolve_turbulence_threshold(cfg, train):
     """Liquidation threshold for trading, or ``None`` to disable it."""
-    if not cfg.use_turbulence:
+    if not cfg.use_turbulence or cfg.task != "trading":
         return None
     if cfg.turbulence_threshold is not None:
         return float(cfg.turbulence_threshold)
@@ -252,7 +303,6 @@ def run_training(cfg=None):
     Returns a dict with the run name, output directories, the agent's account
     values and the statistics table (agent and baselines side by side).
     """
-    from rl.env.env_stocktrading import StockTradingEnv
     from rl.model.models import DRLAgent, make_vec_env
 
     cfg = (cfg or TrainConfig()).validate()
@@ -269,12 +319,12 @@ def run_training(cfg=None):
     kwargs = env_kwargs(cfg, len(tickers))
     threshold = resolve_turbulence_threshold(cfg, train)
     logger.info(
-        "%d tickers, %d training days, %d trading days, turbulence threshold %s",
-        len(tickers), train.index.nunique(), trade.index.nunique(), threshold,
+        "%s task, %d tickers, %d training days, %d trading days, turbulence threshold %s",
+        cfg.task, len(tickers), train.index.nunique(), trade.index.nunique(), threshold,
     )
 
     logger.info("==============Training %s===========", cfg.agent.upper())
-    train_env = StockTradingEnv(df=train, results_dir=out_dir, **kwargs)
+    train_env = make_env(cfg, train, kwargs, results_dir=out_dir)
     venv = make_vec_env(train_env, normalize_obs=cfg.normalize_observations, seed=cfg.seed)
     agent = DRLAgent(env=venv)
     model = agent.get_model(
@@ -302,12 +352,9 @@ def run_training(cfg=None):
 
 
 def _trade(model, cfg, trade, kwargs, threshold, out_dir, obs_normalizer="auto"):
-    from rl.env.env_stocktrading import StockTradingEnv
     from rl.model.models import DRLAgent
 
-    trade_env = StockTradingEnv(
-        df=trade, turbulence_threshold=threshold, results_dir=out_dir, **kwargs
-    )
+    trade_env = make_env(cfg, trade, kwargs, turbulence_threshold=threshold, results_dir=out_dir)
     account_value, actions = DRLAgent.DRL_prediction(
         model, trade_env, deterministic=True, obs_normalizer=obs_normalizer
     )
@@ -339,7 +386,6 @@ def run_backtest(model_dir, **overrides):
     """
     from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
 
-    from rl.env.env_stocktrading import StockTradingEnv
     from rl.model.models import MODELS
 
     cfg, saved = load_run_config(model_dir)
@@ -349,14 +395,14 @@ def run_backtest(model_dir, **overrides):
     _, _, trade = prepare_data(cfg, tickers=tickers)
     kwargs = env_kwargs(cfg, len(tickers))
     threshold = saved.get("resolved_turbulence_threshold") if cfg.use_turbulence else None
-    if overrides.get("turbulence_threshold") is not None:
+    if cfg.task == "trading" and overrides.get("turbulence_threshold") is not None:
         threshold = float(overrides["turbulence_threshold"])
 
     model = MODELS[cfg.agent].load(os.path.join(model_dir, "model.zip"))
     normalizer = None
     stats_path = os.path.join(model_dir, "vecnormalize.pkl")
     if os.path.exists(stats_path):
-        dummy = DummyVecEnv([lambda: StockTradingEnv(df=trade, **kwargs)])
+        dummy = DummyVecEnv([lambda: make_env(cfg, trade, kwargs)])
         normalizer = VecNormalize.load(stats_path, dummy)
         normalizer.training = False
     out_dir = os.path.join(
@@ -372,7 +418,9 @@ def run_ensemble(cfg):
     """Rolling-window A2C/PPO/DDPG ensemble over the trading period."""
     from rl.model.models import DRLEnsembleAgent, MODEL_KWARGS
 
-    cfg = dataclasses.replace(cfg, agent="ensemble", use_turbulence=True).validate()
+    cfg = dataclasses.replace(
+        cfg, agent="ensemble", task="trading", use_turbulence=True
+    ).validate()
     _seed_everything(cfg.seed)
     run_name = _run_name(cfg)
     out_dir = os.path.join(cfg.results_dir, run_name)

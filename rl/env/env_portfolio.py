@@ -33,7 +33,10 @@ class StockPortfolioEnv(gym.Env):
         transaction_cost_pct: float
             cost as a fraction of the value traded when rebalancing
         reward_scaling: float
-            scaling factor for the reward (the change in portfolio value)
+            scaling factor for the reward
+        reward_type: str
+            ``"asset_change"`` (default) rewards the change in portfolio
+            value, ``"log_return"`` the log of the portfolio's gross return
         state_space: int
             the number of stocks (the covariance matrix is state_space wide)
         action_space: int
@@ -67,6 +70,7 @@ class StockPortfolioEnv(gym.Env):
         lookback=252,
         day=0,
         *,
+        reward_type="asset_change",
         make_plots=False,
         results_dir=config.RESULTS_DIR,
     ):
@@ -82,6 +86,9 @@ class StockPortfolioEnv(gym.Env):
         self.state_space = state_space
         self.tech_indicator_list = tech_indicator_list
         self.turbulence_threshold = turbulence_threshold
+        if reward_type not in ("asset_change", "log_return"):
+            raise ValueError("reward_type must be 'asset_change' or 'log_return'")
+        self.reward_type = reward_type
         self.make_plots = make_plots
         self.results_dir = results_dir
 
@@ -141,7 +148,10 @@ class StockPortfolioEnv(gym.Env):
         self.portfolio_return_memory.append(self.portfolio_value / begin_value - 1)
         self.date_memory.append(self.data.date.unique()[0])
         self.asset_memory.append(self.portfolio_value)
-        self.reward = (self.portfolio_value - begin_value) * self.reward_scaling
+        if self.reward_type == "log_return":
+            self.reward = float(np.log(self.portfolio_value / begin_value)) * self.reward_scaling
+        else:
+            self.reward = (self.portfolio_value - begin_value) * self.reward_scaling
 
         self.terminal = self.day >= self.n_days - 1
         info = {}

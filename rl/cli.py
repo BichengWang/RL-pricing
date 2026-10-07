@@ -44,6 +44,12 @@ def build_parser():
     data.add_argument("--output", help="download_data: output CSV path")
 
     agent = parser.add_argument_group("agent")
+    agent.add_argument(
+        "--task",
+        choices=("trading", "portfolio"),
+        default="trading",
+        help="trading: buy and sell share counts; portfolio: choose daily portfolio weights",
+    )
     agent.add_argument("--agent", choices=("a2c", "ppo", "ddpg", "td3", "sac"), default="sac")
     agent.add_argument(
         "--timesteps", type=int, default=80_000, help="training steps (per model for ensemble)"
@@ -65,6 +71,12 @@ def build_parser():
     )
     env.add_argument("--reward-type", choices=("asset_change", "log_return"), default="asset_change")
     env.add_argument("--reward-scaling", type=float, help="default: 1e-4 (asset_change), 1 (log_return)")
+    env.add_argument(
+        "--cov-lookback",
+        type=int,
+        default=252,
+        help="portfolio task: days of returns in each covariance matrix",
+    )
     env.add_argument("--no-turbulence", action="store_true", help="disable turbulence liquidation")
     env.add_argument(
         "--turbulence-threshold", type=float, help="fixed liquidation threshold (overrides quantile)"
@@ -94,6 +106,7 @@ def _train_config(options):
     if reward_scaling is None:
         reward_scaling = 1.0 if options.reward_type == "log_return" else 1e-4
     return TrainConfig(
+        task=options.task,
         agent="ensemble" if options.mode == "ensemble" else options.agent,
         total_timesteps=options.timesteps,
         data_source=data_source,
@@ -111,6 +124,7 @@ def _train_config(options):
         sell_cost_pct=options.transaction_cost,
         reward_scaling=reward_scaling,
         reward_type=options.reward_type,
+        cov_lookback=options.cov_lookback,
         normalize_observations=not options.no_normalize,
         seed=options.seed,
         benchmark_ticker=options.benchmark,
@@ -156,6 +170,9 @@ def main(argv=None):
         df.to_csv(path, index=False)
         log.info("Saved %d rows to %s", len(df), path)
         return path
+
+    if options.mode == "ensemble" and options.task != "trading":
+        parser.error("--mode ensemble supports only --task trading")
 
     if options.mode == "backtest":
         from rl.autotrain.training import run_backtest

@@ -48,6 +48,17 @@ def test_portfolio_costs_reduce_value(processed):
     assert costly.portfolio_value < free.portfolio_value
 
 
+def test_portfolio_log_return_reward(processed):
+    data = data_split(add_covariance_matrix(processed, lookback=60), "2017-01-01", "2017-03-01")
+    env = StockPortfolioEnv(data, 3, 100, 1e6, 0.001, 1.0, 3, 3, TECH, reward_type="log_return")
+    env.reset()
+    begin = env.portfolio_value
+    _, reward, _, _, _ = env.step(np.zeros(3, dtype=np.float32))
+    assert reward == pytest.approx(np.log(env.portfolio_value / begin))
+    with pytest.raises(ValueError):
+        StockPortfolioEnv(data, 3, 100, 1e6, 0.0, 1.0, 3, 3, TECH, reward_type="sharpe")
+
+
 @pytest.mark.parametrize("env_class", [StockTradingEnvCashpenalty, StockTradingEnvStopLoss])
 def test_penalty_envs(processed, env_class):
     env = env_class(

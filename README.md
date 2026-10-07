@@ -14,7 +14,7 @@ https://www.youtube.com/watch?v=bE8MFq4sB2k
 
 | Path | Contents |
 | --- | --- |
-| `main.py` | Command-line entry point (`--mode train`, `backtest`, `ensemble`, `download_data`) |
+| `main.py` | Command-line entry point (`--mode train`, `backtest`, `ensemble`, `download_data`; `--task trading` or `portfolio`) |
 | `rl/` | Trading library adapted from [FinRL](https://github.com/AI4Finance-Foundation/FinRL) |
 | `rl/marketdata/` | Yahoo Finance downloader and a synthetic price generator for offline runs |
 | `rl/preprocessing/` | Panel cleaning, technical indicators, turbulence index, covariance features |
@@ -82,6 +82,27 @@ python main.py --mode backtest --model-dir trained_models/<run-name> \
     --start-trade-date 2020-01-01 --end-date 2021-01-01
 ```
 
+### Portfolio allocation
+
+`--task portfolio` swaps share trading for portfolio allocation: every day the
+agent picks long-only weights for the tickers (they sum to one) and holds them
+until the next close, paying transaction costs on the turnover. Its
+observation is the return covariance matrix of the last `--cov-lookback` days
+stacked on the technical indicators, so the first `--cov-lookback` days of
+data are used up as warm-up and the training period must be longer than that:
+
+```bash
+python main.py --mode train --task portfolio --agent ppo --timesteps 50000
+python main.py --mode train --task portfolio --data-source synthetic \
+    --tickers AAA BBB CCC DDD --start-date 2015-01-01 --start-trade-date 2019-01-01 \
+    --end-date 2020-01-01 --agent ppo --timesteps 20000 --seed 0
+```
+
+`actions.csv` then holds the daily weights instead of share counts. A saved
+portfolio model is backtested like any other (`--mode backtest --model-dir
+...`). `--hmax` and the turbulence options do not apply to this task, and the
+ensemble supports only `--task trading`.
+
 ### Ensemble strategy
 
 The ensemble walks forward through the trading period. Every
@@ -99,6 +120,7 @@ Run `python main.py --help` for the full list. The most useful ones:
 
 | Option | Default | Meaning |
 | --- | --- | --- |
+| `--task` | `trading` | `trading` (buy and sell shares) or `portfolio` (daily portfolio weights) |
 | `--agent` | `sac` | `a2c`, `ppo`, `ddpg`, `td3` or `sac` |
 | `--timesteps` | 80000 | training steps (per model for the ensemble) |
 | `--data-source` / `--data-file` | `yahoo` | `yahoo`, `csv` or `synthetic` |
@@ -108,6 +130,7 @@ Run `python main.py --help` for the full list. The most useful ones:
 | `--transaction-cost` | 0.001 | fraction paid on every buy and sell |
 | `--hmax` | 100 | maximum shares traded per stock per day |
 | `--reward-type` | `asset_change` | or `log_return` |
+| `--cov-lookback` | 252 | portfolio task: days of returns in each covariance matrix |
 | `--turbulence-quantile` / `--turbulence-threshold` / `--no-turbulence` | 0.99 quantile | when to liquidate during market turmoil |
 | `--no-normalize` | off | feed raw observations to the agent |
 | `--benchmark` | none | Yahoo ticker to add to the comparison, e.g. `^DJI` or `SPY` |
@@ -122,7 +145,7 @@ A run named `<run>` (default: timestamp and agent) writes:
 | `trained_models/<run>/vecnormalize.pkl` | observation-normalisation statistics |
 | `trained_models/<run>/run_config.json` | every setting, the tickers and the turbulence threshold used |
 | `results/<run>/account_value.csv` | daily account value over the trading period |
-| `results/<run>/actions.csv` | shares bought (+) or sold (-) per ticker per day |
+| `results/<run>/actions.csv` | shares bought (+) or sold (-) per ticker per day; portfolio weights for `--task portfolio` |
 | `results/<run>/perf_stats.csv` | agent, baselines and benchmark side by side |
 | `results/<run>/backtest.png` | cumulative return and drawdown chart |
 
@@ -156,6 +179,14 @@ threshold, all positions are sold (paying costs) and buying is blocked. The
 observation is `[cash, prices, holdings, indicators]`; by default the pipeline
 standardises it with running statistics, because these differ by several
 orders of magnitude.
+
+`rl.env.env_portfolio.StockPortfolioEnv` (used by `--task portfolio`) holds a
+fractional, long-only portfolio. The agent outputs one score in [0, 1] per
+stock and a softmax turns the scores into weights, so no stock gets more than
+about e times the weight of another: the agent tilts away from an equal-weight
+portfolio rather than concentrating in a few names. Between rebalances the
+weights drift with prices; rebalancing pays the transaction cost on the
+difference between the drifted and the new weights.
 
 ## Changes from the 2021 version
 
@@ -204,7 +235,7 @@ python -m pytest
 They cover the environments' accounting, feature engineering (including a
 check that no future data leaks into earlier rows), the metrics and baselines,
 the Yahoo downloader's column handling, and short end-to-end runs of the
-train, backtest, CLI and ensemble pipelines.
+train, backtest, portfolio, CLI and ensemble pipelines.
 
 ## License
 
