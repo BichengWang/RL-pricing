@@ -7,7 +7,7 @@ from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 
 from rl.config import config
 
-MODES = ("train", "backtest", "ensemble", "download_data")
+MODES = ("train", "backtest", "ensemble", "lstm", "download_data")
 
 
 def build_parser():
@@ -21,8 +21,8 @@ def build_parser():
         choices=MODES,
         default="train",
         help="train: train an agent and trade the test period; backtest: trade with a "
-        "saved model; ensemble: rolling A2C/PPO/DDPG ensemble; download_data: save "
-        "Yahoo Finance prices to CSV",
+        "saved model; ensemble: rolling A2C/PPO/DDPG ensemble; lstm: LSTM price "
+        "forecasts with a hold-if-rising rule; download_data: save Yahoo Finance prices to CSV",
     )
 
     data = parser.add_argument_group("data")
@@ -73,6 +73,18 @@ def build_parser():
     agent.add_argument("--rebalance-window", type=int, default=63, help="ensemble only")
     agent.add_argument("--validation-window", type=int, default=63, help="ensemble only")
 
+    lstm = parser.add_argument_group("lstm forecasting strategy (--mode lstm)")
+    lstm.add_argument("--lstm-window", type=int, default=20, help="days of history per forecast")
+    lstm.add_argument("--lstm-epochs", type=int, default=30)
+    lstm.add_argument("--lstm-hidden-size", type=int, default=32, help="units per LSTM layer")
+    lstm.add_argument("--lstm-loss", choices=("mape", "mse"), default="mape")
+    lstm.add_argument(
+        "--leverage",
+        type=float,
+        default=1.0,
+        help="fraction of the account invested when every stock is forecast to rise",
+    )
+
     env = parser.add_argument_group("environment")
     env.add_argument("--hmax", type=int, default=100, help="max shares traded per stock per day")
     env.add_argument("--initial-amount", type=float, default=1_000_000)
@@ -117,7 +129,7 @@ def _train_config(options):
         reward_scaling = 1.0 if options.reward_type == "log_return" else 1e-4
     return TrainConfig(
         task=options.task,
-        agent="ensemble" if options.mode == "ensemble" else options.agent,
+        agent={"ensemble": "ensemble", "lstm": "lstm"}.get(options.mode, options.agent),
         total_timesteps=options.timesteps,
         data_source=data_source,
         data_file=options.data_file,
@@ -146,6 +158,11 @@ def _train_config(options):
         rebalance_window=options.rebalance_window,
         validation_window=options.validation_window,
         verbose=1 if options.verbose else 0,
+        lstm_window=options.lstm_window,
+        lstm_epochs=options.lstm_epochs,
+        lstm_hidden_size=options.lstm_hidden_size,
+        lstm_loss=options.lstm_loss,
+        leverage=options.leverage,
     )
 
 
@@ -183,8 +200,8 @@ def main(argv=None):
         log.info("Saved %d rows to %s", len(df), path)
         return path
 
-    if options.mode == "ensemble" and options.task != "trading":
-        parser.error("--mode ensemble supports only --task trading")
+    if options.mode in ("ensemble", "lstm") and options.task != "trading":
+        parser.error("--mode {} supports only --task trading".format(options.mode))
 
     if options.mode == "backtest":
         from rl.autotrain.training import run_backtest
@@ -195,7 +212,7 @@ def main(argv=None):
             parser,
             options,
             ["data_file", "start_trade_date", "end_date", "benchmark", "turbulence_threshold",
-             "results_dir"],
+             "results_dir", "leverage"],
         )
         if options.data_source or options.data_file:
             overrides["data_source"] = options.data_source or "csv"

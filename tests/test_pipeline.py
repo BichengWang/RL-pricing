@@ -3,6 +3,7 @@
 import json
 import os
 
+import numpy as np
 import pandas as pd
 import pytest
 
@@ -103,6 +104,64 @@ def test_cli_rejects_portfolio_ensemble():
         cli.main(["--mode", "ensemble", "--task", "portfolio"])
 
 
+def test_lstm_strategy_trains_and_backtests(tmp_path):
+    cfg = small_config(tmp_path, agent="lstm", lstm_epochs=2, lstm_window=10)
+    result = run_training(cfg)
+    model_dir, out_dir = result["model_dir"], result["results_dir"]
+    for name in ("model.pt", "run_config.json"):
+        assert os.path.exists(os.path.join(model_dir, name))
+    for name in ("account_value.csv", "actions.csv", "predictions.csv", "forecast_metrics.csv",
+                 "training_history.csv", "perf_stats.csv", "backtest.png"):
+        assert os.path.exists(os.path.join(out_dir, name))
+    assert len(result["history"]) == 2
+
+    account = result["account_value"]
+    assert account.date.iloc[0] >= "2017-06-01" and account.date.iloc[-1] < "2017-12-01"
+    predictions = result["predictions"]
+    assert predictions.date.min() >= "2017-06-01"
+    assert sorted(predictions.tic.unique()) == TICKERS
+    # Hold a stock (a third of the account) exactly when it is forecast to rise.
+    weights = result["actions"]
+    signals = predictions.pivot(index="date", columns="tic", values="signal")
+    np.testing.assert_allclose(weights.to_numpy(), signals.to_numpy() / 3)
+    assert 0 <= result["forecast_metrics"]["Directional accuracy"] <= 1
+    assert "LSTM" in result["stats"].columns
+
+    replay = run_backtest(model_dir, results_dir=str(tmp_path / "replay"))
+    pd.testing.assert_frame_equal(replay["account_value"], account)
+    pd.testing.assert_frame_equal(replay["predictions"], predictions)
+    levered = run_backtest(model_dir, results_dir=str(tmp_path / "levered"), leverage=2.0)
+    pd.testing.assert_frame_equal(levered["actions"], 2 * weights)
+
+
+def test_cli_runs_lstm_mode(tmp_path):
+    result = cli.main(
+        [
+            "--mode", "lstm",
+            "--data-source", "synthetic",
+            "--tickers", *TICKERS,
+            "--start-date", "2016-01-01",
+            "--start-trade-date", "2017-06-01",
+            "--end-date", "2017-08-01",
+            "--lstm-epochs", "1",
+            "--lstm-window", "5",
+            "--lstm-loss", "mse",
+            "--leverage", "1.5",
+            "--seed", "0",
+            "--run-name", "lstm_cli",
+            "--results-dir", str(tmp_path / "results"),
+            "--trained-model-dir", str(tmp_path / "models"),
+        ]
+    )
+    with open(os.path.join(result["model_dir"], "run_config.json"), encoding="utf-8") as f:
+        saved = json.load(f)
+    assert saved["agent"] == "lstm"
+    assert saved["lstm_loss"] == "mse" and saved["leverage"] == 1.5
+    assert set(np.unique(result["actions"].to_numpy())) <= {0.0, 0.5}
+    with pytest.raises(SystemExit):
+        cli.main(["--mode", "lstm", "--task", "portfolio"])
+
+
 def test_cli_trains_from_csv_without_turbulence(tmp_path, raw_prices):
     data_file = tmp_path / "prices.csv"
     raw_prices.to_csv(data_file, index=False)
@@ -182,6 +241,12 @@ def test_config_validation():
         TrainConfig(task="futures").validate()
     with pytest.raises(ValueError):
         TrainConfig(task="portfolio", agent="ensemble").validate()
+    with pytest.raises(ValueError):
+        TrainConfig(agent="lstm", task="portfolio").validate()
+    with pytest.raises(ValueError):
+        TrainConfig(agent="lstm", lstm_loss="huber").validate()
+    with pytest.raises(ValueError):
+        TrainConfig(agent="lstm", leverage=0).validate()
     assert TrainConfig().tickers() == config.DOW_30_TICKER
     assert TrainConfig(data_source="csv", data_file="x.csv").tickers() is None
 

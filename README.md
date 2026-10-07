@@ -14,17 +14,18 @@ https://www.youtube.com/watch?v=bE8MFq4sB2k
 
 | Path | Contents |
 | --- | --- |
-| `main.py` | Command-line entry point (`--mode train`, `backtest`, `ensemble`, `download_data`; `--task trading` or `portfolio`) |
+| `main.py` | Command-line entry point (`--mode train`, `backtest`, `ensemble`, `lstm`, `download_data`; `--task trading` or `portfolio`) |
 | `rl/` | Trading library adapted from [FinRL](https://github.com/AI4Finance-Foundation/FinRL) |
 | `rl/marketdata/` | Yahoo Finance downloader and a synthetic price generator for offline runs |
 | `rl/preprocessing/` | Panel cleaning, technical indicators, turbulence index, covariance features |
 | `rl/env/` | Trading environments (gymnasium API) |
+| `rl/forecast/lstm.py` | LSTM price forecaster (PyTorch) and the forecast-driven trading rule |
 | `rl/model/models.py` | DRL agents (A2C, PPO, DDPG, SAC, TD3) and the rolling ensemble |
 | `rl/trade/` | Performance metrics, rule-based baselines and backtest plots |
 | `rl/autotrain/training.py` | End-to-end train / backtest / ensemble pipelines (`TrainConfig`) |
 | `rl/config/config.py` | Default dates, ticker lists, technical indicators and agent hyperparameters |
 | `tests/` | Offline test suite (synthetic data, no network needed) |
-| `dl/` | Deep-learning models and preprocessing (TensorFlow) |
+| `dl/` | Original TensorFlow LSTM code used by the notebooks |
 | `rl_portfolio_trading.ipynb` | Running results (the notebook to start with) |
 | `rl_portfolio_trading_phase2.ipynb` | Phase 2 notebook |
 | `notebooks/`, `*.ipynb` | Other experiments |
@@ -119,6 +120,38 @@ portfolio model is backtested like any other (`--mode backtest --model-dir
 ...`). `--hmax` and the turbulence options do not apply to this task, and the
 ensemble supports only `--task trading`.
 
+### LSTM forecasting strategy
+
+The paper's other approach: instead of learning actions end to end, a
+two-layer LSTM forecasts every ticker's next close and a simple rule trades
+on the forecasts. Each day the strategy holds a stock (with `1/N` of the
+account, times `--leverage`) when its forecast is at or above today's close,
+and keeps that share of the account in cash otherwise. It is benchmarked
+against the same baselines as the agents:
+
+```bash
+python main.py --mode lstm --lstm-epochs 30
+python main.py --mode lstm --data-source synthetic --tickers AAA BBB CCC DDD \
+    --start-date 2015-01-01 --start-trade-date 2019-01-01 --end-date 2020-01-01 --seed 0
+
+# The paper's leveraged variant, from the same saved model
+python main.py --mode backtest --model-dir trained_models/<run-name> --leverage 2
+```
+
+As in the paper, one model is trained on all tickers together with a mean
+absolute percentage error (MAPE) loss (`--lstm-loss mse` is the alternative),
+so it fits low- and high-price periods equally. The inputs are the last
+`--lstm-window` days of each ticker's log returns and technical indicators,
+made scale free (moving averages and bands as ratios to the close; other
+indicators standardised with training-period statistics). The most recent
+10% of the training days are held out, and the epoch with the lowest
+validation loss is kept.
+
+The run also writes `predictions.csv` (each day's close, forecast, next close
+and signal), `forecast_metrics.csv` (MAPE and directional accuracy over the
+trading period) and `training_history.csv` (losses per epoch); `actions.csv`
+holds the daily weights and the model is saved as `model.pt`.
+
 ### Ensemble strategy
 
 The ensemble walks forward through the trading period. Every
@@ -150,6 +183,8 @@ Run `python main.py --help` for the full list. The most useful ones:
 | `--turbulence-quantile` / `--turbulence-threshold` / `--no-turbulence` | 0.99 quantile | when to liquidate during market turmoil |
 | `--no-normalize` | off | feed raw observations to the agent |
 | `--validation-days` / `--eval-freq` | 0 / 10000 | hold out the last N training days and keep the best checkpoint on them |
+| `--lstm-window`, `--lstm-epochs`, `--lstm-hidden-size`, `--lstm-loss` | 20, 30, 32, `mape` | LSTM strategy settings |
+| `--leverage` | 1 | LSTM strategy: fraction of the account invested when every stock is forecast to rise |
 | `--benchmark` | none | Yahoo ticker to add to the comparison, e.g. `^DJI` or `SPY` |
 
 ### Outputs
@@ -253,7 +288,8 @@ python -m pytest
 They cover the environments' accounting, feature engineering (including a
 check that no future data leaks into earlier rows), the metrics and baselines,
 the Yahoo downloader's column handling, and short end-to-end runs of the
-train, backtest, portfolio, CLI and ensemble pipelines.
+train, backtest, portfolio, LSTM, CLI and ensemble pipelines, plus the
+forecaster's features, windows, loss and trading rule.
 
 ## License
 

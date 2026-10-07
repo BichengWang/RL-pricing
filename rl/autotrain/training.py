@@ -39,6 +39,12 @@ class TrainConfig:
     tickers instead of trading share counts; ``hmax`` and the turbulence
     settings do not apply, and the first ``cov_lookback`` days of data are
     used to warm up the covariance features.
+
+    ``agent="lstm"`` runs the forecasting strategy instead of a DRL agent: an
+    LSTM forecasts each ticker's next close and the portfolio holds the
+    stocks forecast to rise (see :mod:`rl.forecast.lstm`). It uses the
+    ``lstm_*`` settings and ``leverage``; ``total_timesteps``, ``hmax``, the
+    reward and turbulence settings do not apply.
     """
 
     task: str = "trading"
@@ -80,6 +86,17 @@ class TrainConfig:
     # ensemble strategy
     rebalance_window: int = 63
     validation_window: int = 63
+    # LSTM forecasting strategy
+    lstm_window: int = 20
+    lstm_hidden_size: int = 32
+    lstm_num_layers: int = 2
+    lstm_epochs: int = 30
+    lstm_batch_size: int = 256
+    lstm_learning_rate: float = 1e-3
+    lstm_loss: str = "mape"
+    # fraction of the training days (the most recent) held out for validation
+    lstm_validation_fraction: float = 0.1
+    leverage: float = 1.0
     verbose: int = 0
 
     def validate(self):
@@ -93,8 +110,19 @@ class TrainConfig:
             raise ValueError("data_source must be one of {}".format(DATA_SOURCES))
         if self.data_source == "csv" and not self.data_file:
             raise ValueError("data_file is required for the csv data source")
-        if self.agent not in AGENTS + ("ensemble",):
-            raise ValueError("agent must be one of {}".format(AGENTS + ("ensemble",)))
+        if self.agent not in AGENTS + ("ensemble", "lstm"):
+            raise ValueError("agent must be one of {}".format(AGENTS + ("ensemble", "lstm")))
+        if self.agent == "lstm":
+            if self.task != "trading":
+                raise ValueError("The LSTM strategy supports only the trading task")
+            if self.lstm_loss not in ("mape", "mse"):
+                raise ValueError("lstm_loss must be 'mape' or 'mse'")
+            if self.lstm_window < 1 or self.lstm_epochs < 1:
+                raise ValueError("lstm_window and lstm_epochs must be at least 1")
+            if not 0 <= self.lstm_validation_fraction < 1:
+                raise ValueError("lstm_validation_fraction must be in [0, 1)")
+            if self.leverage <= 0:
+                raise ValueError("leverage must be positive")
         if not self.start_date < self.start_trade_date < self.end_date:
             raise ValueError("Need start_date < start_trade_date < end_date")
         if self.turbulence_quantile is not None and not 0 < self.turbulence_quantile <= 1:
@@ -105,6 +133,8 @@ class TrainConfig:
             raise ValueError("eval_freq must be at least 1")
         if self.validation_days and self.agent == "ensemble":
             raise ValueError("The ensemble strategy has its own validation_window")
+        if self.validation_days and self.agent == "lstm":
+            raise ValueError("The LSTM strategy has its own lstm_validation_fraction")
         return self
 
     def tickers(self):
@@ -342,6 +372,8 @@ def run_training(cfg=None):
     cfg = (cfg or TrainConfig()).validate()
     if cfg.agent == "ensemble":
         return run_ensemble(cfg)
+    if cfg.agent == "lstm":
+        return run_lstm(cfg)
     _seed_everything(cfg.seed)
     run_name = _run_name(cfg)
     model_dir = os.path.join(cfg.trained_model_dir, run_name)
@@ -460,6 +492,8 @@ def run_backtest(model_dir, **overrides):
     cfg, saved = load_run_config(model_dir)
     cfg = dataclasses.replace(cfg, **{k: v for k, v in overrides.items() if v is not None})
     cfg.validate()
+    if cfg.agent == "lstm":
+        return _backtest_lstm(model_dir, cfg, saved)
     tickers = saved["tickers"]
     _, _, trade = prepare_data(cfg, tickers=tickers)
     kwargs = env_kwargs(cfg, len(tickers))
@@ -539,6 +573,164 @@ def run_ensemble(cfg):
         "summary": summary,
         "stats": stats,
     }
+
+
+# ----------------------------------------------------------------------
+# LSTM forecasting strategy
+# ----------------------------------------------------------------------
+def _lstm_inputs(cfg, processed, stats):
+    """Scaled windows for every row of ``processed`` with enough history."""
+    from rl.forecast import lstm
+
+    ordered = processed.sort_values(["tic", "date"]).reset_index(drop=True)
+    features = lstm.apply_scaler(lstm.raw_features(ordered, cfg.tech_indicator_list), stats)
+    X, y, rows = lstm.make_windows(
+        features, ordered["close"], cfg.lstm_window, lstm.feature_columns(cfg.tech_indicator_list)
+    )
+    return ordered, X, y, rows
+
+
+def _lstm_trade(cfg, model, processed, trade, stats, out_dir, extra=None):
+    """Forecast the trading period, trade the signals and save the results."""
+    from rl.forecast import lstm
+    from rl.trade.baselines import target_weights_strategy
+
+    ordered, X, _, rows = _lstm_inputs(cfg, processed, stats)
+    in_trade = ordered["date"].iloc[rows].isin(set(trade["date"])).to_numpy()
+    X, rows = X[in_trade], rows[in_trade]
+    picked = ordered.iloc[rows]
+    ratio = lstm.predict_ratio(model, X)
+    next_close = ordered.groupby("tic")["close"].shift(-1).iloc[rows]
+    predictions = pd.DataFrame(
+        {
+            "date": picked["date"].to_numpy(),
+            "tic": picked["tic"].to_numpy(),
+            "close": picked["close"].to_numpy(),
+            "predicted_close": picked["close"].to_numpy() * ratio,
+            "next_close": next_close.to_numpy(),
+        }
+    ).sort_values(["date", "tic"], ignore_index=True)
+    predictions["signal"] = (predictions["predicted_close"] >= predictions["close"]).astype(float)
+    weights = lstm.signal_weights(predictions, cfg.leverage)
+    traded = trade[trade["date"].isin(weights.index)]
+    if traded["date"].nunique() < 2:
+        raise ValueError("Not enough history before the trading period for the LSTM window")
+    account_value = target_weights_strategy(
+        traded, weights, cfg.initial_amount, (cfg.buy_cost_pct + cfg.sell_cost_pct) / 2
+    )
+    metrics = lstm.forecast_metrics(predictions)
+    logger.info("Forecast quality over the trading period:\n%s", metrics.to_string())
+    files = {
+        "predictions.csv": predictions,
+        "forecast_metrics.csv": metrics.rename_axis("metric").reset_index(name="value"),
+    }
+    files.update(extra or {})
+    stats_table = evaluate_account(
+        account_value,
+        trade,
+        cfg,
+        out_dir,
+        actions=weights,
+        title="LSTM forecast strategy vs baselines",
+        extra=files,
+    )
+    return {
+        "account_value": account_value,
+        "actions": weights,
+        "predictions": predictions,
+        "forecast_metrics": metrics,
+        "stats": stats_table,
+    }
+
+
+def run_lstm(cfg):
+    """Train the LSTM forecaster on the training period and trade its signals."""
+    import torch
+
+    from rl.forecast import lstm
+
+    cfg = dataclasses.replace(cfg, use_turbulence=False).validate()
+    _seed_everything(cfg.seed)
+    run_name = _run_name(cfg)
+    model_dir = os.path.join(cfg.trained_model_dir, run_name)
+    out_dir = os.path.join(cfg.results_dir, run_name)
+
+    logger.info("==============Loading data and engineering features===========")
+    processed, train, trade = prepare_data(cfg)
+    tickers = sorted(train["tic"].unique())
+    stats = lstm.fit_scaler(
+        lstm.raw_features(train, cfg.tech_indicator_list), cfg.tech_indicator_list
+    )
+    ordered, X, y, rows = _lstm_inputs(cfg, train, stats)
+    keep = ~np.isnan(y)
+    X, y, dates = X[keep], y[keep], ordered["date"].to_numpy()[rows[keep]]
+    if len(X) == 0:
+        raise ValueError("The training period is shorter than lstm_window")
+    train_dates = np.sort(np.unique(dates))
+    n_val = int(len(train_dates) * cfg.lstm_validation_fraction)
+    if n_val:
+        # Hold out the most recent days: validating on the past would leak.
+        is_val = dates >= train_dates[-n_val]
+        X_fit, y_fit, X_val, y_val = X[~is_val], y[~is_val], X[is_val], y[is_val]
+    else:
+        X_fit, y_fit, X_val, y_val = X, y, None, None
+    logger.info(
+        "%d tickers, %d training and %d validation windows of %d days, %d trading days",
+        len(tickers), len(X_fit), 0 if X_val is None else len(X_val), cfg.lstm_window,
+        trade.index.nunique(),
+    )
+
+    logger.info("==============Training LSTM forecaster===========")
+    model, history = lstm.train_forecaster(
+        X_fit,
+        y_fit,
+        X_val,
+        y_val,
+        hidden_size=cfg.lstm_hidden_size,
+        num_layers=cfg.lstm_num_layers,
+        epochs=cfg.lstm_epochs,
+        batch_size=cfg.lstm_batch_size,
+        learning_rate=cfg.lstm_learning_rate,
+        loss=cfg.lstm_loss,
+    )
+
+    os.makedirs(model_dir, exist_ok=True)
+    torch.save(model.state_dict(), os.path.join(model_dir, "model.pt"))
+    run_config = dataclasses.asdict(cfg)
+    run_config.update(run_name=run_name, tickers=tickers, feature_scaler=stats)
+    with open(os.path.join(model_dir, "run_config.json"), "w", encoding="utf-8") as f:
+        json.dump(run_config, f, indent=2, default=_to_jsonable)
+
+    logger.info("==============Trading===========")
+    result = _lstm_trade(
+        cfg, model, processed, trade, stats, out_dir, extra={"training_history.csv": history}
+    )
+    result.update(run_name=run_name, model_dir=model_dir, results_dir=out_dir, history=history)
+    return result
+
+
+def _backtest_lstm(model_dir, cfg, saved):
+    import torch
+
+    from rl.forecast import lstm
+
+    tickers = saved["tickers"]
+    processed, _, trade = prepare_data(cfg, tickers=tickers)
+    stats = saved["feature_scaler"]
+    model = lstm.LSTMForecaster(
+        len(lstm.feature_columns(cfg.tech_indicator_list)),
+        cfg.lstm_hidden_size,
+        cfg.lstm_num_layers,
+    )
+    model.load_state_dict(torch.load(os.path.join(model_dir, "model.pt"), weights_only=True))
+    model.eval()
+    out_dir = os.path.join(
+        cfg.results_dir,
+        "{}_backtest_{}".format(saved["run_name"], datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
+    )
+    result = _lstm_trade(cfg, model, processed, trade, stats, out_dir)
+    result.update(run_name=saved["run_name"], model_dir=model_dir, results_dir=out_dir)
+    return result
 
 
 def train_one():
