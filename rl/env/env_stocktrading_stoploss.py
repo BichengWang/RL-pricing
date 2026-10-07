@@ -1,14 +1,11 @@
 import numpy as np
 import pandas as pd
 from copy import deepcopy
-import gym
-from gym import spaces
+import gymnasium as gym
+from gymnasium import spaces
 import matplotlib
 matplotlib.use("Agg")
-import random
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
-from stable_baselines3.common import logger
-import time
 class StockTradingEnvStopLoss(gym.Env):
     """
     A stock trading environment for OpenAI gym
@@ -51,7 +48,7 @@ class StockTradingEnvStopLoss(gym.Env):
         after reset, static strategy should result in same metrics
         given no change in prices, no change in asset values
     """
-    metadata = {"render.modes": ["human"]}
+    metadata = {"render_modes": ["human"]}
     def __init__(
         self,
         df,
@@ -95,9 +92,11 @@ class StockTradingEnvStopLoss(gym.Env):
         self.state_space = (
             1 + len(self.assets) + len(self.assets) * len(self.daily_information_cols)
         )
-        self.action_space = spaces.Box(low=-1, high=1, shape=(len(self.assets),))
+        self.action_space = spaces.Box(
+            low=-1, high=1, shape=(len(self.assets),), dtype=np.float32
+        )
         self.observation_space = spaces.Box(
-            low=-np.inf, high=np.inf, shape=(self.state_space,)
+            low=-np.inf, high=np.inf, shape=(self.state_space,), dtype=np.float32
         )
         self.turbulence = 0
         self.episode = -1  # initialize so we can call reset
@@ -107,20 +106,14 @@ class StockTradingEnvStopLoss(gym.Env):
         self.cached_data = None
         self.cash_penalty_proportion = cash_penalty_proportion
         if self.cache_indicator_data:
-            print("caching data")
             self.cached_data = [
                 self.get_date_vector(i) for i, _ in enumerate(self.dates)
             ]
-            print("data cached!")
-    def seed(self, seed=None):
-        if seed is None:
-            seed = int(round(time.time() * 1000))
-        random.seed(seed)
     @property
     def current_step(self):
         return self.date_index - self.starting_point
-    def reset(self):
-        self.seed()
+    def reset(self, *, seed=None, options=None):
+        super().reset(seed=seed)
         self.sum_trades = 0
         self.actual_num_trades = 0
         self.closing_diff_avg_buy = np.zeros(len(self.assets))
@@ -128,7 +121,9 @@ class StockTradingEnvStopLoss(gym.Env):
         self.n_buys = np.zeros(len(self.assets))
         self.avg_buy_price = np.zeros(len(self.assets))
         if self.random_start:
-            starting_point = random.choice(range(int(len(self.dates) * 0.5)))
+            starting_point = int(
+                self.np_random.integers(max(1, int(len(self.dates) * 0.5)))
+            )
             self.starting_point = starting_point
         else:
             self.starting_point = 0
@@ -150,7 +145,7 @@ class StockTradingEnvStopLoss(gym.Env):
             + self.get_date_vector(self.date_index)
         )
         self.state_memory.append(init_state)
-        return init_state
+        return init_state.astype(np.float32), {}
     def get_date_vector(self, date, cols=None):
         if (cols is None) and (self.cached_data is not None):
             return self.cached_data[date]
@@ -168,38 +163,21 @@ class StockTradingEnvStopLoss(gym.Env):
     def return_terminal(self, reason="Last Date", reward=0):
         state = self.state_memory[-1]
         self.log_step(reason=reason, terminal_reward=reward)
-        # Add outputs to logger interface
-        gl_pct = self.account_information["total_assets"][-1] / self.initial_amount
-        logger.record("environment/GainLoss_pct",(gl_pct - 1)*100)
-        logger.record(
-            "environment/total_assets",
-            int(self.account_information["total_assets"][-1]),
-        )
-        reward_pct = self.account_information["total_assets"][-1] / self.initial_amount
-        logger.record("environment/total_reward_pct", (reward_pct - 1) * 100)
-        logger.record("environment/total_trades", self.sum_trades)
-        logger.record(
-            "environment/actual_num_trades",
-            self.actual_num_trades,
-        )
-        logger.record(
-            "environment/avg_daily_trades",
-            self.sum_trades / (self.current_step),
-        )
-        logger.record(
-            "environment/avg_daily_trades_per_asset",
-            self.sum_trades / (self.current_step) / len(self.assets),
-        )
-        logger.record("environment/completed_steps", self.current_step)
-        logger.record(
-            "environment/sum_rewards", np.sum(self.account_information["reward"])
-        )
-        logger.record(
-            "environment/cash_proportion",
-            self.account_information["cash"][-1]
-            / self.account_information["total_assets"][-1],
-        )
-        return state, reward, True, {}
+        total_assets = self.account_information["total_assets"][-1]
+        steps = max(1, self.current_step)
+        stats = {
+            "GainLoss_pct": (total_assets / self.initial_amount - 1) * 100,
+            "total_assets": int(total_assets),
+            "total_reward_pct": (total_assets / self.initial_amount - 1) * 100,
+            "total_trades": self.sum_trades,
+            "actual_num_trades": self.actual_num_trades,
+            "avg_daily_trades": self.sum_trades / steps,
+            "avg_daily_trades_per_asset": self.sum_trades / steps / len(self.assets),
+            "completed_steps": self.current_step,
+            "sum_rewards": np.sum(self.account_information["reward"]),
+            "cash_proportion": self.account_information["cash"][-1] / total_assets,
+        }
+        return np.asarray(state, dtype=np.float32), reward, True, False, {"episode_stats": stats}
     def log_step(self, reason, terminal_reward=None):
         if terminal_reward is None:
             terminal_reward = self.account_information["reward"][-1]
@@ -376,7 +354,13 @@ class StockTradingEnvStopLoss(gym.Env):
             # Update average buy price
             buys = np.sign(buys)
             self.n_buys += buys
-            self.avg_buy_price = np.where(buys > 0, self.avg_buy_price + ((closings - self.avg_buy_price) / self.n_buys), self.avg_buy_price) #incremental average
+            # incremental average (only where we bought, so n_buys > 0)
+            self.avg_buy_price = self.avg_buy_price + np.divide(
+                closings - self.avg_buy_price,
+                self.n_buys,
+                out=np.zeros(len(self.assets)),
+                where=buys > 0,
+            )
             
             #set as zero when we don't have any holdings anymore
             self.n_buys = np.where(holdings_updated > 0, self.n_buys, 0)
@@ -394,7 +378,7 @@ class StockTradingEnvStopLoss(gym.Env):
             )
             self.state_memory.append(state)
 
-            return state, reward, False, {}
+            return np.asarray(state, dtype=np.float32), reward, False, False, {}
     def get_sb_env(self):
         def get_self():
             return deepcopy(self)
@@ -412,7 +396,7 @@ class StockTradingEnvStopLoss(gym.Env):
             return None
         else:
             self.account_information["date"] = self.dates[
-                -len(self.account_information["cash"]) :
+                self.starting_point : self.starting_point + len(self.account_information["cash"])
             ]
             return pd.DataFrame(self.account_information)
     def save_action_memory(self):
@@ -421,7 +405,10 @@ class StockTradingEnvStopLoss(gym.Env):
         else:
             return pd.DataFrame(
                 {
-                    "date": self.dates[-len(self.account_information["cash"]) :],
+                    "date": self.dates[
+                        self.starting_point : self.starting_point
+                        + len(self.account_information["cash"])
+                    ],
                     "actions": self.actions_memory,
                     "transactions": self.transaction_memory,
                 }

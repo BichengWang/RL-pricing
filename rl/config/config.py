@@ -1,29 +1,15 @@
-# import rl
+"""Project-wide defaults: output directories, dates, features, agent
+hyperparameters and ticker lists.
 
+Most of these can be overridden from the command line (``python main.py -h``)
+or through :class:`rl.autotrain.training.TrainConfig`.
+"""
 
-# pd.options.display.max_rows = 10
-# pd.options.display.max_columns = 10
-
-
-# PACKAGE_ROOT = pathlib.Path(rl.__file__).resolve().parent
-# PACKAGE_ROOT = pathlib.Path().resolve().parent
-
-TRAINED_MODEL_DIR = "trained_models"
-# DATASET_DIR = PACKAGE_ROOT / "data"
-
-# data
-# TRAINING_DATA_FILE = "data/ETF_SPY_2009_2020.csv"
-# TURBULENCE_DATA = "data/dow30_turbulence_index.csv"
-# TESTING_DATA_FILE = "test.csv"
-
-# now = datetime.datetime.now()
-# TRAINED_MODEL_DIR = f"trained_models/{now}"
+# output directories (relative to the working directory)
 DATA_SAVE_DIR = "datasets"
 TRAINED_MODEL_DIR = "trained_models"
 TENSORBOARD_LOG_DIR = "tensorboard_log"
 RESULTS_DIR = "results"
-# os.makedirs(TRAINED_MODEL_DIR)
-
 
 ## time_fmt = '%Y-%m-%d'
 START_DATE = "2000-01-01"
@@ -37,7 +23,22 @@ DEFAULT_DATA_COLUMNS = ["date", "tic", "close"]
 
 ## stockstats technical indicator column names
 ## check https://pypi.org/project/stockstats/ for different names
-TECHNICAL_INDICATORS_LIST = ["macd", "boll_ub", "boll_lb", "rsi_10", "rsi_20", "cci_10", "cci_20", "dx_30", "close_20_sma", "close_60_sma", "close_120_sma", "close_20_ema", "close_60_ema", "close_120_ema"]
+TECHNICAL_INDICATORS_LIST = [
+    "macd",
+    "boll_ub",
+    "boll_lb",
+    "rsi_10",
+    "rsi_20",
+    "cci_10",
+    "cci_20",
+    "dx_30",
+    "close_20_sma",
+    "close_60_sma",
+    "close_120_sma",
+    "close_20_ema",
+    "close_60_ema",
+    "close_120_ema",
+]
 
 
 ## Model Parameters
@@ -55,7 +56,6 @@ SAC_PARAMS = {
     "buffer_size": 100000,
     "learning_rate": 0.0001,
     "learning_starts": 100,
-    "batch_size": 64,
     "ent_coef": "auto_0.1",
 }
 
