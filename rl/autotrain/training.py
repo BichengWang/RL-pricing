@@ -72,6 +72,11 @@ class TrainConfig:
     # portfolio task: days of returns in each covariance matrix
     cov_lookback: int = 252
     normalize_observations: bool = True
+    # Hold out the last ``validation_days`` training days; every ``eval_freq``
+    # steps the agent trades them and the best checkpoint (by Sharpe ratio)
+    # is kept instead of the final one. 0 trains on everything.
+    validation_days: int = 0
+    eval_freq: int = 10_000
     model_kwargs: Optional[dict] = None
     seed: Optional[int] = None
     benchmark_ticker: Optional[str] = None
@@ -122,6 +127,14 @@ class TrainConfig:
             raise ValueError("Need start_date < start_trade_date < end_date")
         if self.turbulence_quantile is not None and not 0 < self.turbulence_quantile <= 1:
             raise ValueError("turbulence_quantile must be in (0, 1]")
+        if self.validation_days < 0:
+            raise ValueError("validation_days must not be negative")
+        if self.eval_freq < 1:
+            raise ValueError("eval_freq must be at least 1")
+        if self.validation_days and self.agent == "ensemble":
+            raise ValueError("The ensemble strategy has its own validation_window")
+        if self.validation_days and self.agent == "lstm":
+            raise ValueError("The LSTM strategy has its own lstm_validation_fraction")
         return self
 
     def tickers(self):
@@ -241,6 +254,29 @@ def make_env(cfg, df, kwargs, turbulence_threshold=None, results_dir=config.RESU
     )
 
 
+def split_validation(train, validation_days):
+    """Split the training frame into ``(fit, validation)`` by date.
+
+    The validation part is the last ``validation_days`` trading days, so the
+    agent is selected on data that follows everything it was trained on.
+    """
+    from rl.preprocessing.data import data_split
+
+    dates = sorted(train["date"].unique())
+    if validation_days < 2 or validation_days > len(dates) - 2:
+        raise ValueError(
+            "validation_days must be between 2 and {} (the training period has {} days)".format(
+                len(dates) - 2, len(dates)
+            )
+        )
+    split_date = dates[-validation_days]
+    end = pd.Timestamp(dates[-1]) + pd.Timedelta(days=1)
+    return (
+        data_split(train, dates[0], split_date),
+        data_split(train, split_date, end.strftime("%Y-%m-%d")),
+    )
+
+
 def resolve_turbulence_threshold(cfg, train):
     """Liquidation threshold for trading, or ``None`` to disable it."""
     if not cfg.use_turbulence or cfg.task != "trading":
@@ -331,7 +367,7 @@ def run_training(cfg=None):
     Returns a dict with the run name, output directories, the agent's account
     values and the statistics table (agent and baselines side by side).
     """
-    from rl.model.models import DRLAgent, make_vec_env
+    from rl.model.models import DRLAgent, ValidationCallback, load_model, make_vec_env
 
     cfg = (cfg or TrainConfig()).validate()
     if cfg.agent == "ensemble":
@@ -345,12 +381,17 @@ def run_training(cfg=None):
 
     logger.info("==============Loading data and engineering features===========")
     _, train, trade = prepare_data(cfg)
+    validation = None
+    if cfg.validation_days:
+        train, validation = split_validation(train, cfg.validation_days)
     tickers = sorted(train["tic"].unique())
     kwargs = env_kwargs(cfg, len(tickers))
     threshold = resolve_turbulence_threshold(cfg, train)
     logger.info(
-        "%s task, %d tickers, %d training days, %d trading days, turbulence threshold %s",
-        cfg.task, len(tickers), train.index.nunique(), trade.index.nunique(), threshold,
+        "%s task, %d tickers, %d training days, %d validation days, %d trading days, "
+        "turbulence threshold %s",
+        cfg.task, len(tickers), train.index.nunique(),
+        0 if validation is None else validation.index.nunique(), trade.index.nunique(), threshold,
     )
 
     logger.info("==============Training %s===========", cfg.agent.upper())
@@ -360,24 +401,56 @@ def run_training(cfg=None):
     model = agent.get_model(
         cfg.agent, model_kwargs=cfg.model_kwargs, verbose=cfg.verbose, seed=cfg.seed
     )
-    model = agent.train_model(model=model, tb_log_name=cfg.agent, total_timesteps=cfg.total_timesteps)
-
     os.makedirs(model_dir, exist_ok=True)
-    model.save(os.path.join(model_dir, "model.zip"))
-    if model.get_vec_normalize_env() is not None:
-        model.get_vec_normalize_env().save(os.path.join(model_dir, "vecnormalize.pkl"))
+    validator = None
+    if validation is not None:
+        validator = ValidationCallback(
+            lambda: make_env(cfg, validation, kwargs, turbulence_threshold=threshold,
+                             results_dir=out_dir),
+            eval_freq=cfg.eval_freq,
+            save_dir=model_dir,
+        )
+    model = agent.train_model(
+        model=model,
+        tb_log_name=cfg.agent,
+        total_timesteps=cfg.total_timesteps,
+        callback=validator,
+    )
+
     run_config = dataclasses.asdict(cfg)
     run_config.update(
         run_name=run_name,
         tickers=tickers,
         resolved_turbulence_threshold=threshold,
     )
+    obs_normalizer = "auto"
+    if validator is None:
+        model.save(os.path.join(model_dir, "model.zip"))
+        if model.get_vec_normalize_env() is not None:
+            model.get_vec_normalize_env().save(os.path.join(model_dir, "vecnormalize.pkl"))
+    else:
+        # Trade with the best validation checkpoint, not the final model.
+        model, obs_normalizer = load_model(model_dir, cfg.agent, make_env(cfg, trade, kwargs))
+        history = pd.DataFrame(validator.history)
+        os.makedirs(out_dir, exist_ok=True)
+        history.to_csv(os.path.join(out_dir, "validation.csv"), index=False)
+        run_config.update(
+            best_validation_timesteps=validator.best["timesteps"],
+            best_validation_sharpe=validator.best["sharpe"],
+        )
+        logger.info(
+            "Selected the checkpoint at %d of %d steps (validation Sharpe %.3f)",
+            validator.best["timesteps"], validator.history[-1]["timesteps"],
+            validator.best["sharpe"],
+        )
     with open(os.path.join(model_dir, "run_config.json"), "w", encoding="utf-8") as f:
         json.dump(run_config, f, indent=2, default=_to_jsonable)
 
     logger.info("==============Trading===========")
-    result = _trade(model, cfg, trade, kwargs, threshold, out_dir)
+    result = _trade(model, cfg, trade, kwargs, threshold, out_dir, obs_normalizer=obs_normalizer)
     result.update(run_name=run_name, model_dir=model_dir, results_dir=out_dir)
+    if validator is not None:
+        result["validation"] = history
     return result
 
 
@@ -414,9 +487,7 @@ def run_backtest(model_dir, **overrides):
     ``end_date`` to test another period, or ``data_source``/``data_file``.
     Features are recomputed from ``start_date`` so indicators are warmed up.
     """
-    from stable_baselines3.common.vec_env import DummyVecEnv, VecNormalize
-
-    from rl.model.models import MODELS
+    from rl.model.models import load_model
 
     cfg, saved = load_run_config(model_dir)
     cfg = dataclasses.replace(cfg, **{k: v for k, v in overrides.items() if v is not None})
@@ -430,13 +501,7 @@ def run_backtest(model_dir, **overrides):
     if cfg.task == "trading" and overrides.get("turbulence_threshold") is not None:
         threshold = float(overrides["turbulence_threshold"])
 
-    model = MODELS[cfg.agent].load(os.path.join(model_dir, "model.zip"))
-    normalizer = None
-    stats_path = os.path.join(model_dir, "vecnormalize.pkl")
-    if os.path.exists(stats_path):
-        dummy = DummyVecEnv([lambda: make_env(cfg, trade, kwargs)])
-        normalizer = VecNormalize.load(stats_path, dummy)
-        normalizer.training = False
+    model, normalizer = load_model(model_dir, cfg.agent, make_env(cfg, trade, kwargs))
     out_dir = os.path.join(
         cfg.results_dir,
         "{}_backtest_{}".format(saved["run_name"], datetime.datetime.now().strftime("%Y%m%d-%H%M%S")),
