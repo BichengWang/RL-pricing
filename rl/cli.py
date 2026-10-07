@@ -60,6 +60,16 @@ def build_parser():
         action="store_true",
         help="feed raw observations instead of running-mean/std normalised ones",
     )
+    agent.add_argument(
+        "--validation-days",
+        type=int,
+        default=0,
+        help="hold out the last N training days and keep the checkpoint that trades them "
+        "best (0: train on everything and keep the final model)",
+    )
+    agent.add_argument(
+        "--eval-freq", type=int, default=10_000, help="training steps between validation runs"
+    )
     agent.add_argument("--rebalance-window", type=int, default=63, help="ensemble only")
     agent.add_argument("--validation-window", type=int, default=63, help="ensemble only")
 
@@ -138,6 +148,8 @@ def _train_config(options):
         reward_type=options.reward_type,
         cov_lookback=options.cov_lookback,
         normalize_observations=not options.no_normalize,
+        validation_days=options.validation_days,
+        eval_freq=options.eval_freq,
         seed=options.seed,
         benchmark_ticker=options.benchmark,
         run_name=options.run_name,

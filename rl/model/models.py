@@ -118,6 +118,85 @@ def predict_episode(model, environment, deterministic=True, obs_normalizer="auto
     return environment.save_asset_memory(), environment.save_action_memory()
 
 
+
+class ValidationCallback(BaseCallback):
+    """Keep the model that trades a held-out validation period best.
+
+    Every ``eval_freq`` training steps (and once more when training ends) the
+    current policy trades one episode of ``make_eval_env()`` deterministically.
+    Whenever its annualised Sharpe ratio is the best so far, the model is saved
+    to ``<save_dir>/model.zip`` together with its observation-normalisation
+    statistics (``vecnormalize.pkl``), so the files always hold the best
+    checkpoint. ``history`` lists every evaluation.
+    """
+
+    def __init__(self, make_eval_env, eval_freq, save_dir, verbose=0):
+        super().__init__(verbose)
+        if eval_freq < 1:
+            raise ValueError("eval_freq must be at least 1")
+        self.make_eval_env = make_eval_env
+        self.eval_freq = eval_freq
+        self.save_dir = save_dir
+        self.history = []
+        self.best = None
+        self._last_eval = 0
+
+    def _evaluate(self):
+        self._last_eval = self.num_timesteps
+        values, _ = predict_episode(self.model, self.make_eval_env())
+        account = values["account_value"]
+        record = {
+            "timesteps": self.num_timesteps,
+            "sharpe": metrics.sharpe_ratio(account.pct_change()),
+            "total_return": float(account.iloc[-1] / account.iloc[0] - 1),
+        }
+        self.history.append(record)
+        self.logger.record("validation/sharpe", record["sharpe"])
+        self.logger.record("validation/total_return", record["total_return"])
+        score = -np.inf if np.isnan(record["sharpe"]) else record["sharpe"]
+        best_score = None if self.best is None else self.best["score"]
+        if best_score is None or score > best_score:
+            self.best = dict(record, score=score)
+            os.makedirs(self.save_dir, exist_ok=True)
+            self.model.save(os.path.join(self.save_dir, "model.zip"))
+            normalizer = self.model.get_vec_normalize_env()
+            if normalizer is not None:
+                normalizer.save(os.path.join(self.save_dir, "vecnormalize.pkl"))
+        logger.info(
+            "Validation at %d steps: Sharpe %.3f, return %.2f%% (best so far: %d steps)",
+            record["timesteps"],
+            record["sharpe"],
+            100 * record["total_return"],
+            self.best["timesteps"],
+        )
+
+    def _on_step(self):
+        if self.num_timesteps - self._last_eval >= self.eval_freq:
+            self._evaluate()
+        return True
+
+    def _on_training_end(self):
+        if self.num_timesteps != self._last_eval or not self.history:
+            self._evaluate()
+
+
+def load_model(model_dir, model_name, env=None):
+    """Load ``model.zip`` and, if saved, its ``VecNormalize`` statistics.
+
+    ``env`` (an unwrapped environment matching the model's spaces) is needed
+    to restore the statistics. Returns ``(model, normalizer or None)``.
+    """
+    model = MODELS[model_name].load(os.path.join(model_dir, "model.zip"))
+    normalizer = None
+    stats_path = os.path.join(model_dir, "vecnormalize.pkl")
+    if os.path.exists(stats_path):
+        if env is None:
+            raise ValueError("env is required to load the normalisation statistics")
+        normalizer = VecNormalize.load(stats_path, DummyVecEnv([lambda: env]))
+        normalizer.training = False
+    return model, normalizer
+
+
 class DRLAgent:
     """Provides implementations for DRL algorithms
 
