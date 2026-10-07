@@ -68,6 +68,41 @@ def test_train_then_backtest_reproduces_the_run(tmp_path):
     pd.testing.assert_frame_equal(replay["actions"], result["actions"])
 
 
+def test_portfolio_task_trains_and_backtests(tmp_path):
+    cfg = small_config(tmp_path, task="portfolio", agent="ppo", total_timesteps=128, cov_lookback=60)
+    result = run_training(cfg)
+    model_dir = result["model_dir"]
+    with open(os.path.join(model_dir, "run_config.json"), encoding="utf-8") as f:
+        saved = json.load(f)
+    assert saved["task"] == "portfolio"
+    assert saved["resolved_turbulence_threshold"] is None
+
+    account = result["account_value"]
+    assert account.date.iloc[0] >= "2017-06-01" and account.date.iloc[-1] < "2017-12-01"
+    assert account.account_value.iloc[0] == cfg.initial_amount
+    # Actions are long-only portfolio weights.
+    weights = result["actions"]
+    assert list(weights.columns) == TICKERS
+    assert (weights.to_numpy() >= 0).all()
+    assert weights.sum(axis=1).to_numpy() == pytest.approx(1.0)
+    assert "PPO" in result["stats"].columns
+
+    replay = run_backtest(model_dir, results_dir=str(tmp_path / "replay"))
+    pd.testing.assert_frame_equal(replay["account_value"], account)
+    pd.testing.assert_frame_equal(replay["actions"], weights)
+
+
+def test_portfolio_task_needs_covariance_warmup(tmp_path):
+    cfg = small_config(tmp_path, task="portfolio", start_trade_date="2016-06-01")
+    with pytest.raises(ValueError, match="covariances"):
+        run_training(cfg)
+
+
+def test_cli_rejects_portfolio_ensemble():
+    with pytest.raises(SystemExit):
+        cli.main(["--mode", "ensemble", "--task", "portfolio"])
+
+
 def test_cli_trains_from_csv_without_turbulence(tmp_path, raw_prices):
     data_file = tmp_path / "prices.csv"
     raw_prices.to_csv(data_file, index=False)
@@ -143,6 +178,10 @@ def test_config_validation():
         TrainConfig(start_trade_date="1999-01-01").validate()
     with pytest.raises(ValueError):
         TrainConfig(agent="dqn").validate()
+    with pytest.raises(ValueError):
+        TrainConfig(task="futures").validate()
+    with pytest.raises(ValueError):
+        TrainConfig(task="portfolio", agent="ensemble").validate()
     assert TrainConfig().tickers() == config.DOW_30_TICKER
     assert TrainConfig(data_source="csv", data_file="x.csv").tickers() is None
 
