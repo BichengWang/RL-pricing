@@ -1,5 +1,8 @@
-# Custom config
-#results/
+# Run outputs (see rl/config/config.py)
+results/
+trained_models/
+datasets/
+tensorboard_log/
 
 
 # remove DS_Store

@@ -13,17 +13,18 @@ except FileNotFoundError:
 
 setup(
     name="rl",
-    version="0.3.0",
+    version="0.4.0",
     include_package_data=True,
     author="Bicheng Wang",
     url="https://github.com/BichengWang/RL-pricing",
     license="MIT",
-    packages=find_packages(),
-    install_requires=REQUIRES
-    + ["pyfolio @ git+https://github.com/quantopian/pyfolio.git#egg=pyfolio-0.9.2"],
+    packages=find_packages(exclude=["tests", "tests.*"]),
+    install_requires=REQUIRES,
+    entry_points={"console_scripts": ["rl-pricing=rl.cli:main"]},
     description="Deep reinforcement learning for stock portfolio trading, adapted from the FinRL library.",
     long_description="""RL-pricing applies deep reinforcement learning (A2C, PPO, DDPG, SAC,
-    TD3) to multi-stock portfolio trading and benchmarks the results against SPY.
+    TD3 and a rolling ensemble) to multi-stock portfolio trading and benchmarks
+    the results against rule-based portfolios and market indices.
 
     The environment, preprocessing, and training code are adapted from FinRL
     (https://github.com/AI4Finance-Foundation/FinRL), which is MIT-licensed.
@@ -34,13 +35,13 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
-        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Programming Language :: Python :: Implementation :: CPython",
-        "Programming Language :: Python :: Implementation :: PyPy",
     ],
     keywords="reinforcement learning, stock trading",
     platforms=["any"],
-    python_requires=">=3.6",
+    python_requires=">=3.10",
 )
