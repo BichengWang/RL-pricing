@@ -72,6 +72,22 @@ python main.py --mode download_data --tickers AAPL MSFT JPM --output datasets/pr
 python main.py --mode train --data-file datasets/prices.csv --agent a2c
 ```
 
+### Choosing the checkpoint on validation data
+
+RL training is noisy, and the model at the end of training is often not the
+best one. With `--validation-days N` the last N days of the training period
+are held out: every `--eval-freq` steps the agent trades them, and the
+checkpoint with the best Sharpe ratio there is kept and used for trading:
+
+```bash
+python main.py --mode train --agent ppo --timesteps 200000 \
+    --validation-days 252 --eval-freq 10000
+```
+
+The test period is never used for this choice. Each evaluation is listed in
+`results/<run>/validation.csv`, and `run_config.json` records which checkpoint
+was chosen.
+
 ### Backtesting a saved model
 
 Each training run saves its model, observation-normalisation statistics and
@@ -133,6 +149,7 @@ Run `python main.py --help` for the full list. The most useful ones:
 | `--cov-lookback` | 252 | portfolio task: days of returns in each covariance matrix |
 | `--turbulence-quantile` / `--turbulence-threshold` / `--no-turbulence` | 0.99 quantile | when to liquidate during market turmoil |
 | `--no-normalize` | off | feed raw observations to the agent |
+| `--validation-days` / `--eval-freq` | 0 / 10000 | hold out the last N training days and keep the best checkpoint on them |
 | `--benchmark` | none | Yahoo ticker to add to the comparison, e.g. `^DJI` or `SPY` |
 
 ### Outputs
@@ -141,13 +158,14 @@ A run named `<run>` (default: timestamp and agent) writes:
 
 | Path | Contents |
 | --- | --- |
-| `trained_models/<run>/model.zip` | the trained stable-baselines3 model |
+| `trained_models/<run>/model.zip` | the trained stable-baselines3 model (the best validation checkpoint with `--validation-days`) |
 | `trained_models/<run>/vecnormalize.pkl` | observation-normalisation statistics |
 | `trained_models/<run>/run_config.json` | every setting, the tickers and the turbulence threshold used |
 | `results/<run>/account_value.csv` | daily account value over the trading period |
 | `results/<run>/actions.csv` | shares bought (+) or sold (-) per ticker per day; portfolio weights for `--task portfolio` |
 | `results/<run>/perf_stats.csv` | agent, baselines and benchmark side by side |
 | `results/<run>/backtest.png` | cumulative return and drawdown chart |
+| `results/<run>/validation.csv` | with `--validation-days`: validation Sharpe and return at each evaluation |
 
 The statistics are those of pyfolio's `perf_stats` (annual return, Sharpe,
 Sortino, Calmar, max drawdown, ...) plus the final account value. The agent is
