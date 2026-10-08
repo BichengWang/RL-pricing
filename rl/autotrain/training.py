@@ -187,6 +187,14 @@ def load_market_data(cfg):
             df = df[df["tic"].isin(tickers)]
     if df.empty:
         raise ValueError("No market data for the requested tickers and dates")
+    if tickers is not None:
+        missing = sorted(set(tickers) - set(df["tic"]))
+        if missing:
+            # Typos and delisted symbols would otherwise just shrink the universe.
+            logger.warning(
+                "No %s data between %s and %s for: %s",
+                cfg.data_source, cfg.start_date, cfg.end_date, ", ".join(missing),
+            )
     return df.reset_index(drop=True)
 
 
