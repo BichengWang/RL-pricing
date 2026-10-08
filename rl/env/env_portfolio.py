@@ -121,7 +121,8 @@ class StockPortfolioEnv(gym.Env):
         self.weights = np.full(self.stock_dim, 1.0 / self.stock_dim)
         self.asset_memory = [self.initial_amount]
         self.portfolio_return_memory = [0]
-        self.actions_memory = [self.weights.copy()]
+        # Weights chosen at each day's close (held until the next close).
+        self.actions_memory = []
         self.date_memory = [self.data.date.unique()[0]]
 
     def step(self, actions):
@@ -208,9 +209,12 @@ class StockPortfolioEnv(gym.Env):
         return df_account_value
 
     def save_action_memory(self):
-        # date and close price length must match actions length
-        df_actions = pd.DataFrame(np.asarray(self.actions_memory), columns=self.data.tic.values)
-        df_actions.index = pd.Index(self.date_memory, name="date")
+        """Portfolio weights chosen on each day, one column per ticker."""
+        df_actions = pd.DataFrame(
+            np.asarray(self.actions_memory).reshape(-1, self.stock_dim),
+            columns=self.data.tic.values,
+        )
+        df_actions.index = pd.Index(self.date_memory[:-1], name="date")
         return df_actions
 
     def get_sb_env(self):
