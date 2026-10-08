@@ -12,5 +12,4 @@ gymnasium>=0.29.1
 stable-baselines3>=2.3.2
 torch>=2.0
 
-# testing requirements
-pytest>=7.0
+# Test and lint tools are extras in setup.py: pip install -e ".[test]"

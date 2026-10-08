@@ -286,8 +286,15 @@ saved outputs are kept as a record.
 The tests use synthetic data and offline fixtures, so they need no network:
 
 ```bash
-pip install -e .
+pip install -e ".[test]"
 python -m pytest
+```
+
+CI also lints the code (pyflakes-style checks, configured in `ruff.toml`):
+
+```bash
+pip install -e ".[lint]"
+ruff check .
 ```
 
 They cover the environments' accounting, feature engineering (including a

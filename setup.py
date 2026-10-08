@@ -20,6 +20,7 @@ setup(
     license="MIT",
     packages=find_packages(exclude=["tests", "tests.*"]),
     install_requires=REQUIRES,
+    extras_require={"test": ["pytest>=7.0"], "lint": ["ruff>=0.5"]},
     entry_points={"console_scripts": ["rl-pricing=rl.cli:main"]},
     description="Deep reinforcement learning for stock portfolio trading, adapted from the FinRL library.",
     long_description="""RL-pricing applies deep reinforcement learning (A2C, PPO, DDPG, SAC,
