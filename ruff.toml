@@ -1,0 +1,7 @@
+# Lint settings for `ruff check .` (run in CI).
+extend-exclude = ["*.ipynb"]
+
+[lint]
+# pyflakes and the pycodestyle errors that indicate real problems
+# (syntax, imports, comparisons, statements); formatting is not enforced.
+select = ["E4", "E7", "E9", "F"]
