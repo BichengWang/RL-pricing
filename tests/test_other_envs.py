@@ -52,6 +52,19 @@ def test_portfolio_weights_are_dated_when_chosen(processed):
     assert weights.iloc[0].to_numpy() == pytest.approx(env.softmax_normalization(np.array([1.0, 0, 0])))
 
 
+def test_portfolio_observation_is_covariance_on_indicators(processed):
+    data = data_split(add_covariance_matrix(processed, lookback=60), "2017-01-01", "2017-03-01")
+    env = StockPortfolioEnv(data, 3, 100, 1e6, 0.001, 1e-4, 3, 3, TECH)
+    obs, _ = env.reset()
+    for day in range(3):
+        rows = data.loc[day].sort_values("tic")
+        expected = np.vstack([rows.cov_list.iloc[0], rows[TECH].to_numpy().T])
+        np.testing.assert_allclose(obs, expected.astype(np.float32))
+        obs, *_ = env.step(np.zeros(3, dtype=np.float32))
+    with pytest.raises(ValueError, match="stock_dim"):
+        StockPortfolioEnv(data, 2, 100, 1e6, 0.001, 1e-4, 2, 2, TECH)
+
+
 def test_portfolio_costs_reduce_value(processed):
     data = data_split(add_covariance_matrix(processed, lookback=60), "2017-01-01", "2018-01-01")
     free = StockPortfolioEnv(data, 3, 100, 1e6, 0.0, 1e-4, 3, 3, TECH)

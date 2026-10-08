@@ -8,6 +8,7 @@ from gymnasium import spaces
 from stable_baselines3.common.vec_env import DummyVecEnv
 
 from rl.config import config
+from rl.env.env_stocktrading import panel_arrays
 
 logger = logging.getLogger(__name__)
 
@@ -99,17 +100,35 @@ class StockPortfolioEnv(gym.Env):
             shape=(self.state_space + len(self.tech_indicator_list), self.state_space),
             dtype=np.float32,
         )
-        self.n_days = len(self.df.index.unique())
+        # Look up each day's prices and observation in arrays instead of
+        # slicing the frame on every step.
+        self.dates, self.tickers, arrays = panel_arrays(df, ["close"] + list(tech_indicator_list))
+        if len(self.tickers) != self.stock_dim:
+            raise ValueError(
+                "stock_dim is {} but the data has {} tickers".format(
+                    self.stock_dim, len(self.tickers)
+                )
+            )
+        if "cov_list" not in df.columns:
+            raise ValueError("Data is missing column 'cov_list' (see add_covariance_matrix)")
+        self.n_days = len(self.dates)
+        self.close_prices = arrays["close"]
+        covs = np.stack(
+            [np.asarray(c, dtype=np.float64) for c in df["cov_list"].groupby(df.index).first()]
+        )
+        tech = [arrays[name][:, np.newaxis, :] for name in self.tech_indicator_list]
+        # (days, stocks + indicators, stocks)
+        self.observations = np.concatenate([covs] + tech, axis=1)
         self._reset_memory()
 
+    @property
+    def data(self):
+        """The rows of ``df`` for the current day."""
+        return self.df.loc[self.day, :]
+
     def _load_day(self):
-        self.data = self.df.loc[self.day, :]
-        self.covs = self.data["cov_list"].values[0]
-        self.state = np.append(
-            np.array(self.covs),
-            [self.data[tech].values.tolist() for tech in self.tech_indicator_list],
-            axis=0,
-        )
+        self.covs = self.observations[self.day, : self.stock_dim]
+        self.state = self.observations[self.day]
 
     def _reset_memory(self):
         self.day = self.start_day
@@ -125,7 +144,7 @@ class StockPortfolioEnv(gym.Env):
         self.portfolio_return_memory = [0]
         # Weights chosen at each day's close (held until the next close).
         self.actions_memory = []
-        self.date_memory = [self.data.date.unique()[0]]
+        self.date_memory = [self.dates[self.day]]
 
     def step(self, actions):
         if self.terminal:
@@ -138,11 +157,10 @@ class StockPortfolioEnv(gym.Env):
         cost = self.portfolio_value * turnover * self.transaction_cost_pct
         self.cost += cost
         self.actions_memory.append(weights)
-        last_day_memory = self.data
 
         self.day += 1
         self._load_day()
-        relative = self.data.close.values / last_day_memory.close.values
+        relative = self.close_prices[self.day] / self.close_prices[self.day - 1]
         portfolio_return = float(np.dot(relative - 1, weights))
         begin_value = self.portfolio_value
         self.portfolio_value = (begin_value - cost) * (1 + portfolio_return)
@@ -150,7 +168,7 @@ class StockPortfolioEnv(gym.Env):
         self.weights = drifted / drifted.sum()
 
         self.portfolio_return_memory.append(self.portfolio_value / begin_value - 1)
-        self.date_memory.append(self.data.date.unique()[0])
+        self.date_memory.append(self.dates[self.day])
         self.asset_memory.append(self.portfolio_value)
         if self.reward_type == "log_return":
             self.reward = float(np.log(self.portfolio_value / begin_value)) * self.reward_scaling
@@ -215,7 +233,7 @@ class StockPortfolioEnv(gym.Env):
         """Portfolio weights chosen on each day, one column per ticker."""
         df_actions = pd.DataFrame(
             np.asarray(self.actions_memory).reshape(-1, self.stock_dim),
-            columns=self.data.tic.values,
+            columns=self.tickers,
         )
         df_actions.index = pd.Index(self.date_memory[:-1], name="date")
         return df_actions
