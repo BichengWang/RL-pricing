@@ -115,7 +115,8 @@ python main.py --mode train --task portfolio --data-source synthetic \
     --end-date 2020-01-01 --agent ppo --timesteps 20000 --seed 0
 ```
 
-`actions.csv` then holds the daily weights instead of share counts. A saved
+`actions.csv` then holds the weights chosen at each day's close (held until
+the next close) instead of share counts. A saved
 portfolio model is backtested like any other (`--mode backtest --model-dir
 ...`). `--hmax` and the turbulence options do not apply to this task, and the
 ensemble supports only `--task trading`.

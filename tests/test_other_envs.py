@@ -35,8 +35,21 @@ def test_portfolio_env(processed):
     assert stats["total_cost"] > 0
     values = env.save_asset_memory()
     assert len(values) == data.index.nunique()
-    weights = env.save_action_memory().to_numpy()
+    weights = env.save_action_memory()
     np.testing.assert_allclose(weights.sum(axis=1), 1.0)
+    # One row per decision, dated by the day it was made, as in StockTradingEnv.
+    assert list(weights.index) == list(values.date.iloc[:-1])
+
+
+def test_portfolio_weights_are_dated_when_chosen(processed):
+    data = data_split(add_covariance_matrix(processed, lookback=60), "2017-01-01", "2017-01-10")
+    env = StockPortfolioEnv(data, 3, 100, 1e6, 0.0, 1e-4, 3, 3, TECH)
+    env.reset()
+    first_day = env.date_memory[0]
+    env.step(np.array([1.0, 0.0, 0.0], dtype=np.float32))
+    weights = env.save_action_memory()
+    assert list(weights.index) == [first_day]
+    assert weights.iloc[0].to_numpy() == pytest.approx(env.softmax_normalization(np.array([1.0, 0, 0])))
 
 
 def test_portfolio_costs_reduce_value(processed):
