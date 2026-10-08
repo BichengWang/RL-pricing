@@ -18,7 +18,7 @@ from rl.autotrain.training import (
 )
 from rl.config import config
 from rl.env.env_stocktrading import StockTradingEnv
-from rl.model.models import MODEL_KWARGS, build_model, make_vec_env
+from rl.model.models import MODEL_KWARGS, DRLEnsembleAgent, build_model, make_vec_env
 from rl.preprocessing.data import data_split
 
 TICKERS = ["AAA", "BBB", "CCC"]
@@ -214,6 +214,32 @@ def test_ensemble_strategy_runs_walk_forward(tmp_path):
     assert account.date.is_unique and account.date.is_monotonic_increasing
     assert account.date.iloc[0] == summary["Val End"].iloc[0]
     assert "ENSEMBLE" in result["stats"].columns
+
+
+def test_ensemble_trading_period_includes_its_first_day(processed):
+    n = processed.tic.nunique()
+    ensemble = DRLEnsembleAgent(
+        df=processed,
+        train_period=("2016-01-01", "2017-06-01"),
+        val_test_period=("2017-06-01", "2017-09-15"),
+        rebalance_window=20,
+        validation_window=20,
+        stock_dim=n,
+        hmax=100,
+        initial_amount=1e6,
+        buy_cost_pct=0.001,
+        sell_cost_pct=0.001,
+        reward_scaling=1e-4,
+        state_space=1 + 2 * n + len(TECH) * n,
+        action_space=n,
+        tech_indicator_list=TECH,
+        print_verbosity=10,
+    )
+    dates = sorted(processed.date[(processed.date >= "2017-06-01") & (processed.date < "2017-09-15")]
+                   .unique())
+    # The start date is a trading day (a Thursday) and must not be skipped.
+    assert dates[0] == "2017-06-01"
+    assert list(ensemble.unique_trade_date) == dates
 
 
 def test_build_model_does_not_mutate_default_kwargs(processed):
