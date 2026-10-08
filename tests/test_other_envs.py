@@ -1,5 +1,3 @@
-import contextlib
-import io
 import warnings
 
 import numpy as np
@@ -97,20 +95,23 @@ def test_portfolio_log_return_reward(processed):
 
 
 @pytest.mark.parametrize("env_class", [StockTradingEnvCashpenalty, StockTradingEnvStopLoss])
-def test_penalty_envs(processed, env_class):
+def test_penalty_envs(processed, env_class, capsys, caplog):
     env = env_class(
         processed,
         daily_information_cols=["open", "close", "high", "low", "volume"] + TECH,
         print_verbosity=10**9,
         patient=True,
     )
-    with contextlib.redirect_stdout(io.StringIO()):
+    with caplog.at_level("INFO", logger=env_class.__module__):
         check_env(env)
         env.reset(seed=3)
         first_start = env.starting_point
         env.reset(seed=3)
         assert env.starting_point == first_start  # seeded random start
         info = run_episode(env, scale=0.1, seed=3)
+    # Episode summaries go to the log, not stdout.
+    assert capsys.readouterr().out == ""
+    assert "TERMINAL_REASON" in caplog.text
     assert "total_assets" in info["episode_stats"]
     values = env.save_asset_memory()
     # Records start on the episode's first date.
