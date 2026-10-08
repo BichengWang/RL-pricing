@@ -1,12 +1,14 @@
+import logging
+
 import numpy as np
 import pandas as pd
 from copy import deepcopy
 import gymnasium as gym
 from gymnasium import spaces
-import matplotlib
-
-matplotlib.use("Agg")
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
+
+
+logger = logging.getLogger(__name__)
 
 
 class StockTradingEnvCashpenalty(gym.Env):
@@ -200,12 +202,12 @@ class StockTradingEnvCashpenalty(gym.Env):
             f"{cash_pct*100:0.2f}%",
         ]
         self.episode_history.append(rec)
-        print(self.template.format(*rec))
+        logger.info(self.template.format(*rec))
 
     def log_header(self):
         if self.printed_header is False:
             self.template = "{0:4}|{1:4}|{2:15}|{3:15}|{4:15}|{5:10}|{6:10}|{7:10}"  # column widths: 8, 10, 15, 7, 10
-            print(
+            logger.info(
                 self.template.format(
                     "EPISODE",
                     "STEPS",
