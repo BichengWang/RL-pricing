@@ -12,6 +12,7 @@ from rl import cli
 from rl.autotrain.training import (
     TrainConfig,
     evaluate_account,
+    prepare_data,
     resolve_turbulence_threshold,
     run_backtest,
     run_training,
@@ -274,8 +275,22 @@ def test_config_validation():
         TrainConfig(agent="lstm", lstm_loss="huber").validate()
     with pytest.raises(ValueError):
         TrainConfig(agent="lstm", leverage=0).validate()
+    with pytest.raises(ValueError, match="start_trade_date"):
+        TrainConfig(start_trade_date="2019-13-01").validate()
     assert TrainConfig().tickers() == config.DOW_30_TICKER
     assert TrainConfig(data_source="csv", data_file="x.csv").tickers() is None
+
+
+def test_config_normalises_dates(tmp_path):
+    cfg = TrainConfig(start_date="2016-1-4", start_trade_date="2017/6/1", end_date="20171201")
+    cfg.validate()
+    assert (cfg.start_date, cfg.start_trade_date, cfg.end_date) == (
+        "2016-01-04", "2017-06-01", "2017-12-01"
+    )
+    # Compared as strings, "2019-1-1" sorts after "2019-09-30" and would have
+    # put most of 2019 in the training period.
+    _, train, trade = prepare_data(small_config(tmp_path, start_trade_date="2017-6-1").validate())
+    assert train.date.max() < "2017-06-01" <= trade.date.min()
 
 
 def test_turbulence_threshold_resolution(processed):
