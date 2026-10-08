@@ -205,7 +205,9 @@ A run named `<run>` (default: timestamp and agent) writes:
 The statistics are those of pyfolio's `perf_stats` (annual return, Sharpe,
 Sortino, Calmar, max drawdown, ...) plus the final account value. The agent is
 always compared with an equal-weight buy-and-hold portfolio and an equal-weight
-portfolio rebalanced monthly, both paying the same transaction costs.
+portfolio rebalanced monthly, both paying the same transaction costs. A
+`--benchmark` index is shown as if the starting capital had been invested in
+it, so its final value is comparable with the agent's.
 
 ### Python API
 
