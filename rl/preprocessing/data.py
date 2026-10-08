@@ -1,5 +1,3 @@
-import datetime
-
 import pandas as pd
 
 
@@ -26,10 +24,3 @@ def data_split(df, start, end):
     data = data.sort_values(["date", "tic"], ignore_index=True)
     data.index = data.date.factorize()[0]
     return data
-
-
-def convert_to_datetime(time):
-    time_fmt = "%Y-%m-%dT%H:%M:%S"
-    if isinstance(time, str):
-        return datetime.datetime.strptime(time, time_fmt)
-    return time
