@@ -118,7 +118,9 @@ class StockPortfolioEnv(gym.Env):
         self.reward = 0.0
         self.portfolio_value = self.initial_amount
         self.cost = 0.0
-        self.weights = np.full(self.stock_dim, 1.0 / self.stock_dim)
+        # The account starts in cash, so the first allocation pays costs on
+        # the whole portfolio, as the baselines' initial purchase does.
+        self.weights = np.zeros(self.stock_dim)
         self.asset_memory = [self.initial_amount]
         self.portfolio_return_memory = [0]
         # Weights chosen at each day's close (held until the next close).
@@ -130,7 +132,8 @@ class StockPortfolioEnv(gym.Env):
             raise RuntimeError("Episode is over; call reset() before step()")
         weights = self.softmax_normalization(np.asarray(actions, dtype=np.float64))
         # Weights drift with prices between rebalances, so rebalancing costs
-        # are charged on the change from the drifted weights.
+        # are charged on the change from the drifted weights (all of the
+        # new weights on the first day, when the account holds only cash).
         turnover = np.abs(weights - self.weights).sum()
         cost = self.portfolio_value * turnover * self.transaction_cost_pct
         self.cost += cost

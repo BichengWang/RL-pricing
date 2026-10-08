@@ -242,7 +242,9 @@ stock and a softmax turns the scores into weights, so no stock gets more than
 about e times the weight of another: the agent tilts away from an equal-weight
 portfolio rather than concentrating in a few names. Between rebalances the
 weights drift with prices; rebalancing pays the transaction cost on the
-difference between the drifted and the new weights.
+difference between the drifted and the new weights. The account starts in
+cash, so the first allocation pays it on the whole portfolio, like the
+baselines' initial purchase.
 
 ## Changes from the 2021 version
 

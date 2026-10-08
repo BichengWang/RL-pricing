@@ -61,6 +61,17 @@ def test_portfolio_costs_reduce_value(processed):
     assert costly.portfolio_value < free.portfolio_value
 
 
+def test_portfolio_first_allocation_pays_costs(processed):
+    data = data_split(add_covariance_matrix(processed, lookback=60), "2017-01-01", "2017-03-01")
+    env = StockPortfolioEnv(data, 3, 100, 1e6, 0.01, 1e-4, 3, 3, TECH)
+    env.reset()
+    # Equal weights from cash: the whole account is invested and pays 1%.
+    env.step(np.zeros(3, dtype=np.float32))
+    assert env.cost == pytest.approx(0.01 * 1e6)
+    relative = env.data.close.to_numpy() / data.loc[0].close.to_numpy()
+    assert env.portfolio_value == pytest.approx(0.99e6 * relative.mean())
+
+
 def test_portfolio_log_return_reward(processed):
     data = data_split(add_covariance_matrix(processed, lookback=60), "2017-01-01", "2017-03-01")
     env = StockPortfolioEnv(data, 3, 100, 1e6, 0.001, 1.0, 3, 3, TECH, reward_type="log_return")
