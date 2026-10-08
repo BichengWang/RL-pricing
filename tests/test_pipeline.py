@@ -12,6 +12,7 @@ from rl import cli
 from rl.autotrain.training import (
     TrainConfig,
     evaluate_account,
+    load_market_data,
     prepare_data,
     resolve_turbulence_threshold,
     run_backtest,
@@ -332,3 +333,16 @@ def test_benchmark_is_scaled_to_the_starting_capital(tmp_path, monkeypatch, raw_
     # Same 10% gain as the agent, so the same final value, not the index level.
     assert stats.loc["Final value", "^DJI"] == pytest.approx(1.1e6)
     assert stats.loc["Cumulative returns", "^DJI"] == pytest.approx(0.1)
+
+
+def test_requested_tickers_without_data_are_reported(tmp_path, raw_prices, caplog):
+    data_file = tmp_path / "prices.csv"
+    raw_prices.to_csv(data_file, index=False)
+    cfg = TrainConfig(
+        data_source="csv", data_file=str(data_file), ticker_list=["AAA", "BBB", "XYZ"],
+        start_date="2016-01-01", start_trade_date="2017-01-01", end_date="2018-01-01",
+    )
+    with caplog.at_level("WARNING", logger="rl.autotrain.training"):
+        df = load_market_data(cfg)
+    assert sorted(df.tic.unique()) == ["AAA", "BBB"]
+    assert "XYZ" in caplog.text and "AAA" not in caplog.text
