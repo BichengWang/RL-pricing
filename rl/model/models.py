@@ -300,14 +300,6 @@ class DRLEnsembleAgent:
             )
         return model
 
-    @staticmethod
-    def get_validation_sharpe(iteration, model_name):
-        """Annualised Sharpe ratio of a saved validation run."""
-        df_total_value = pd.read_csv(
-            f"{config.RESULTS_DIR}/account_value_validation_{model_name}_{iteration}.csv"
-        )
-        return metrics.sharpe_ratio(df_total_value["daily_return"])
-
     def __init__(
         self,
         df,

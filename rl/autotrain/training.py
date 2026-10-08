@@ -771,10 +771,3 @@ def _backtest_lstm(model_dir, cfg, saved):
     result = _lstm_trade(cfg, model, processed, trade, stats, out_dir)
     result.update(run_name=saved["run_name"], model_dir=model_dir, results_dir=out_dir)
     return result
-
-
-def train_one():
-    """
-    train an agent with the default settings
-    """
-    return run_training(TrainConfig())
