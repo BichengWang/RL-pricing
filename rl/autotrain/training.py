@@ -317,6 +317,19 @@ def _to_jsonable(value):
     return str(value)
 
 
+def scale_to_account(prices, initial_value):
+    """Account values of ``initial_value`` invested in a price series on its first day.
+
+    Index levels (e.g. ``^DJI`` around 30,000) are not comparable with an
+    account's value, so the benchmark is shown as if the starting capital had
+    been put into it.
+    """
+    close = prices["close"].to_numpy(dtype=float)
+    return pd.DataFrame(
+        {"date": prices["date"].to_numpy(), "account_value": initial_value * close / close[0]}
+    )
+
+
 def evaluate_account(
     account_value, trade, cfg, out_dir, actions=None, title="Backtest", extra=None
 ):
@@ -343,7 +356,9 @@ def evaluate_account(
             if bench.empty:
                 logger.warning("No benchmark data for %s", cfg.benchmark_ticker)
             else:
-                strategies[cfg.benchmark_ticker] = bench[["date", "close"]]
+                strategies[cfg.benchmark_ticker] = scale_to_account(
+                    bench, float(account_value["account_value"].iloc[0])
+                )
         except Exception as exc:  # network problems should not lose the run
             logger.warning("Could not download benchmark %s: %s", cfg.benchmark_ticker, exc)
 

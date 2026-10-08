@@ -11,6 +11,7 @@ from conftest import TECH
 from rl import cli
 from rl.autotrain.training import (
     TrainConfig,
+    evaluate_account,
     resolve_turbulence_threshold,
     run_backtest,
     run_training,
@@ -274,3 +275,19 @@ def test_saving_a_plot_keeps_the_matplotlib_backend(tmp_path):
     plot_account_values({"A": account}, save_path=str(tmp_path / "plot.png"))
     assert (tmp_path / "plot.png").exists()
     assert matplotlib.get_backend() == backend
+
+
+def test_benchmark_is_scaled_to_the_starting_capital(tmp_path, monkeypatch, raw_prices):
+    from rl.trade import backtest
+
+    trade = data_split(raw_prices, "2018-01-01", "2018-02-01")
+    dates = sorted(trade.date.unique())
+    account = pd.DataFrame({"date": dates, "account_value": np.linspace(1e6, 1.1e6, len(dates))})
+    index_level = pd.DataFrame({"date": dates, "close": np.linspace(25_000.0, 27_500.0, len(dates))})
+    monkeypatch.setattr(backtest, "get_baseline", lambda ticker, start, end: index_level)
+
+    cfg = TrainConfig(agent="a2c", benchmark_ticker="^DJI", initial_amount=1e6)
+    stats = evaluate_account(account, trade, cfg, str(tmp_path))
+    # Same 10% gain as the agent, so the same final value, not the index level.
+    assert stats.loc["Final value", "^DJI"] == pytest.approx(1.1e6)
+    assert stats.loc["Cumulative returns", "^DJI"] == pytest.approx(0.1)
