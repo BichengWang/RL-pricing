@@ -52,7 +52,7 @@ def test_degenerate_inputs_return_nan():
     assert np.isnan(metrics.annual_return(pd.Series([], dtype=float)))
 
 
-def test_backtest_stats_has_pyfolio_fields():
+def test_backtest_stats_has_pyfolio_fields(capsys):
     account = pd.DataFrame(
         {
             "date": pd.bdate_range("2020-01-01", periods=60).strftime("%Y-%m-%d"),
@@ -61,6 +61,7 @@ def test_backtest_stats_has_pyfolio_fields():
     )
     stats = backtest_stats(account)
     assert list(stats.index) == PYFOLIO_STATS
+    assert capsys.readouterr().out == ""  # logged, not printed
     table = compare_stats({"A": account, "B": account.rename(columns={"account_value": "close"})})
     assert list(table.columns) == ["A", "B"]
     assert table.loc["Final value", "A"] == pytest.approx(account.account_value.iloc[-1])

@@ -1,3 +1,4 @@
+import logging
 from copy import deepcopy
 
 import numpy as np
@@ -6,6 +7,8 @@ import pandas as pd
 from rl.config import config
 from rl.marketdata.yahoodownloader import YahooDownloader
 from rl.trade import metrics
+
+logger = logging.getLogger(__name__)
 
 
 def get_daily_return(df, value_col_name="account_value"):
@@ -32,7 +35,7 @@ def backtest_stats(account_value, value_col_name="account_value"):
     """Performance statistics (pyfolio's ``perf_stats`` set) for an account."""
     dr_test = get_daily_return(account_value, value_col_name=value_col_name)
     perf_stats_all = metrics.perf_stats(dr_test)
-    print(perf_stats_all)
+    logger.info("Performance statistics:\n%s", perf_stats_all.to_string())
     return perf_stats_all
 
 

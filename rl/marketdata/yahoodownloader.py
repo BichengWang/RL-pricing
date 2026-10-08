@@ -2,8 +2,12 @@
 Yahoo Finance API
 """
 
+import logging
+
 import pandas as pd
 import yfinance as yf
+
+logger = logging.getLogger(__name__)
 
 
 class YahooDownloader:
@@ -94,8 +98,7 @@ class YahooDownloader:
         # drop missing data
         data_df = data_df.dropna()
         data_df = data_df.reset_index(drop=True)
-        print("Shape of DataFrame: ", data_df.shape)
-        # print("Display DataFrame: ", data_df.head())
+        logger.info("Downloaded %d rows for %d tickers", len(data_df), data_df["tic"].nunique())
 
         data_df = data_df.sort_values(by=['date','tic']).reset_index(drop=True)
 
