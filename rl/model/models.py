@@ -339,9 +339,10 @@ class DRLEnsembleAgent:
         self.train_period = train_period
         self.val_test_period = val_test_period
 
-        self.unique_trade_date = df[
-            (df.date > val_test_period[0]) & (df.date <= val_test_period[1])
-        ].date.unique()
+        # Like data_split: the start date is included and the end date is not.
+        self.unique_trade_date = np.sort(
+            df[(df.date >= val_test_period[0]) & (df.date < val_test_period[1])].date.unique()
+        )
         self.rebalance_window = rebalance_window
         self.validation_window = validation_window
 
