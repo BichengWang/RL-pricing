@@ -28,6 +28,17 @@ AGENTS = ("a2c", "ppo", "ddpg", "td3", "sac")
 TASKS = ("trading", "portfolio")
 
 
+def normalize_date(value, name="date"):
+    """``value`` (a date string or datetime) as a ``YYYY-MM-DD`` string."""
+    try:
+        timestamp = pd.Timestamp(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError("{} is not a valid date: {!r}".format(name, value)) from exc
+    if pd.isna(timestamp):
+        raise ValueError("{} is not a valid date: {!r}".format(name, value))
+    return timestamp.strftime("%Y-%m-%d")
+
+
 @dataclass
 class TrainConfig:
     """Settings for one training / backtest run.
@@ -100,6 +111,12 @@ class TrainConfig:
     verbose: int = 0
 
     def validate(self):
+        """Check the settings and normalise the dates to ``YYYY-MM-DD``."""
+        # Dates are compared as strings throughout the pipeline, so
+        # "2019-1-1" would sort after "2019-09-30" and silently move the
+        # split between training and trading.
+        for name in ("start_date", "start_trade_date", "end_date"):
+            setattr(self, name, normalize_date(getattr(self, name), name))
         if self.task not in TASKS:
             raise ValueError("task must be one of {}".format(TASKS))
         if self.task == "portfolio" and self.agent == "ensemble":
