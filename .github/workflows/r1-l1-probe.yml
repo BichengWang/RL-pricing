@@ -20,7 +20,7 @@ jobs:
       - name: Install system build and MPI libraries
         run: |
           apt-get update
-          apt-get install -y --no-install-recommends build-essential libopenmpi-dev
+          apt-get install -y --no-install-recommends build-essential libopenmpi-dev libgl1 libglib2.0-0
       - name: Download the preregistered authors' revision
         run: |
           curl --fail --location --retry 3 \
