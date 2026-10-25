@@ -1,0 +1,1517 @@
+{
+  "archive_url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+  "authors_repository": [
+    {
+      "path": "FinRL-Trading-5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+      "retrieved_at_utc": "2026-10-25T17:44:52.476776+00:00",
+      "sha256": "b2f98719dd1bc887f29153bdd57d46718464ba2e74011819511e17704c78206f",
+      "size_bytes": 18461261,
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+      "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+    },
+    {
+      "file_count": 184,
+      "files": [
+        {
+          "path": ".devcontainer/Dockerfile",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478062+00:00",
+          "sha256": "1f0101be745cdb32545cf510929ec8e92e883db907b62ae85af93c24fe92bbcb",
+          "size_bytes": 1153,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".devcontainer/devcontainer.json",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478164+00:00",
+          "sha256": "bc8d47daaa07505c9470f7dee32cb4e66a2f58c1077cbb180ad6c031a3b659e6",
+          "size_bytes": 1647,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".gitignore",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478245+00:00",
+          "sha256": "acc350bd999d106351710d161cfcea5b4b5585ea7789bf30929ea9ddd8383f53",
+          "size_bytes": 1858,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".idea/.gitignore",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478339+00:00",
+          "sha256": "a9e54fc4f08bc97d82c04bd86ff37d3af84ba9ef4ad87fcfcb438dab622e8aaa",
+          "size_bytes": 47,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".idea/Deep-Reinforcement-Learning-for-Automated-Stock-Trading-Ensemble-Strategy-ICAIF-2020.iml",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478409+00:00",
+          "sha256": "5e7dcb9c2be24c4fa009e79c426787e0bd2b24995bc04e7a3433e92cc5627848",
+          "size_bytes": 559,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".idea/inspectionProfiles/profiles_settings.xml",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478490+00:00",
+          "sha256": "6172c5997eeb3cd19c9ca2b5b97d6e2983cdd1fa60b2460d7bbb74055edcaa46",
+          "size_bytes": 174,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".idea/misc.xml",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478552+00:00",
+          "sha256": "473096d4507a41e01441edeed8ba180d32b4bd2341ced01ac77a9c69041da969",
+          "size_bytes": 185,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".idea/modules.xml",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478616+00:00",
+          "sha256": "d98bea5ec8eae3bbeedeed152446102eb4ab7964b341fad8a1fe82832fc4cd6c",
+          "size_bytes": 420,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": ".idea/vcs.xml",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478674+00:00",
+          "sha256": "55768f1f84fb117f1d0fc383e180b5d0aa5e5e6584c8c4a2995c15b4237f0972",
+          "size_bytes": 180,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "LICENSE",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478737+00:00",
+          "sha256": "c1a74847ba3264511cb0a74486bd9ed53f1db253616649b0e78cfeb6288d9d45",
+          "size_bytes": 1080,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "README.md",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478816+00:00",
+          "sha256": "0d51269db5bbf07966dba5baef4147c936d999b29ea72c3aa53511df15fddc4b",
+          "size_bytes": 6188,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "__init__.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.478866+00:00",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "backtesting.ipynb",
+          "retrieved_at_utc": "2026-10-25T17:44:52.479887+00:00",
+          "sha256": "ea0193426f5c25fc26fa00b32fa09e21b0d65f28f64022acb0a490616dfeb01d",
+          "size_bytes": 462820,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "config/__init__.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.479950+00:00",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "config/config.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.480007+00:00",
+          "sha256": "065d4841fba8a43888e52c20587bb5463574873b8182b70e2d30f9d3aaa892c5",
+          "size_bytes": 651,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "data/ETF_SPY_2009_2020.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.480312+00:00",
+          "sha256": "b448d10c1f5ae415d2daf32ab2e5b8692bd451694143b354abfb6ce2a9af1242",
+          "size_bytes": 162621,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "data/^DJI.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.480683+00:00",
+          "sha256": "6676701a9ec0a01d8474a89282a0ffdcdd447fd8863988944ec171b2c48d88d3",
+          "size_bytes": 250154,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "data/__init__.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.480727+00:00",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "data/dow30_turbulence_index.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.480916+00:00",
+          "sha256": "844156aff4948a7fae863625f6bd5ecde08ba75b937f07cd7346351f9c01b73c",
+          "size_bytes": 74189,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "data/dow_30_2009_2020.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.488123+00:00",
+          "sha256": "1fa004731c88bc2e202ec30e5f59b4f35cb40ced0566135bdd564fdd8e2a63eb",
+          "size_bytes": 5114942,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "done_data.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.508413+00:00",
+          "sha256": "1969cdec86154daa57df8cafb027defe85693adbaa1883928922780a86052372",
+          "size_bytes": 13026419,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "env/EnvMultipleStock_trade.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.508662+00:00",
+          "sha256": "5e9297480efd6329c1c562e9be2171efeb9e31ba59e8afc40c0145ef6fc09a89",
+          "size_bytes": 10904,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "env/EnvMultipleStock_train.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.508762+00:00",
+          "sha256": "79eb8554747c262ec3fd5f2db81795964474fd6cc9f95a424fc472f44feab657",
+          "size_bytes": 7889,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "env/EnvMultipleStock_validation.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.508862+00:00",
+          "sha256": "dcf50943831599448e2ffe10af222fd614e5f77d7dbf25b1d7ca92313fac37ff",
+          "size_bytes": 9427,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "env/__init__.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.508936+00:00",
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+          "size_bytes": 1,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "figs/data.PNG",
+          "retrieved_at_utc": "2026-10-25T17:44:52.509083+00:00",
+          "sha256": "7d68d798dea94542d5f0e997f35357b1901e66bf55f6284bbc621826506f7a8b",
+          "size_bytes": 25027,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "figs/performance.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.509736+00:00",
+          "sha256": "6664f8816dd1b16cd13f8b626a4c6c2b7ee86e842dc11ffe9f71b3d9ae0c476f",
+          "size_bytes": 274202,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "figs/stock_trading.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.510105+00:00",
+          "sha256": "e4b3a685807ec1913bfc5aa32ce6fb481f2bc91ba2696b298dff596f71016f95",
+          "size_bytes": 137482,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "model/.DS_Store",
+          "retrieved_at_utc": "2026-10-25T17:44:52.510229+00:00",
+          "sha256": "433d191a432ecf0f0dd149fc69ba86423082ecb1d21fb488469f609914c042b8",
+          "size_bytes": 6148,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "model/__init__.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.510284+00:00",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "model/models.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.510391+00:00",
+          "sha256": "8f23d7f93fbdaefb095cf9ffbb6996ff32c9d605852cbdcdb8620bc060b2d738",
+          "size_bytes": 12688,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "preprocessing/__init__.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.510462+00:00",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "size_bytes": 0,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "preprocessing/preprocessors.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.511445+00:00",
+          "sha256": "6db8e3e3377775c431e306113bba8baf30c6a3ef06dd2d08ac673aedc74d13f5",
+          "size_bytes": 4970,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "requirements.txt",
+          "retrieved_at_utc": "2026-10-25T17:44:52.511557+00:00",
+          "sha256": "8b5c150813caa2a7e74577f8eb67db133c6ed73a5feb592f011feb6a91efd32b",
+          "size_bytes": 295,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/.DS_Store",
+          "retrieved_at_utc": "2026-10-25T17:44:52.511676+00:00",
+          "sha256": "8a2f8e2cbce32d637373f812a6aec9731489385cefdf43e355d650d418a00c3c",
+          "size_bytes": 6148,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_1008.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.511795+00:00",
+          "sha256": "9b25debcf5826dbaa9f1488a5d32a50651008bec3834a18ac1bb6f7d4cba7cdc",
+          "size_bytes": 669,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_1071.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.511874+00:00",
+          "sha256": "9b6ff0904eac66ade9d09d24084c30f29e99cf719e108f1f1fb90462146a077f",
+          "size_bytes": 488,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_1134.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.511950+00:00",
+          "sha256": "38ce57d05d038b815dc92041901f994a7d2e89ac7cd08e69e73b644a19b5a889",
+          "size_bytes": 581,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_1197.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512028+00:00",
+          "sha256": "59f919d64ef0fc1b7bce5a70fda224efb0ac51af33147360a420ae696b73b703",
+          "size_bytes": 531,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_126.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512107+00:00",
+          "sha256": "1811b2a8ddec3e0777900a92b4867e94c97ce36806452947e8d17c5129f09fcd",
+          "size_bytes": 1345,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_189.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512180+00:00",
+          "sha256": "e7972f683f6e0f5555cb0c53e32f6da0b8ef1925f69c9108a2e6a2c627ce069b",
+          "size_bytes": 1342,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_252.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512250+00:00",
+          "sha256": "f9f2a3b429c3a77f9ec3e460dfdaa43fb570c6313ca94fb41661f2550be8a51f",
+          "size_bytes": 1346,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_315.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512320+00:00",
+          "sha256": "bb7a34929628a9f722f9de92ca163e95e92cdc72c916060e3898b766389370d9",
+          "size_bytes": 1340,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_378.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512405+00:00",
+          "sha256": "7dc80c33e2891f941c75108147993a6b049bc8be62bc5a7eb7e6d7882eb8dd41",
+          "size_bytes": 1360,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_441.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512480+00:00",
+          "sha256": "5baf500924d1756b26c8d80daa850511eefa26552efaad17c8f7d8b41b1c5d5b",
+          "size_bytes": 1252,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_504.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512554+00:00",
+          "sha256": "e8a2b6be2704c35c87db6db07cee0d9981200b9a9b8680bfe8a915e9fb75fdd1",
+          "size_bytes": 1342,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_567.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512624+00:00",
+          "sha256": "ef4ef2bf74b82501cf6725bd803a970100201d681a040ff6c5ad482f112dfbad",
+          "size_bytes": 1330,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_630.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512688+00:00",
+          "sha256": "ed3e002233f853830c2ff6f55d220b9e3e6d7c327fc0ffd9b05571f06c14c6b0",
+          "size_bytes": 653,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_693.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512763+00:00",
+          "sha256": "63e45bd05e5706f45fb990ebcf88d93cf0c7233be6ef8f36b817bba0203a905c",
+          "size_bytes": 1085,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_756.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512833+00:00",
+          "sha256": "e9aa386502387a7aad2ddcd09496f6cb2de59410880bad62f8ce81a26aac5164",
+          "size_bytes": 1052,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_819.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512900+00:00",
+          "sha256": "71226860fe18ecbb2c75f4217fc00b16d84be8c27f2e495cb0d1f9f698848668",
+          "size_bytes": 562,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_882.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.512983+00:00",
+          "sha256": "fc871009e971461074a924c9b9c8fa8a16101dc18295d19af24882debe334f8a",
+          "size_bytes": 1325,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_rewards_trade_ensemble_945.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513048+00:00",
+          "sha256": "a3374825e5a53b5dcf4e6ed1bd0ced68512c3481748b4a2b6067e85c8e9ffeb7",
+          "size_bytes": 547,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1008.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513113+00:00",
+          "sha256": "270dbbab5dc77281754762db20171164e2d15c9dab62e2d2b3390cdfeb477872",
+          "size_bytes": 1374,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1008.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513255+00:00",
+          "sha256": "c20c6a3e748486d2770b5f1aab0d535cd4d4afb7eb0828600a35fd415e391f77",
+          "size_bytes": 16051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1071.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513338+00:00",
+          "sha256": "0b913dd7a7e1bae24f1ec40d556ca86078974e9e9f3e5c537a4b6a40db9ab4c4",
+          "size_bytes": 1379,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1071.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513478+00:00",
+          "sha256": "93f47d2156a6c9f2f717dfed04aa4b0f0e0e85612fa9dfb8d3428313ebaf8596",
+          "size_bytes": 15756,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1134.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513548+00:00",
+          "sha256": "ffcda70f5aa80cb7feb069982c3e699f42c0863faf08ca38ed4f547f5d7095b5",
+          "size_bytes": 1378,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1134.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513663+00:00",
+          "sha256": "f61a81c052350f45638a048c0b37d200644285799dc16f6bcbe4095f6e5826f1",
+          "size_bytes": 15678,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1197.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513729+00:00",
+          "sha256": "ad58ea6c5d3d2cfb54f421e4e7001eac17b9ca5c276fe44f63828a50a22a2faa",
+          "size_bytes": 1376,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_1197.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513839+00:00",
+          "sha256": "7b996ff010298241a26c62da6654c539ef79d567e03ea24ea23871045cba65af",
+          "size_bytes": 13684,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_126.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.513913+00:00",
+          "sha256": "f1f854a40f344f2fd8188556e32c6d731414d74bdeab456f9e96b7f18ce0eb2c",
+          "size_bytes": 1343,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_126.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514037+00:00",
+          "sha256": "d7ea98f299279b4f6c94fb328387c196286f63346198383665cb4f6124202fb5",
+          "size_bytes": 22067,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_189.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514130+00:00",
+          "sha256": "a3659136a7f758f870512332ba65352d6065c3c73dfd4bb96d37869257e2c591",
+          "size_bytes": 1360,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_189.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514252+00:00",
+          "sha256": "ac0206317f5d7e3e32849d8b41f2b80977b1cd86bd55295989ca6f1be463abd4",
+          "size_bytes": 24485,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_252.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514318+00:00",
+          "sha256": "1df086c6e5be9ec5da922c769c4c1127b9c7a02a4f273c5e0d736853f3041547",
+          "size_bytes": 1361,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_252.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514439+00:00",
+          "sha256": "14fbcc98cf07af848475fcd1e1545029c553635a6f6cd52d8aa783abb9744732",
+          "size_bytes": 22869,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_315.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514502+00:00",
+          "sha256": "09bbcee9c64ec9669a35d5a3af8b16b209c3425e8d0a41776d725260381dc7ca",
+          "size_bytes": 1359,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_315.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514625+00:00",
+          "sha256": "370d29ac6ab8a479ad0462eae04582c6e9dc15b8e1cd2343a5c0a3631f903569",
+          "size_bytes": 21182,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_378.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514697+00:00",
+          "sha256": "11285efbdb16ea9c19ffe2b440887990f988c345da456caac8ecb7faea9fce22",
+          "size_bytes": 1364,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_378.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514810+00:00",
+          "sha256": "072709eab127dfdcd5ee3971be9997771468841e06dba3ddd2136517a3bbbb28",
+          "size_bytes": 21884,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_441.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514872+00:00",
+          "sha256": "2bb28cb6abe7a075c93fddece1675a90c596fc455d90c462e185295d17fd622d",
+          "size_bytes": 1364,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_441.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.514980+00:00",
+          "sha256": "95303cdfd79df48174f9f72caeb75dff18939bfe6e71869ca7dd7203f5c31d6c",
+          "size_bytes": 18827,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_504.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515035+00:00",
+          "sha256": "a4ac53288bcae0c2586910f0cbeecce1d458d975c2e2ce436a9bf1d438fbbec0",
+          "size_bytes": 1357,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_504.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515140+00:00",
+          "sha256": "2f02f5cb9c1d7bf2d634eb2b76497d0e5068d532ab60d78fa97dbd00be54e520",
+          "size_bytes": 19755,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_567.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515200+00:00",
+          "sha256": "1fb9af279a2eaba50e380776bf55bd658c6440a9f5d56cfced0657382d28bb3d",
+          "size_bytes": 1366,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_567.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515296+00:00",
+          "sha256": "02d47d37604e0d51ad62901549e48fe692385b83c4ec716b256f30f33179d91d",
+          "size_bytes": 20166,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_630.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515350+00:00",
+          "sha256": "0e0e8f03944282c2fe79b0b7555a34673ae9679fb15781869878d46b7947d6d1",
+          "size_bytes": 1376,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_630.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515442+00:00",
+          "sha256": "6a168cf598ade1ce5826f13b1645e90d3627329ec70843a77df3845bc3b60711",
+          "size_bytes": 16901,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_693.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515497+00:00",
+          "sha256": "d7a8c9649425df903510b096bea8178493c941dbcc6f825fd7242df65e3e1a70",
+          "size_bytes": 1363,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_693.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515601+00:00",
+          "sha256": "f23be0562088d48553e079119a4269135bed8f9b451422ba84ea143d3b660622",
+          "size_bytes": 21257,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_756.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515658+00:00",
+          "sha256": "c7af636e2e45cc08fbc6d331945cd57c394fd9cc85ba49ce9596ef371dfdebd0",
+          "size_bytes": 1361,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_756.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515749+00:00",
+          "sha256": "ad25323bc6d29cfd40496a3cd5e6338a3c180a53b219c2f2413d7eedcd1a1347",
+          "size_bytes": 18359,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_819.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515802+00:00",
+          "sha256": "d449f440a5768b5f779cb0a6b9e6d007d1f90bf4d4305ef0c247967a0ac51538",
+          "size_bytes": 1373,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_819.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515905+00:00",
+          "sha256": "241a4e0c56208d100563ec0277c410c97efe41fc5f771c3930a1730b0c776942",
+          "size_bytes": 14328,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_882.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.515970+00:00",
+          "sha256": "868e2152f432af22ced6bba9740d0102690bd8f8741367bbdbe5177595863194",
+          "size_bytes": 1353,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_882.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516096+00:00",
+          "sha256": "cc966602895c7fbbeb6f03fc2afbb925a64ea8a0556181c16c03de88a14400e1",
+          "size_bytes": 22794,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_945.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516160+00:00",
+          "sha256": "4e9a6eea97672b44e9b88bb50c3e2ea632ff4dfe378cbc1368997b0a070e4e41",
+          "size_bytes": 1320,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_trade_ensemble_945.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516265+00:00",
+          "sha256": "8b2f4f4da8b6f0713e32a5116373ee8004350ab7ce084cb544255520240ec43c",
+          "size_bytes": 13985,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_train.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516436+00:00",
+          "sha256": "f6ecdd0ccf9bd1ef8bf38dc58938e5a9fef70ad15f8601135826b4fcc953dd20",
+          "size_bytes": 64358,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_train.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516542+00:00",
+          "sha256": "378a6e095fac1c0e44b1cf40e83e45a1d810871906012c4851bd3e67bc3d8cb6",
+          "size_bytes": 20399,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1008.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516596+00:00",
+          "sha256": "2c8998abae051c675804d6338f6ba7b33b6915221f9e9f6b5166a8bfc6f63f39",
+          "size_bytes": 1313,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1008.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516697+00:00",
+          "sha256": "215e09ec798239800769602cb362a14912eef8a1bde5f29b515befa0e465bf18",
+          "size_bytes": 16240,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1071.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516755+00:00",
+          "sha256": "1f956f66e40edb59aba6753908c1c77a532d352adf79b113acb6edcdaaaccede",
+          "size_bytes": 1366,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1071.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516844+00:00",
+          "sha256": "c83bcac6c8e657ea86893edd6d1c098c4dd1f1874b3bdcfcc50122879231ce52",
+          "size_bytes": 16462,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1134.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516900+00:00",
+          "sha256": "8c3435561c5886b87a4e872edc9422b2bba7eafd7eb2223d191cac4320a147f0",
+          "size_bytes": 1308,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1134.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.516993+00:00",
+          "sha256": "90a19caf1545b3f0f7df520c8aee8347a8db019de332a4a9178c6038dae58c82",
+          "size_bytes": 18759,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1197.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517046+00:00",
+          "sha256": "b2b97460e07904ad66d8e43b8c4c4855a26301550216aea0d91da316df91b16e",
+          "size_bytes": 1285,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_1197.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517146+00:00",
+          "sha256": "f0d84549bf63f8a070837c5eade0a1c28113777c27187f8459a84cd4d2fa084f",
+          "size_bytes": 13783,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_126.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517206+00:00",
+          "sha256": "6a275252d35b310db238d4e3536c3e088c32fa0b428fa75c19592638fad796be",
+          "size_bytes": 1356,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_126.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517321+00:00",
+          "sha256": "e3a488db9fb50749131a1ded6dc5ddbeff293eb0fe77522c43a5d7df46d7574e",
+          "size_bytes": 23890,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_189.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517376+00:00",
+          "sha256": "815360beaf99a7683a004cc6f3f4f3399abbf842ec372f76fd285bba2490c646",
+          "size_bytes": 1313,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_189.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517477+00:00",
+          "sha256": "3ee4c5a40a95d72606c63067566b405289c0de54191732c1a6671c95e4a381c4",
+          "size_bytes": 20649,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_252.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517532+00:00",
+          "sha256": "982dc91f03bdd7ad03aeca2b3b035e623296d341024d1c119638bd77f76261cf",
+          "size_bytes": 1332,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_252.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517640+00:00",
+          "sha256": "2b76203ca83e13a4670199fd5b322ed0a32c90d664b0596b2b4507085ac9577e",
+          "size_bytes": 24448,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_315.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517697+00:00",
+          "sha256": "ed522b9428db955f9169bd35384b5891f45763989ccd1f2afaab86746526343f",
+          "size_bytes": 1346,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_315.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517814+00:00",
+          "sha256": "f5546f9cc445df4a3b35f87cfb3967dca43c2f102ebf58a59ab481db94028c42",
+          "size_bytes": 29002,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_378.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517871+00:00",
+          "sha256": "da7237b9de79a760a2aceea7a1ebaaeba2e18e3fef1fb05016f65a1f7a6b5e9c",
+          "size_bytes": 1339,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_378.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.517977+00:00",
+          "sha256": "bcbb587aa9ebbcc094dfa7a504220fc055eabd5ed8c01d2450c9fc091ee16250",
+          "size_bytes": 18724,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_441.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518033+00:00",
+          "sha256": "bc81fbe9872967ffa379ca5bb59d8f923e2ea767471a5cfe025f4450658b628f",
+          "size_bytes": 1357,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_441.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518146+00:00",
+          "sha256": "c2466153504446dc74201008c8d05ddf592964ac2005bbfff98a3693648f5461",
+          "size_bytes": 21898,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_504.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518210+00:00",
+          "sha256": "7a3abb438ddc09bbb10c97dee08d980990c50f219dc88e8a8dbf32e00ce1d456",
+          "size_bytes": 1349,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_504.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518311+00:00",
+          "sha256": "ef0dea4870b86aff1e7af761e2a8f08a0b9d460ffbdc6547e8c0b08a599bef93",
+          "size_bytes": 18000,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_567.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518367+00:00",
+          "sha256": "89038eacf2e8f34048186f83dadfa8f77026875bb476f466996e93c880847d6c",
+          "size_bytes": 1314,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_567.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518468+00:00",
+          "sha256": "c06c0953d1310f065558196541c1463017c55f1fcdc697ccfd9162166c145ec9",
+          "size_bytes": 21930,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_630.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518521+00:00",
+          "sha256": "4adf92765cd7fe199e9b1dff7a86c3b7466c547b6f2d70d2a9678e98a35424a1",
+          "size_bytes": 1347,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_630.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518624+00:00",
+          "sha256": "449fa6d3f978779723f7f3a4af73ccfbd4f1812e4b9573cf8009c3a52fc41a67",
+          "size_bytes": 21035,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_693.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518773+00:00",
+          "sha256": "c8aa1b8ca2970b8d93f9e915fc920c7075d2f931089fd4c6fe134aa95a8385d2",
+          "size_bytes": 1359,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_693.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518871+00:00",
+          "sha256": "858370cd2a20f8a85cf2d765582e29b5ef0b9d2f448f60d9a581b9621b75954c",
+          "size_bytes": 20443,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_756.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.518927+00:00",
+          "sha256": "e2664b780a2a67dbdee6ad758d01381b94f963fa39d22e319f7bcac9bfc46494",
+          "size_bytes": 1363,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_756.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519023+00:00",
+          "sha256": "5db1bb0ad37f857d5333f9029a645cb78d6b4b4f3d006c9f730c77c3ad26bcea",
+          "size_bytes": 20017,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_819.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519077+00:00",
+          "sha256": "7a75c28b004c0164ff1ceb8aa681fd7dd87da755a3ac505848dc31c23f7257c9",
+          "size_bytes": 1349,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_819.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519176+00:00",
+          "sha256": "b92a058a0cc657b4ae2c708b3ad9ae654975e10097c8ea8af721b9fb44ab4e54",
+          "size_bytes": 20899,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_882.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519238+00:00",
+          "sha256": "c862bff94ebf3b723d1f0a432e85d1d9e10812d01fd24f2f8cbb70a577af5072",
+          "size_bytes": 1300,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_882.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519351+00:00",
+          "sha256": "8858201130aa853fea93175ac53200789d52a8faa8f1d06a5b82333e938a4d0a",
+          "size_bytes": 24266,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_945.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519408+00:00",
+          "sha256": "29f1124cf926573e4cb89805ed887a024c935ce35210af90851074764c18623d",
+          "size_bytes": 1357,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/account_value_validation_945.png",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519505+00:00",
+          "sha256": "34abb37d84d34a404e98289df25cdc687a7de88a2c6aedcdd6fe3670e30454f8",
+          "size_bytes": 17496,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "results/firstRun/last_state_ensemble_62.csv",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519569+00:00",
+          "sha256": "6405e73e415979726236d7b05601d913d152c8d92288909292c60e1f6da12fbe",
+          "size_bytes": 2583,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "run_DRL.py",
+          "retrieved_at_utc": "2026-10-25T17:44:52.519629+00:00",
+          "sha256": "6f46c4f157951c610b0ec00cc31307d18ec8fe6e2266a93d14b1556fab19c7d6",
+          "size_bytes": 1543,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_1008.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.520070+00:00",
+          "sha256": "02c410c343f62c266f418ae22c1c607b50456a7b09f89cecf8e82ae583ff8594",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_1071.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.520455+00:00",
+          "sha256": "197f794f04f2eb547176c6ad2d50491eab53c2e28515305d5720103ba1b20093",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_1134.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.520832+00:00",
+          "sha256": "add5ba73f5f40f63280cdc684981fd1272d3daf4b98e79f78de53e6d88c6d079",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_1197.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.521223+00:00",
+          "sha256": "de85c9417d3479b5ef0446fe6e117e67839adcba66a67a8ddeae675ed2b7061d",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_126.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.521650+00:00",
+          "sha256": "815f514e30c923aa047409aaa5a85c2fdfcf8b95348cedb8cf17628302b523f3",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_189.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.522032+00:00",
+          "sha256": "efaf00a49fbe471cd21395f571d50138e18a774d9d8e8d4480019b822f790402",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_252.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.522413+00:00",
+          "sha256": "b6eebe09f3c872a7de1e2b31b840e0630171224ff026614151953d0c317f9e1e",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_315.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.523682+00:00",
+          "sha256": "7d4d4377ef4ddb63fe142a7ff0edc17323cf0e80b0c2d62f57efc29425dceb1f",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_378.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.524072+00:00",
+          "sha256": "a8df7c19a31012d27fc6ead18471d5c754172b47edccfff822485aac1b11dc3c",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_441.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.524483+00:00",
+          "sha256": "1f821addfcf1371b7b0282ba2503eb3818b11ccdfdad15e0c030d4657ee64464",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_504.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.524879+00:00",
+          "sha256": "76c7b548e5e3dc3cedb002f69f92b1aef9085dd969bc14fe758d4a75715a7aa8",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_567.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.525290+00:00",
+          "sha256": "94d679659cf4ddb47cc8dcde9fe7a5b6debed3288f155af73bd6592df39cb25a",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_630.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.525684+00:00",
+          "sha256": "f8fdccf9585524419ece37473187c57ce657d8b63f95f018eaeafbdbd6ad3486",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_693.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.529528+00:00",
+          "sha256": "6eeec824cc1f76a4fc5ef2bd7cb8064e6235eb92544a84a00315b03f3a66218f",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_756.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.530273+00:00",
+          "sha256": "206bdfb98911c4ae14135a676a72c7bc74073aeb979ebe077290443618f22a22",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_819.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.530738+00:00",
+          "sha256": "18adf8d637654ee0542df66173e3fb07b5b31501d0429bc19ccae8fdd1dfd0cb",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_882.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.531357+00:00",
+          "sha256": "b3caf4db765f8da4c58c5cb16f5b1b8a097f8740a48b1a0e654f072ed2bfaf4d",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/A2C_30k_dow_945.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.531755+00:00",
+          "sha256": "944a44ca28bbc586579f6d1809a5836ff104113f851bf9a46eff757588c3f6a1",
+          "size_bytes": 157051,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_1008.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.533084+00:00",
+          "sha256": "e5cc675082d6d24e6e808389130e22563e77eff6b078614c30c32bf17c7edc48",
+          "size_bytes": 304796,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_1071.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.533792+00:00",
+          "sha256": "b365fafcaaf06b0d632feb8968d58dcb5a93f276c2e7802a7f793b12c3adf24c",
+          "size_bytes": 304796,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_1134.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.534505+00:00",
+          "sha256": "da64a4cafb696675a3fa9eab6914d3db303fdb87b6bdb7d8830b96a5214bfbbd",
+          "size_bytes": 304923,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_1197.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.535199+00:00",
+          "sha256": "e355b5aabee6e7b11b4cbd61621e830f491b4dddf736dcb24cfecfba4a4fc144",
+          "size_bytes": 304795,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_126.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.535904+00:00",
+          "sha256": "9f9e80dcbcb7a7c6814063b3bde4e629c058bd77c5d4303d8aface7c5430960e",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_189.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.536598+00:00",
+          "sha256": "fdb5eb3ed420360ad064b00bd21caffdf2bb9baa5d2206b56a1c751e9a0d1ffc",
+          "size_bytes": 304795,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_252.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.537297+00:00",
+          "sha256": "5bbc893bf9b8b3342d8a6fd3e9308d342bfd958986e0d33ba4abee64251800e5",
+          "size_bytes": 304795,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_315.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.538021+00:00",
+          "sha256": "fdea79475c2de8dfbe2ec3f893b34c02cdc28537b2cc18035733495955217bc0",
+          "size_bytes": 304796,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_378.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.538722+00:00",
+          "sha256": "b69b7f9a7da0bdc285bc43fe986fc013d24f11df2b09332d46291e7626650b96",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_441.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.539413+00:00",
+          "sha256": "ad80be415a13aa864bc9c15f705a9866afd56000b27a46079338ffdbad7e7725",
+          "size_bytes": 304796,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_504.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.540116+00:00",
+          "sha256": "b5eaee02ad2a70f98287e4980f644f8240ee010d81d29a1648848ddcb63e398d",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_567.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.540799+00:00",
+          "sha256": "7d637656f811570d5b30147eec7106b1d9a27f8c285514b648238eb0b1c1a8de",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_630.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.541484+00:00",
+          "sha256": "05c08a6e5f95c6e0bcc29a00fec7719a155982b026d9d8de9482a8583607db99",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_693.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.542341+00:00",
+          "sha256": "8d1abb215216750de9f3588ef96e0852349b7bbddeaf3ca09dbba1465a213806",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_756.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.543034+00:00",
+          "sha256": "689308b3dabe927a28124d4593d90bedbf60412fe68cf8ec34700bcb6ae37295",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_819.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.543726+00:00",
+          "sha256": "d441891b6c9dc616c6dff9c33666a971439a1ad09e00c70d74695f2ef9fd5780",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_882.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.544419+00:00",
+          "sha256": "98c3cf06de7b87783239b498e33ec4533d864b6f90560462d1a544a8ae2e1694",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/DDPG_10k_dow_945.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.545117+00:00",
+          "sha256": "a840669add6e6d94199ab4c4a97bcdf85eed7c391f60ea09ef567f021e04f928",
+          "size_bytes": 304797,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_1008.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.545515+00:00",
+          "sha256": "f2bc7da3193071a2bb3823b19f32b34953a7d5edef2c9d7446fefde32f4ca881",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_1071.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.545913+00:00",
+          "sha256": "b00d0a2a0d323456140162bd492b59dec7f4bd856c000859fbbee5cbe21382e8",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_1134.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.546293+00:00",
+          "sha256": "5a0f6293d6c26c72fe9607f976c8f7ea17950f08dfc041ef7f9bf0ce178c288a",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_1197.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.546682+00:00",
+          "sha256": "d231177530e12a5e29cdf477b20811c0f68283a292a01e5298fa78d05c6e8240",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_126.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.547080+00:00",
+          "sha256": "12ef2bb94e0253cdcfc07e1517e75b661a5d1d389e889beefdea668de97fc13b",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_189.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.547479+00:00",
+          "sha256": "3736c2fbf558ef6078523a4eda43557e3fb8a4391ce914a587693a30972960ab",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_252.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.547871+00:00",
+          "sha256": "3307109c019ea39ed2f5f9d95af7a19befc26345b25a7268aa743d0889dbb1b7",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_315.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.548255+00:00",
+          "sha256": "8ccb582eca2d3bf70b1959e230c2bcf1b38bda89e2168427a0fbfd15d99380be",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_378.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.548653+00:00",
+          "sha256": "8fcd0aa76dc29378f9a77aa961e82191538c816064cef2d8d294e3d9feac5b19",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_441.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.549041+00:00",
+          "sha256": "9f120b4bc02734bfd308685793fa6946a8a8d519d624e42f0d2683f1dfbfb5e2",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_504.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.549437+00:00",
+          "sha256": "283d3f26d81157fa678386dfc7c3793cded03ab14c55dd4a2a3a62aa26843610",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_567.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.549821+00:00",
+          "sha256": "2e0477a2aca71a6a1c9d11f04bef89e47a64231f111bed14f8a79dfed1f86d00",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_630.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.550208+00:00",
+          "sha256": "1a771b2c55b5390c11e95e8554c80f757aae395775d2975a8d83444a886d1434",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_693.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.550593+00:00",
+          "sha256": "e9252c4fe17992a9f306a6a5c035768a170b1a24bdd5d673e05478d4b77c85b3",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_756.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.550970+00:00",
+          "sha256": "3469ac4aa48bf77d0d7d76625b0bbee4acdaf03d9ca9d6d611aa0457f8648905",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_819.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.551358+00:00",
+          "sha256": "d4df560d375f07e1a244c3c3d721ea1fdf46a2ce8a5d0969a525b16d9e761659",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_882.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.551740+00:00",
+          "sha256": "90c8562743831de1366285992be8937579c85baea654da3d5e00144837588159",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/PPO_100k_dow_945.zip",
+          "retrieved_at_utc": "2026-10-25T17:44:52.552124+00:00",
+          "sha256": "d9da03ea8ccf2d0fce57b226b05b1bd794ddcba8c210577feaf40456099cbc27",
+          "size_bytes": 159324,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        },
+        {
+          "path": "trained_models/firstRun/firstRun.txt",
+          "retrieved_at_utc": "2026-10-25T17:44:52.552242+00:00",
+          "sha256": "3428d19fd4648140aa8a9e49417bb1757abadd03f78988c3ce97989e8510a328",
+          "size_bytes": 14451,
+          "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+          "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+        }
+      ],
+      "path": "FinRL-Trading@5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc",
+      "url": "https://github.com/AI4Finance-Foundation/FinRL-Trading/archive/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc.zip",
+      "version": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc"
+    }
+  ],
+  "cache_directory": ".cache/r1-finrl-ensemble (local, untracked)",
+  "commit": "5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc",
+  "description": "R1 FinRL ensemble source and Yahoo baseline input hashes. Raw downloads are excluded from git.",
+  "repository": "https://github.com/AI4Finance-Foundation/FinRL-Trading",
+  "retrieved_at_utc": "2026-10-25T17:44:55.072791+00:00",
+  "schema_version": 1,
+  "yahoo_data": [
+    {
+      "path": "yahoo-DJI.json",
+      "retrieved_at_utc": "2026-10-25T17:44:52.806376+00:00",
+      "sha256": "3adb14f378493463816406f61376d035e85cbb50ec19a4916c69b807b7ca8be3",
+      "size_bytes": 409979,
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/%5EDJI?period1=1230768000&period2=1767312000&interval=1d&events=history&includeAdjustedClose=true",
+      "version": "Yahoo chart API, daily, 2009-01-01 through 2025-12-31"
+    },
+    {
+      "path": "yahoo-DIA.json",
+      "retrieved_at_utc": "2026-10-25T17:44:54.072422+00:00",
+      "sha256": "396d0c9e16a4c1af987e751dbf2ff0dcff64d65e7c9cc3ec2d3b12c6bf5ba0ed",
+      "size_bytes": 467172,
+      "url": "https://query1.finance.yahoo.com/v8/finance/chart/DIA?period1=1230768000&period2=1767312000&interval=1d&events=history&includeAdjustedClose=true",
+      "version": "Yahoo chart API, daily, 2009-01-01 through 2025-12-31"
+    }
+  ]
+}

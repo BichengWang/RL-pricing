@@ -1,0 +1,43 @@
+name: R1 L1 build probe
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/scripts/r1_l1_smoke.py"
+      - ".github/workflows/r1-l1-probe.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  authors-build:
+    runs-on: ubuntu-latest
+    container: python:3.7
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system build and MPI libraries
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential libopenmpi-dev
+      - name: Download the preregistered authors' revision
+        run: |
+          curl --fail --location --retry 3 \
+            https://api.github.com/repos/AI4Finance-Foundation/FinRL-Trading/zipball/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc \
+            --output "$RUNNER_TEMP/authors.zip"
+          mkdir "$RUNNER_TEMP/authors"
+          unzip -q "$RUNNER_TEMP/authors.zip" -d "$RUNNER_TEMP/authors"
+          echo "AUTHORS_DIR=$(find "$RUNNER_TEMP/authors" -mindepth 1 -maxdepth 1 -type d)" >> "$GITHUB_ENV"
+      - name: Install the authors' Python 3.7 requirements
+        working-directory: ${{ runner.temp }}
+        run: |
+          sed 's/^stable-baselines\[mpi\]$/stable-baselines[mpi]==2.10.1/' \
+            "$AUTHORS_DIR/requirements.txt" > "$RUNNER_TEMP/requirements.txt"
+          python -m pip install --upgrade 'pip<24.1'
+          python -m pip install -r "$RUNNER_TEMP/requirements.txt"
+      - name: Import dependencies and build the authors' training entry point
+        working-directory: ${{ env.AUTHORS_DIR }}
+        run: |
+          python -c 'import gym, stable_baselines, tensorflow; print("gym", gym.__version__, "stable-baselines", stable_baselines.__version__, "tensorflow", tensorflow.__version__)'
+          python "$GITHUB_WORKSPACE/.github/scripts/r1_l1_smoke.py"
