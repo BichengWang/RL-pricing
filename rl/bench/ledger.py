@@ -3,9 +3,9 @@
 Some strategies cannot be replayed or frozen (an LLM agent's output depends on
 live news and a non-deterministic model), so they are scored on decisions
 committed *before the fact*. A scheduled GitHub Actions workflow
-(``.github/workflows/ledger.yml``) calls :func:`record_all` once a day. Each
-submission whose ``submission.json`` lists the task under ``"ledger"`` gets one
-entry per decision session::
+(``.github/workflows/ledger.yml``) calls :func:`record_all` three times each
+weekday. Each submission whose ``submission.json`` lists the task under
+``"ledger"`` gets one entry per decision session::
 
     submissions/<id>/ledger/<task>/<decision_date>.json
 
@@ -24,9 +24,15 @@ Recording (:func:`record_decision`)
     * Optional policy attributes read after ``act``: ``last_cost_usd`` (spend of
       the call, counted against the budget) and ``ledger_inputs`` (JSON-able
       provenance: model ids, agent commit, raw decision...).
+    * An LLM submission requires ``OPENAI_API_KEY``, ``FRED_API_KEY``,
+      ``SEC_EDGAR_USER_AGENT`` and a monthly budget cap. Its policy is built
+      before recording even a budget hold, so missing credentials, a mismatched
+      TradingAgents pin or graph construction failure writes no entry. Other
+      participants still record, and the command reports failure.
     * If this month's summed ``cost_usd`` of the submission is at or above
       ``LEDGER_MONTHLY_BUDGET_USD`` the entry is a hold with reason
-      ``"budget cap"`` and the policy is not built. A policy that raises (or
+      ``"budget cap"`` (non-LLM policies are not built). Baselines cost nothing
+      and ignore the cap. A policy whose ``act`` raises (or
       returns weights the engine rejects) yields a hold with reason
       ``"error: ..."``. A policy that cannot even be constructed is an
       infrastructure failure: nothing is written, so the job fails visibly
@@ -49,7 +55,7 @@ Scoring (:func:`score_ledger`)
     (``github(path) -> dict | None``, ``None`` for a 404, raising on any other
     failure so a flaky API cannot silently lower a score).
 
-Crypto note: Binance sessions open at 00:00 UTC, so a daily 12:00 UTC job
+Crypto note: Binance sessions open at 00:00 UTC, so the weekday morning job
 decides after the open of the day's session and its entries cannot verify.
 """
 
@@ -251,11 +257,21 @@ def record_decision(
         "run": _run_identity(run, now),
         "created_at": runner._utc(now),
     }
-    cap = _cap(budget)
+    cap = None if submission.kind == "baseline" else _cap(budget)
+    policy = None
+    if submission.kind == "llm":
+        missing = [name for name in ("OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT")
+                   if not os.environ.get(name, "").strip()]
+        if cap is None:
+            missing.append(BUDGET_ENV)
+        if missing:
+            raise ValueError("LLM ledger preflight requires {}".format(", ".join(missing)))
+        policy = runner.build_policy(submission, task)
     if cap is not None and month_cost(submission, entry["created_at"][:7], root=root) >= cap:
         entry["reason"] = "budget cap"
     else:
-        policy = runner.build_policy(submission, task)
+        if policy is None:
+            policy = runner.build_policy(submission, task)
         targets, invalid = _targets(entries, history.tickers)
         for date, reason in invalid.items():
             log.warning("%s on %s: entry %s treated as a hold (%s)", submission.id, task.id, date, reason)

@@ -6,13 +6,16 @@ import io
 import json
 import urllib.error
 from argparse import ArgumentParser
+from pathlib import Path
 
 import numpy as np
 import pytest
 
-from rl.bench import ledger, leaderboard, runner
+from rl.bench import cli, ledger, leaderboard, monthly, runner
 from rl.bench.data import load_task_data
 from rl.bench.engine import simulate
+from rl.bench.market import FIELDS
+from rl.bench.policies import tradingagents as ta
 from rl.bench.policy import Policy
 from rl.bench.submission import Submission
 from rl.bench.tasks import get_task
@@ -67,7 +70,7 @@ def clean(monkeypatch):
     CALLS.clear()
     for name in (
         "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_REPOSITORY", "GITHUB_WORKFLOW_REF",
-        "GITHUB_TOKEN", ledger.BUDGET_ENV,
+        "GITHUB_TOKEN", ledger.BUDGET_ENV, "OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -330,6 +333,103 @@ def test_policy_returning_none_is_a_hold_without_reason(tmp_path, data):
     idle = make_submission(tmp_path / "s", "idle", "test_bench_ledger:Idle")
     entry = load(record(idle, data, [BASE])[0])
     assert entry["hold"] is True and entry["weights"] is None and entry["reason"] is None
+
+
+def copy_participant(root, sub_id):
+    source = Path(__file__).resolve().parents[1] / "submissions" / sub_id / "submission.json"
+    directory = root / sub_id
+    directory.mkdir(parents=True)
+    (directory / "submission.json").write_bytes(source.read_bytes())
+    return Submission.load(directory)
+
+
+@pytest.mark.parametrize("missing,cap,commit", [
+    ("OPENAI_API_KEY", "40", ta.PINNED_COMMIT),
+    ("FRED_API_KEY", "40", ta.PINNED_COMMIT),
+    ("SEC_EDGAR_USER_AGENT", "40", ta.PINNED_COMMIT),
+    (None, None, ta.PINNED_COMMIT),
+    (None, " ", ta.PINNED_COMMIT),
+    (None, "nan", ta.PINNED_COMMIT),
+    (None, "-1", ta.PINNED_COMMIT),
+    (None, "40", "0" * 40),
+    (None, "40", None),
+    ("OPENAI_API_KEY", "0", ta.PINNED_COMMIT),  # preflight also precedes budget holds
+    (None, "0", "0" * 40),
+])
+def test_llm_preflight_failure_writes_no_entry_but_canary_records(
+    tmp_path, data, monkeypatch, capsys, missing, cap, commit,
+):
+    root = tmp_path / "submissions"
+    # This participant sorts before the canary, proving failure doesn't stop later pairs.
+    paid = copy_participant(root, "tradingagents")
+    paid.directory.rename(root / "aaa-paid")
+    canary = copy_participant(root, "ledger-canary")
+    for name in ("OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT"):
+        if name != missing:
+            monkeypatch.setenv(name, "test-only")
+    if cap is not None:
+        monkeypatch.setenv(ledger.BUDGET_ENV, cap)
+    monkeypatch.setattr(ta, "installed_commit", lambda: commit)
+
+    def single_asset(task, supplied, **kwargs):
+        panel = data.rows(0, BASE + 1)
+        return dataclasses.replace(panel, tickers=task.tickers,
+                                   **{k: getattr(panel, k)[:, :1] for k in FIELDS})
+
+    monkeypatch.setattr(runner, "_data_for", single_asset)
+
+    assert cli.main(["ledger", "record", "--submissions-root", str(root)]) == 1
+    output = capsys.readouterr()
+    expected = missing or ("pins" if commit != ta.PINNED_COMMIT else ledger.BUDGET_ENV)
+    assert expected in output.err
+    assert not (root / "aaa-paid" / "ledger").exists()
+    [path] = list((canary.directory / "ledger").glob("*/*.json"))
+    entry = load(path)
+    assert entry["task"] == "us-aapl" and entry["cost_usd"] == 0
+    assert entry["hold"] is False and entry["weights"] == {"AAPL": 1.0}
+
+
+def test_llm_graph_construction_failure_writes_nothing(tmp_path, data, monkeypatch):
+    sub = dataclasses.replace(make_submission(tmp_path), kind="llm")
+    for name in ("OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT"):
+        monkeypatch.setenv(name, "test-only")
+
+    def broken(*args):
+        raise RuntimeError("graph setup failed")
+
+    monkeypatch.setattr(runner, "build_policy", broken)
+    with pytest.raises(RuntimeError, match="graph setup failed"):
+        ledger.record_decision(TASK, sub, data=data, budget=40)
+    assert not (sub.directory / "ledger").exists()
+
+
+def test_canary_five_sessions_match_direct_engine_and_render_as_baseline(tmp_path, data):
+    sub = copy_participant(tmp_path / "submissions", "ledger-canary")
+    task = get_task("us-aapl")
+    assert sub.kind == "baseline" and sub.ledger == (task.id,) and task.tickers == ("AAPL",)
+    single = dataclasses.replace(data, tickers=task.tickers, **{k: getattr(data, k)[:, :1] for k in FIELDS})
+    indices = range(BASE, BASE + 5)
+    paths = record(sub, single, indices, task=task, budget=0)
+    assert all(load(p)["cost_usd"] == 0 for p in paths)
+    assert load(paths[0])["weights"] == {"AAPL": 1.0}
+    assert all(load(p)["hold"] for p in paths[1:])
+    before = [p.read_bytes() for p in paths]
+    assert record(sub, single, indices, task=task, budget=0) == paths
+    assert [p.read_bytes() for p in paths] == before
+
+    board = tmp_path / "board"
+    path = ledger.score_ledger(task, sub, data=single.rows(0, BASE + 6), out_root=board,
+                               github=honest_github(single, indices), repository=REPO)
+    record_ = load(path)
+    policy = runner.build_policy(sub, task)
+    reference = simulate(single.rows(0, BASE + 6), policy.act, start=BASE + 1,
+                         transaction_cost=task.transaction_cost)
+    assert_same_equity(record_, reference)
+    assert record_["fit"]["verified"] == 5
+    assert "Ledger canary (1/N)" in leaderboard.render_markdown(leaderboard.build(board))
+    entry = monthly._entry(record_, "2020-01-01")
+    text = monthly.render_markdown("2019-12", "2019-12-31", [entry], None, None)
+    assert "| Ledger canary (1/N) (ledger) | baseline |" in text
 
 
 # --- verification ----------------------------------------------------------------

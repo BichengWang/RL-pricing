@@ -1,15 +1,16 @@
 name: ledger
 
 # Commits one decision per submission and task before each session opens.
-# 12:00 UTC is before the US open (13:30 UTC in summer, 14:30 UTC in winter);
-# weekends and holidays find the latest session already recorded and do nothing.
+# Weekdays at 04:17, 07:17 and 10:17 UTC leave room for scheduler delays before
+# the US open (13:30 UTC in summer, 14:30 UTC in winter). Later runs and holidays
+# find the latest session already recorded and do nothing.
 # Entries are scored only if their run is a run of this file on main that started
 # before the fill session's open (see rl/bench/ledger.py), so never move the
 # decision logic out of this workflow.
 
 on:
   schedule:
-    - cron: "0 12 * * *"
+    - cron: "17 4,7,10 * * 1-5"
   workflow_dispatch:
 
 permissions:
@@ -27,6 +28,8 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
@@ -63,7 +66,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- 'submissions/*/ledger'
+          if [ -n "$(git status --porcelain --untracked-files=all -- ':(glob)submissions/*/ledger/**')" ]; then
+            git add -- ':(glob)submissions/*/ledger/**'
+          fi
           if git diff --cached --quiet; then
             echo "No new entries"
           else

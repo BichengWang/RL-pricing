@@ -1,0 +1,11 @@
+{
+  "name": "Ledger canary (1/N)",
+  "kind": "baseline",
+  "policy": "rl.bench.policies.baselines:EqualWeightBuyHold",
+  "params": {},
+  "trials": 1,
+  "ledger": ["us-aapl"],
+  "authors": ["RL-pricing maintainers"],
+  "url": "",
+  "description": "Zero-cost 1/N buy-and-hold canary for the decision ledger on AAPL only. Checks recording, pre-open verification and engine replay; an operational baseline, not a research competitor. Kept visible in the ledger and monthly tables to audit the workflow."
+}
