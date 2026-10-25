@@ -21,27 +21,40 @@ from 10-30.
 | P0.9 | README restructured lab-first (verdict table, then findings, then leaderboard); launch kit rewritten for the lab identity | agent; owner approves | P0.2, P0.3, P0.8 | README opens with the verdict table; launch kit updated |
 | P0.10 | Launch: outreach to R1 and R2 authors one day before; Show HN, X, Reddit per launch kit | owner | P0.9 | Posts live **2026-11-04**; emails sent 2026-11-03 |
 
-## Status (2026-10-18)
+## Status (2026-10-25)
 
-PRs #86 and #87 merged on 2026-10-16 (#88 was squashed into #87). The three
-scheduled ledger runs since then all failed.
+PRs #97–#99 merged on 2026-10-25. The ledger failed on every scheduled run
+from 10-16 to 10-25 until #98; a `workflow_dispatch` run on `main` after it
+(run 40218696858) committed the canary's first entry (`a1e399f`) and failed
+only on TradingAgents' preflight, as designed. R3's 10-23 target was missed.
 
 | ID | State | Evidence and gap |
 | --- | --- | --- |
-| P0.1 | ✗ open | `gh repo view`: empty description, no topics, no custom preview. The command is in `../launch-kit.md` § Repository metadata (a workspace file, not in the repository) |
+| P0.1 | ◐ preview missing | Description, homepage and 10 topics set on 10-25 (`gh repo view`). The social preview image has no API; set it by hand |
 | P0.2 | ✅ done | `rl-pricing bench reports` renders `reports/README.md` and the README block |
-| P0.3 | ◐ notice missing | Report, `claims.json` and evidence have been on `main` since 2026-10-16, so the draft was public before Xinyi Zhang's notice. `reply.md` still says "pending" |
-| P0.4 | ◐ broken on GitHub | Code and tests shipped; never run end to end on GitHub. Runs on 10-16, 10-17 and 10-18 failed at the commit step: `git add -- 'submissions/*/ledger'` exits 128 when every match is a new nested file (reproduced locally; `':(glob)submissions/*/ledger/**'` adds them). The 12:00 UTC cron started 2 h 41 m to 3 h 48 m late. The weekday run (10-16, 15:48 UTC) began after the 13:30 UTC open, so its entries could never verify |
-| P0.5 | ◐ owner keys and one bug | Adapter, pin, cost logging, cap and R3 pre-registration shipped. No Actions secrets or variables are set, and every decision raised "API key for provider 'openai' is not set". `TradingAgentsPolicy` builds its graph inside `act`, so a missing key becomes an `error:` hold entry, not the "nothing is written" failure `ledger.py` documents. Once the commit step works, those holds would be committed and start R3's window with an agent that never ran. With `LEDGER_MONTHLY_BUDGET_USD` unset, the cap is off (`_cap` returns `None`). No recall-probe code exists. Cost is still R3 §9's estimate |
-| P0.6 | ◐ owner | Sharadar chosen; written confirmation and purchase not recorded. `rl/marketdata/sharadar.py` shipped |
-| P0.7 | ✅ done | `ppo-tuned` and `sac-tuned` (`trials: 8`) frozen and published on 10-16; README findings updated. One caveat is stale: README "Reference RL agents are untuned" |
-| P0.8 | ◐ never run on GitHub | Code shipped. The `live` job (live, ledger score, monthly, commit) first runs on 11-02 |
-| P0.9 | ◐ | README is lab-first. The launch kit was rewritten on 10-14, but it lives outside the repository and cites `2026-11.md` |
+| P0.3 | ◐ notice missing | `reply.md` still says "pending". A Gmail draft to Xinyi Zhang (`xyzh@stanford.edu`, the paper's address) is ready, and says the draft has been public since 10-16 |
+| P0.4 | ◐ first entry | Records on GitHub since #98. Closes at 5 verified canary sessions with `ledger score` equal to the engine (P0.14) |
+| P0.5 | ◐ owner keys | Preflight shipped (P0.13). Waits for the P0.15 gate, then the secrets |
+| P0.6 | ◐ owner | Sharadar chosen; written confirmation and purchase not recorded |
+| P0.7 | ✅ done | README limitation corrected on 10-25 (P0.20) |
+| P0.8 | ◐ dry run passed | P0.17. First CI run 11-02 06:00 UTC |
+| P0.9 | ◐ | README lab-first. Launch kit (outside the repository) now cites `2026-10.md` and the applied metadata command |
 | P0.10 | ⏳ | Due 11-03 and 11-04 |
+| P0.11 | ✅ done | #98: `':(glob)submissions/*/ledger/**'`, staged only when `git status` shows entries. Dispatch run 40218696858 committed `a1e399f` |
+| P0.12 | ◐ shipped | #98: cron `17 4,7,10 * * 1-5`, checkout `ref: main`. Start delays of 5 sessions still to list |
+| P0.13 | ✅ done | #98: an `llm` participant needs the three credentials and `LEDGER_MONTHLY_BUDGET_USD`; the graph and pin check run at construction. Run 40218696858: "LLM ledger preflight requires OPENAI_API_KEY, FRED_API_KEY, SEC_EDGAR_USER_AGENT, LEDGER_MONTHLY_BUDGET_USD", no TradingAgents entry, canary committed |
+| P0.14 | ◐ running | `submissions/ledger-canary` (1/N, `us-aapl`, `kind: baseline`, shown in ledger and monthly tables). First fill 10-26 |
+| P0.15 | ◐ tooling | #99: `evidence/recall_probe.py`, `evidence/dry_run.py`, `addendum-template.md`. Runs need the owner's keys; the prereg sets no recall threshold, so the addendum states the reading |
+| P0.16 | ◐ owner sends | Draft in Gmail; send by 10-27, then record the date in `reply.md` |
+| P0.17 | ✅ done | All five `live` steps ran in a scratch clone on 10-25; `2026-10.md` rendered (45 strategy-task pairs, 3 tasks). Nothing needed fixing. Local canary entries without a run identity scored as holds, as `ledger.py` documents |
+| P0.18 | ✅ done | `rl-pricing` 0.5.0 on PyPI (release `v0.5.0`, 10-23). On 10-25 a clean Python 3.13 venv ran `pip install rl-pricing` and `rl-pricing bench tasks` |
+| P0.19 | ✅ done | #97: hashes of the authors' repository at `5dbb44df` (184 files) and Yahoo `^DJI`/DIA; L1 probe (Python 3.7, TF 1.15.4, Stable-Baselines 2.10.1) trained A2C for 5 steps, run 40219347746. **L1 go**, decided 10-25. Sharadar files wait for P0.6 |
+| P0.20 | ✅ done | README limitation and launch kit corrected |
 
-Ahead of schedule: the R1 pre-registration and its §12 code (P1.1, due 11-10)
-shipped in #87. Last 14 days: 43 views, 5 unique visitors, 37 stars. So far
-the launch is the only lever for an audience.
+R3 timing: Monday's 04:17 run finds 10-23 recorded, so the canary fills
+10-26, 10-27 and 10-28 (decisions 10-23, 10-26, 10-27). The gate passes after
+the 10-28 close at the earliest; secrets set that evening give a first
+TradingAgents fill on **10-29** (63 sessions), a day before the deadline.
 
 ## Next steps (2026-10-19 → 2026-11-05)
 
@@ -58,38 +71,36 @@ the launch is the only lever for an audience.
 | P0.19 | R1 groundwork while the ledger runs: download and hash the authors' files and the Yahoo data (R1 §14); L1 build probe, TensorFlow 1.15 on Python 3.7 in a `python:3.7` container on a runner | agent | – | Hashes in `reports/r1-finrl-ensemble/evidence/`. L1 go/no-go decided by 11-05 instead of 11-17; the report notes the schedule change | 11-05 |
 | P0.20 | Stale text: README "Reference RL agents are untuned"; the launch kit's `2026-11.md` → `2026-10.md` | agent | – | Both corrected | 10-28 |
 
-Owner checklist, in order:
+Owner checklist, in order (updated 2026-10-25; ledger PR, P0.1 metadata and
+P0.18 PyPI are done):
 
-1. 10-19: review and merge the ledger PR (P0.11–P0.14).
-2. P0.1: run the `gh repo edit` command from `../launch-kit.md`.
-3. P0.16: send the R0 notice by 10-21.
-4. P0.6: ask Sharadar for written confirmation (the agent drafts the email); due 10-31.
-5. P0.15: lend the OpenAI key for the local probe and dry run. Once the
-   addendum is on `main`, set the secrets `OPENAI_API_KEY` and `FRED_API_KEY`
+1. P0.16: send the Gmail draft to Xinyi Zhang by **10-27**, then record the
+   send date in `reply.md`.
+2. P0.1: set the social preview image by hand (launch kit § Repository
+   metadata).
+3. P0.15, 10-26 → 10-28: with the keys in a local shell, run the two commands
+   in `reports/r3-tradingagents-live/addendum-template.md`, fill it in and
+   merge it as its own PR. After the 10-28 close, if the canary has 3
+   verified sessions, set the secrets `OPENAI_API_KEY` and `FRED_API_KEY`
    and the variables `SEC_EDGAR_USER_AGENT` and
    `LEDGER_MONTHLY_BUDGET_USD=40`. Setting them starts R3, so not before.
-6. P0.18, by 11-01: on PyPI, add a pending trusted publisher (project
-   `rl-pricing`, owner `BichengWang`, repository `RL-pricing`, workflow
-   `publish.yml`, environment `pypi`), then publish a GitHub release tagged
-   `v0.5.0` from `main`. A pending publisher doesn't reserve the name, so
-   publish soon after adding it.
-7. 11-02: paste the October report's numbers into the launch kit. 11-03:
+4. P0.6: ask Sharadar for written confirmation; due 10-31.
+5. 11-02: paste the October report's numbers into the launch kit. 11-03:
    author emails. 11-04: posts.
 
 | Date | Step |
 | --- | --- |
-| 10-19 Mon | Ledger PR merged; the canary's first run is Tuesday 04:17 UTC |
-| 10-20 Tue – 10-21 Wed | Recall probe, dry run, addendum; R0 notice sent |
-| 10-22 Thu | Gate: 3 verified canary sessions and the addendum, then the owner sets the secrets |
-| 10-23 Fri | Target for the first TradingAgents fill (R3: 67 sessions) |
-| 10-26 Mon | Canary at 5 sessions; P0.4 closed |
+| 10-25 Sun | Ledger fixed (#98); canary's first entry committed; R1 L1 go |
+| 10-26 Mon | Canary's first fill. The 04:17 run finds 10-23 recorded and stops |
+| 10-26 Mon – 10-28 Wed | Recall probe, dry run, addendum PR; agent lists the first runs' start delays (P0.12) |
 | 10-27 Tue | Last day for the R0 notice |
-| 10-28 Wed | Monthly dry run done |
-| 10-30 Fri | R3 start deadline (62 sessions) |
+| 10-28 Wed | After the close: gate (3 verified canary fills and the addendum), then the owner sets the secrets |
+| 10-29 Thu | Target for the first TradingAgents fill (R3: 63 sessions) |
+| 10-30 Fri | R3 start deadline (62 sessions); canary at 5 fills, P0.4 closed |
 | 11-02 Mon | CI writes `leaderboard/reports/2026-10.md` |
 | 11-03 Tue | R1 and R2 author emails |
 | 11-04 Wed | Launch |
-| 11-05 Thu | R1 L1 go/no-go; Reddit posts begin |
+| 11-05 Thu | Reddit posts begin |
 
 ## Exit criteria
 

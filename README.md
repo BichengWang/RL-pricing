@@ -309,8 +309,9 @@ for non-commercial research.
   than exact exchange fills.
 - Eight-year and three-year test windows are a few market regimes, which is
   why the live track exists.
-- Reference RL agents are untuned and use one feature set
-  ([`rl/bench/features.py`](rl/bench/features.py)); they are a floor, not
+- Reference RL agents use one feature set
+  ([`rl/bench/features.py`](rl/bench/features.py)), and only PPO and SAC
+  get a hyperparameter sweep (8 configurations each); they are a floor, not
   the best RL can do.
 
 ## Training toolkit
