@@ -4,12 +4,14 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import sys
 
 from stable_baselines.common.vec_env import DummyVecEnv
 
 
 def main() -> None:
     checkout = Path.cwd()
+    sys.path.insert(0, str(checkout))
     entrypoint = checkout / "run_DRL.py"
     spec = importlib.util.spec_from_file_location("authors_run_drl", entrypoint)
     if spec is None or spec.loader is None:
