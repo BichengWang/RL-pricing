@@ -1,7 +1,7 @@
-"""TradingAgents ledger policy: rating mapping, cost, provenance and lazy import.
+"""TradingAgents ledger policy: rating mapping, cost, provenance and construction.
 
 No test calls a model: graphs are fakes, and the optional ``tradingagents``
-package is replaced by stand-in modules where the lazy-import path matters.
+package is replaced by stand-in modules where graph construction matters.
 """
 
 import hashlib
@@ -15,7 +15,6 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from rl.bench import runner
 from rl.bench.engine import simulate
 from rl.bench.market import MarketData, MarketView
 from rl.bench.policies import tradingagents as ta
@@ -202,20 +201,30 @@ def test_a_stale_decision_date_is_refused_without_calling_the_agent():
     assert policy.act(MarketView(panel([100, 101, 102], dates=recent), np.zeros(1))).tolist() == [1.0]
 
 
-def test_a_missing_agent_package_fails_at_act_time_with_an_install_hint(monkeypatch):
+def test_a_missing_agent_package_fails_at_construction_with_an_install_hint(monkeypatch):
     for name in ("tradingagents", "tradingagents.default_config", "tradingagents.graph.trading_graph"):
         monkeypatch.setitem(sys.modules, name, None)  # makes the import raise ImportError
-    policy = TradingAgentsPolicy()  # construction must not import the agent
+    monkeypatch.setattr(ta, "installed_commit", lambda: ta.PINNED_COMMIT)
     with pytest.raises(ImportError, match=ta.PINNED_COMMIT):
-        policy.act(MarketView(panel([100, 101]), np.zeros(1)))
+        TradingAgentsPolicy()
 
 
-def test_the_submission_builds_on_every_task_without_the_extra(monkeypatch):
+def test_the_submission_validates_without_the_extra_or_keys(monkeypatch, capsys):
+    from rl.bench import cli
+
     monkeypatch.setitem(sys.modules, "tradingagents", None)
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
     submission = Submission.load(SUBMISSION)
     assert submission.kind == "llm" and submission.ledger == ("us-aapl", "us-googl", "us-amzn")
-    for task in TASKS.values():  # `bench validate` constructs it for every task
-        assert isinstance(runner.build_policy(submission, task), TradingAgentsPolicy)
+    monkeypatch.setattr(cli, "discover", lambda root: {submission.id: submission})
+    assert cli.main(["validate"]) == 0
+    assert "0 failures" in capsys.readouterr().out
+
+    broken = Submission(id="broken", name="Broken", kind="llm", policy=submission.policy,
+                        params={"typo": True}, ledger=submission.ledger)
+    monkeypatch.setattr(cli, "discover", lambda root: {broken.id: broken})
+    assert cli.main(["validate"]) == 1
+    assert "typo" in capsys.readouterr().err
 
 
 def test_the_paper_window_tasks():
@@ -246,6 +255,7 @@ def test_config_layers_defaults_then_params_then_overrides(tmp_path):
         data_vendors={"news_data": "alpha_vantage"},
         config_overrides={"temperature": 0.0, "llm_provider": "anthropic"},
         workdir=str(tmp_path),
+        graph=ScriptedGraph([]),
     )
     config = policy._config(defaults)
     assert config["llm_provider"] == "anthropic"  # overrides win
@@ -253,7 +263,7 @@ def test_config_layers_defaults_then_params_then_overrides(tmp_path):
     assert config["data_vendors"] == {"news_data": "alpha_vantage", "macro_data": "fred"}
     assert config["memory_log_path"] == "{}/memory/trading_memory.md".format(tmp_path)
     assert defaults["data_vendors"]["news_data"] == "yfinance"  # the release defaults are not mutated
-    ephemeral = TradingAgentsPolicy()._config(defaults)
+    ephemeral = TradingAgentsPolicy(graph=ScriptedGraph([]))._config(defaults)
     assert ephemeral["results_dir"].startswith(tempfile_root()) and "tradingagents-" in ephemeral["results_dir"]
 
 
@@ -264,7 +274,7 @@ def tempfile_root():
 
 
 def _fake_agent_modules(monkeypatch, *, commit, record):
-    """Stand-ins for tradingagents and langchain_core, enough for the lazy path."""
+    """Stand-ins for tradingagents and langchain_core, enough to build a graph."""
 
     class Graph:
         def __init__(self, selected_analysts, debug, config, callbacks):
@@ -297,11 +307,11 @@ def _fake_agent_modules(monkeypatch, *, commit, record):
     monkeypatch.setattr(ta, "installed_commit", lambda: commit)
 
 
-def test_the_real_graph_is_built_lazily_with_a_usage_callback(monkeypatch, tmp_path):
+def test_the_real_graph_is_built_at_construction_with_a_usage_callback(monkeypatch, tmp_path):
     record = {}
     _fake_agent_modules(monkeypatch, commit=ta.PINNED_COMMIT, record=record)
     policy = TradingAgentsPolicy(workdir=str(tmp_path), analysts=["market", "news"])
-    assert not record  # nothing is built until the first decision
+    assert record["analysts"] == ["market", "news"]  # built before act
 
     assert policy.act(MarketView(panel([100, 101]), np.zeros(1))).tolist() == [1.0]
     assert record["analysts"] == ["market", "news"] and record["debug"] is False
@@ -311,11 +321,24 @@ def test_the_real_graph_is_built_lazily_with_a_usage_callback(monkeypatch, tmp_p
     assert policy.ledger_inputs["agent_commit"] == ta.PINNED_COMMIT
 
 
-def test_a_different_installed_commit_is_refused(monkeypatch, tmp_path):
-    _fake_agent_modules(monkeypatch, commit="0" * 40, record={})
-    policy = TradingAgentsPolicy(workdir=str(tmp_path))
+@pytest.mark.parametrize("commit", ["0" * 40, None])
+def test_a_different_or_unknown_installed_commit_is_refused_at_construction(monkeypatch, tmp_path, commit):
+    record = {}
+    _fake_agent_modules(monkeypatch, commit=commit, record=record)
     with pytest.raises(RuntimeError, match="pins {}".format(ta.PINNED_COMMIT)):
-        policy.act(MarketView(panel([100, 101]), np.zeros(1)))
+        TradingAgentsPolicy(workdir=str(tmp_path))
+    assert record == {}
+
+
+def test_graph_construction_failure_is_raised_before_act(monkeypatch):
+    _fake_agent_modules(monkeypatch, commit=ta.PINNED_COMMIT, record={})
+
+    def missing_key(**kwargs):
+        raise ValueError("API key for provider 'openai' is not set")
+
+    monkeypatch.setattr(sys.modules["tradingagents.graph.trading_graph"], "TradingAgentsGraph", missing_key)
+    with pytest.raises(ValueError, match="API key"):
+        TradingAgentsPolicy()
 
 
 def test_installed_commit_reads_direct_url_metadata(monkeypatch):

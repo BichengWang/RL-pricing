@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import logging
 import sys
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
@@ -68,7 +69,10 @@ def build_parser() -> ArgumentParser:
     board.add_argument("--readme", default="README.md", help="README whose leaderboard markers are refreshed")
     board.add_argument("--no-readme", action="store_true")
 
-    commands.add_parser("validate", parents=[common], help="check that every submission builds on every task")
+    commands.add_parser(
+        "validate", parents=[common],
+        help="check submissions (paid ledger policies: class and constructor arguments only)",
+    )
 
     # Commands that register themselves and carry their handler.
     ledger.add_cli(commands, common)
@@ -242,7 +246,11 @@ def _cmd_validate(options) -> int:
     for submission in found.values():
         for task in TASKS.values():
             try:
-                runner.build_policy(submission, task)
+                if submission.kind == "llm" and submission.ledger:
+                    # Paid graphs require credentials; record performs the live preflight.
+                    inspect.signature(submission.policy_class()).bind(**submission.params)
+                else:
+                    runner.build_policy(submission, task)
             except Exception as error:
                 failures.append("{} on {}: {}".format(submission.id, task.id, error))
     for message in failures:

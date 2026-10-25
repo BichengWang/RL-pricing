@@ -3,8 +3,9 @@
 The multi-agent LLM framework is installed separately with the pinned
 ``INSTALL_REQUIREMENT`` (the ledger workflow does this; package metadata stays
 free of direct URLs so ``rl-pricing`` can be published to PyPI) and imported
-only when :meth:`TradingAgentsPolicy.act` first runs, so ``rl.bench`` and
-``bench validate`` work without it.
+only when :class:`TradingAgentsPolicy` is constructed, so ``rl.bench`` can be
+imported and submissions validated without it. Construction checks the installed
+commit and builds the graph before any decision can be recorded.
 
 Single-asset convention. ``act`` calls ``TradingAgentsGraph.propagate(ticker,
 date)`` for ``view.tickers[0]`` with ``date`` = the decision session (the last
@@ -249,8 +250,10 @@ class TradingAgentsPolicy(Policy):
         self._injected = graph is not None
         self._tempdir: tempfile.TemporaryDirectory | None = None
         self._agent_version: str | None = None
+        if self._graph is None:
+            self._graph = self._build_graph()
 
-    # -- construction of the real graph, deferred to the first decision ------------------------
+    # -- construction of the real graph --------------------------------------------------------
 
     def _config(self, default_config: dict) -> dict:
         config = copy.deepcopy(default_config)
@@ -276,6 +279,12 @@ class TradingAgentsPolicy(Policy):
         return config
 
     def _build_graph(self):
+        commit = installed_commit()
+        if self.expected_commit and commit != self.expected_commit:
+            raise RuntimeError(
+                "TradingAgents is installed from commit {} but this submission pins {}; "
+                "reinstall with pip install '{}'".format(commit, self.expected_commit, INSTALL_REQUIREMENT)
+            )
         try:
             import tradingagents
             from tradingagents.default_config import DEFAULT_CONFIG
@@ -283,12 +292,6 @@ class TradingAgentsPolicy(Policy):
         except ImportError as error:
             raise ImportError("{} (import failed: {})".format(INSTALL_HINT, error)) from error
         self._agent_version = getattr(tradingagents, "__version__", None)
-        commit = installed_commit()
-        if self.expected_commit and commit and commit != self.expected_commit:
-            raise RuntimeError(
-                "TradingAgents is installed from commit {} but this submission pins {}; "
-                "reinstall with pip install '{}'".format(commit, self.expected_commit, INSTALL_REQUIREMENT)
-            )
         return TradingAgentsGraph(
             selected_analysts=list(self.analysts),
             debug=False,
@@ -318,8 +321,6 @@ class TradingAgentsPolicy(Policy):
                         day, age, self.max_age_days
                     )
                 )
-        if self._graph is None:
-            self._graph = self._build_graph()
         self.usage.reset()
         self.last_cost_usd, self.ledger_inputs = 0.0, {}
         try:
