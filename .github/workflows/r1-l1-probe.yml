@@ -34,8 +34,10 @@ jobs:
         run: |
           sed 's/^stable-baselines\[mpi\]$/stable-baselines[mpi]==2.10.1/' \
             "$AUTHORS_DIR/requirements.txt" > "$RUNNER_TEMP/requirements.txt"
+          printf 'protobuf==3.20.3\n' > "$RUNNER_TEMP/constraints.txt"
           python -m pip install --upgrade 'pip<24.1'
-          python -m pip install -r "$RUNNER_TEMP/requirements.txt"
+          python -m pip install --constraint "$RUNNER_TEMP/constraints.txt" \
+            -r "$RUNNER_TEMP/requirements.txt"
       - name: Import dependencies and build the authors' training entry point
         working-directory: ${{ env.AUTHORS_DIR }}
         run: |
