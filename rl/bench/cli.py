@@ -90,6 +90,8 @@ def _submission(root, submission_id: str) -> Submission:
 
 
 def _seeds(count):
+    if count is not None and count < 1:
+        raise SystemExit("--seeds must be positive")
     return None if count is None else range(count)
 
 

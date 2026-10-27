@@ -110,6 +110,34 @@ def test_deterministic_submission_runs_a_single_seed(tmp_path, data):
     assert [run["seed"] for run in record["runs"]] == [0]
 
 
+@pytest.mark.parametrize("count", [0, -1])
+def test_cli_rejects_nonpositive_seeds_without_overwriting_results(tilt, data, tmp_path, count):
+    out = tmp_path / "board"
+    path = runner.evaluate(TASK, tilt, data=data, seeds=[0], out_root=out)
+    original = path.read_bytes()
+
+    with pytest.raises(SystemExit, match="--seeds must be positive"):
+        cli.main([
+            "bench", "run", "--task", TASK.id, "--submission", tilt.id,
+            "--submissions-root", str(tilt.directory.parent), "--out-root", str(out),
+            "--seeds", str(count),
+        ])
+    assert path.read_bytes() == original
+
+
+def test_empty_seeds_do_not_overwrite_results_or_frozen_artifacts(tilt, data, tmp_path):
+    path = runner.evaluate(TASK, tilt, data=data, seeds=[0], out_root=tmp_path / "board")
+    marker = runner.freeze(LIVE, tilt, data=data, seeds=[0])
+    original = {p: p.read_bytes() for p in [path, marker, *marker.parent.rglob("weights.json")]}
+
+    with pytest.raises(ValueError, match="At least one seed is required"):
+        runner.evaluate(TASK, tilt, data=data, seeds=[], out_root=tmp_path / "board")
+    with pytest.raises(ValueError, match="At least one seed is required"):
+        runner.freeze(LIVE, tilt, data=data, seeds=iter(()), force=True)
+    for path, content in original.items():
+        assert path.read_bytes() == content
+
+
 def test_evaluate_logs_when_data_changes_under_a_record(tilt, data, tmp_path, caplog):
     out = tmp_path / "board"
     runner.evaluate(TASK, tilt, data=data, seeds=[0], out_root=out)
