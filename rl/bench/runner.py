@@ -62,7 +62,10 @@ def build_policy(submission: Submission, task: Task) -> Policy:
 
 def _seeds(policy: Policy, seeds, track: str) -> list[int]:
     if seeds is not None:
-        return [int(s) for s in seeds]
+        seeds = [int(s) for s in seeds]
+        if not seeds:
+            raise ValueError("At least one seed is required")
+        return seeds
     return list(range(STOCHASTIC_SEEDS[track])) if policy.stochastic else [0]
 
 
