@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "submission": "ledger-canary",
+  "task": "us-aapl",
+  "decision_date": "2026-10-27",
+  "weights": null,
+  "hold": true,
+  "reason": null,
+  "cost_usd": 0.0,
+  "inputs": {
+    "policy": "rl.bench.policies.baselines:EqualWeightBuyHold",
+    "params": {}
+  },
+  "data_sha256": "9cdf89cdb5981a4cd2c8f8e99364acbbb50f3fb8134bc483eecb2b83d526fb54",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "40672930905",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-10-28T10:33:33+00:00"
+  },
+  "created_at": "2026-10-28T10:33:33+00:00"
+}
