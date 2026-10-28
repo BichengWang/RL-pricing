@@ -68,6 +68,12 @@ FRAME_COLUMNS = ["date", *FIELDS]
 # format number hold Yahoo's adjusted prices and are downloaded again.
 YAHOO_CACHE_FORMAT = 2
 YAHOO_COLUMNS = [*FRAME_COLUMNS, "dividends"]
+# Cached prices must parse to exactly the floats that were written. pandas 3.1
+# parses every float that way and deprecates the option that asks for it.
+EXACT_FLOATS = (
+    {} if tuple(int(part) for part in pd.__version__.split(".")[:2]) >= (3, 1)
+    else {"float_precision": "round_trip"}
+)
 
 
 def load_task_data(task: Task, *, end=None, cache_dir=None, refresh: bool = False) -> MarketData:
@@ -209,8 +215,7 @@ def _yahoo(task: Task, start, stop, cache: Path, refresh: bool) -> dict[str, pd.
                 and as_day(meta["start"]) <= start
                 and as_day(meta["end"]) >= stop
             ):
-                # round_trip parsing returns exactly the floats that were written.
-                frame = pd.read_csv(data_path, float_precision="round_trip")
+                frame = pd.read_csv(data_path, **EXACT_FLOATS)
         if frame is None:
             logger.info("Downloading %s from Yahoo Finance", ticker)
             frame = _download_yahoo(ticker, start, stop)

@@ -73,7 +73,7 @@ class YahooDownloader:
         if not frames:
             return pd.DataFrame(columns=UNADJUSTED_COLUMNS)
         data_df = pd.concat(frames, ignore_index=True)
-        data_df["day"] = data_df["date"].dt.dayofweek  # Monday = 0
+        data_df["day"] = data_df["date"].dt.day_of_week  # Monday = 0
         data_df["date"] = data_df["date"].dt.strftime("%Y-%m-%d")
         data_df = data_df.sort_values(by=["date", "tic"]).reset_index(drop=True)
         logger.info("Downloaded %d rows for %d tickers", len(data_df), data_df["tic"].nunique())
