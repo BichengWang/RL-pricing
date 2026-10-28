@@ -1,5 +1,5 @@
 # Versions the test suite was last run with (Python 3.13).
-# requirements.in lists the supported ranges; setup.py installs from it.
+# requirements.in lists the supported ranges; pyproject.toml installs from it.
 #
 # For a CPU-only PyTorch (much smaller download), install it first:
 #   pip install torch --index-url https://download.pytorch.org/whl/cpu

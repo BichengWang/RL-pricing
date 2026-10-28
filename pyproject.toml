@@ -2,3 +2,129 @@
 # 77 is the first release that writes License-Expression (PEP 639) metadata.
 requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "rl-pricing"
+dynamic = ["version", "dependencies"]
+description = "A reproducibility lab for trading AI: causal backtests, a live forward-test track and a pre-open decision ledger for RL, LLM and forecasting policies."
+authors = [{ name = "Bicheng Wang" }]
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.10"
+keywords = ["reinforcement learning", "portfolio management", "backtesting", "benchmark", "leaderboard"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: Console",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+# The PyPI page. The repository README carries the verdicts and leaderboard,
+# which CI rewrites between releases, so they are linked rather than copied.
+readme = { content-type = "text/markdown", text = """\
+# RL-pricing
+
+A reproducibility lab for trading AI. RL-pricing re-tests published claims
+about deep RL agents, LLM trading agents and forecasters under one
+pre-registered protocol. This package holds the lab's instruments:
+
+- `rl-pricing bench`: a causal backtesting benchmark. Policies decide at the
+  close and fill at the next open with fees; learned policies run over
+  several seeds; frozen policies are scored on a live forward-test track; and
+  a decision ledger records LLM agents' trades before each US market open.
+- `rl-pricing --mode train|backtest|ensemble|lstm`: the share-trading toolkit
+  that trains and backtests Stable-Baselines3 agents (A2C, PPO, DDPG, TD3,
+  SAC), a rolling ensemble and an LSTM forecaster on daily equity data.
+
+## Score your own policy
+
+A policy maps the history up to today's close to long-only target weights,
+which fill at the next open. Put it in a submission directory:
+
+```python
+# my-submissions/low-vol/policy.py
+import numpy as np
+
+from rl.bench.policy import Policy
+
+
+class LowVolHalf(Policy):
+    \"\"\"Equal-weight the calmer half of the listed assets.\"\"\"
+
+    def act(self, view):
+        closes = view.history.window(64).close
+        vol = np.nanstd(np.diff(np.log(closes), axis=0), axis=0)
+        vol = np.where(view.listed & np.isfinite(vol), vol, np.inf)
+        keep = np.argsort(vol)[: max(1, view.listed.sum() // 2)]
+        weights = np.zeros(len(view.tickers))
+        weights[keep] = 1 / len(keep)
+        return weights
+```
+
+and describe it in `my-submissions/low-vol/submission.json`:
+
+```json
+{"name": "Low-vol half", "kind": "other", "policy": "policy.py:LowVolHalf", "trials": 1}
+```
+
+A submission can also name a built-in policy, such as
+`"policy": "rl.bench.policies.baselines:Momentum"` or
+`"policy": "rl.bench.policies.sb3:SB3Policy"` with `"params": {"algo": "ppo"}`.
+Then score it against 1/N buy-and-hold:
+
+```bash
+pip install rl-pricing
+rl-pricing bench tasks
+rl-pricing bench run --task synthetic --submission low-vol \\
+    --submissions-root my-submissions --out-root board
+rl-pricing bench leaderboard --out-root board --no-readme
+```
+
+`synthetic` runs offline; the real tasks (`us-sectors`, `us-multi-asset`,
+`crypto-majors`, …) download their data on first use into `datasets/bench/`,
+or `$RL_PRICING_DATA`.
+
+The import package is `rl`, so this distribution can't share an environment
+with the unrelated `rl` (GNU Readline bindings) distribution. The policy
+interface, the `submission.json` fields, the record formats and the
+`rl-pricing` commands follow semantic versioning; see the
+[changelog](https://github.com/BichengWang/RL-pricing/blob/main/CHANGELOG.md).
+
+- [Verdicts, findings and leaderboard](https://github.com/BichengWang/RL-pricing#readme)
+- [Paper: Wang & Zhang, arXiv:2609.31870](https://arxiv.org/abs/2609.31870)
+
+The training toolkit's environment, preprocessing and training code are
+adapted from [FinRL](https://github.com/AI4Finance-Foundation/FinRL), which is
+MIT-licensed.
+""" }
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+lint = ["ruff>=0.5"]
+
+[project.scripts]
+rl-pricing = "rl.cli:entrypoint"
+
+[project.urls]
+Homepage = "https://bichengwang.github.io/RL-pricing/"
+Source = "https://github.com/BichengWang/RL-pricing"
+Issues = "https://github.com/BichengWang/RL-pricing/issues"
+Changelog = "https://github.com/BichengWang/RL-pricing/blob/main/CHANGELOG.md"
+Leaderboard = "https://bichengwang.github.io/RL-pricing/leaderboard/"
+Paper = "https://arxiv.org/abs/2609.31870"
+
+[tool.setuptools.dynamic]
+version = { attr = "rl.__version__" }
+dependencies = { file = ["requirements.in"] }
+
+[tool.setuptools.packages.find]
+include = ["rl", "rl.*"]

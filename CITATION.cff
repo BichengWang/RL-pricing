@@ -2,6 +2,8 @@ cff-version: 1.2.0
 message: "If you use this benchmark or its results, please cite it as below."
 title: "RL-pricing: an honest, live-forward-tested benchmark for reinforcement learning portfolio policies"
 type: software
+version: 1.0.0
+date-released: "2026-10-27"
 authors:
   - family-names: Wang
     given-names: Bicheng

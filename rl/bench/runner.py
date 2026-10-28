@@ -44,7 +44,7 @@ STOCHASTIC_SEEDS = {"historical": 5, "live": 3}
 BENCHMARK_NAME = "1/N buy and hold"
 FREEZE_FILE = "freeze.json"
 PUBLICATIONS_FILE = "publications.json"
-_PACKAGES = ("numpy", "pandas", "torch", "gymnasium", "stable-baselines3")
+_PACKAGES = ("rl-pricing", "numpy", "pandas", "torch", "gymnasium", "stable-baselines3")
 
 
 def build_policy(submission: Submission, task: Task) -> Policy:
