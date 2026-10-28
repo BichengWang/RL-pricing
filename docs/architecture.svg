@@ -1,0 +1,228 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1090" width="1280" height="1090" role="img" aria-labelledby="title desc">
+  <title id="title">RL-pricing architecture and north star</title>
+  <desc id="desc">A published trading-AI claim is nominated, pre-registered, tested at three levels, judged by a fixed rule, sent to its authors and published with their reply. The tests run on rl/bench: market data, policies, a next-open execution engine, scoring and committed records, across historical, live and decision-ledger tracks.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#8c959f"/>
+    </marker>
+    <marker id="arrow-accent" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#3f51b5"/>
+    </marker>
+  </defs>
+  <style>
+    text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif; fill: #1f2328; }
+    .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 1.6px; fill: #59636e; }
+    .h1 { font-size: 30px; font-weight: 700; }
+    .star { font-size: 18px; }
+    .title { font-size: 17px; font-weight: 700; }
+    .track { font-size: 15px; font-weight: 700; }
+    .body { font-size: 14px; fill: #424a53; }
+    .small { font-size: 13px; fill: #59636e; }
+    .strong { font-weight: 700; fill: #1f2328; }
+    .accent { fill: #3f51b5; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12.5px; fill: #3f51b5; }
+    .step { font-size: 12px; font-weight: 700; letter-spacing: 1px; }
+    .card { fill: #ffffff; stroke: #d0d7de; stroke-width: 1.2; }
+    .tool { fill: #f6f8fa; stroke: #d0d7de; stroke-width: 1.2; }
+    .flow { stroke: #8c959f; stroke-width: 1.8; fill: none; }
+    .link { stroke: #3f51b5; stroke-width: 1.6; stroke-dasharray: 5 5; fill: none; }
+    .rule { stroke: #eaeef2; stroke-width: 1; }
+  </style>
+
+  <rect x="1" y="1" width="1278" height="1088" rx="20" fill="#fbfcfe" stroke="#d0d7de" stroke-width="1.5"/>
+
+  <!-- Header and north star -->
+  <text x="64" y="58" class="eyebrow accent">RL-PRICING · HOW THE LAB WORKS</text>
+  <text x="64" y="98" class="h1">A reproducibility lab for trading AI</text>
+
+  <rect x="40" y="122" width="1200" height="96" rx="14" fill="#eef1fb" stroke="#c5cae9" stroke-width="1.2"/>
+  <text x="64" y="152" class="eyebrow accent">★ NORTH STAR</text>
+  <text x="64" y="180" class="star">Every published trading-AI claim re-tested under one pre-registered protocol,</text>
+  <text x="64" y="204" class="star">every verdict published, positive or negative, next to the authors' reply.</text>
+  <line x1="880" y1="140" x2="880" y2="200" stroke="#c5cae9" stroke-width="1.2"/>
+  <text x="906" y="152" class="eyebrow">STARTED WITH OUR OWN PAPER</text>
+  <text x="906" y="180" class="title">R0 · Wang &amp; Zhang 2026, 8 claims</text>
+  <text x="906" y="204" class="small"><tspan style="fill:#cf222e;font-weight:700">1</tspan> does not hold · <tspan style="fill:#9a6700;font-weight:700">5</tspan> partly · <tspan class="strong">2</tspan> inconclusive</text>
+
+  <!-- The lab pipeline -->
+  <text x="64" y="256" class="eyebrow">THE LAB · ONE CLAIM'S PATH TO A PUBLISHED VERDICT</text>
+
+  <!-- 1 Claim -->
+  <rect x="40" y="272" width="170" height="226" rx="12" class="card"/>
+  <rect x="56" y="286" width="28" height="4" rx="2" fill="#57606a"/>
+  <text x="56" y="310" class="step" style="fill:#57606a">STEP 1</text>
+  <text x="56" y="334" class="title">Claim</text>
+  <text x="56" y="362" class="body">A published result,</text>
+  <text x="56" y="382" class="body">nominated in an</text>
+  <text x="56" y="402" class="body">issue or picked by</text>
+  <text x="56" y="422" class="body">a scored rubric</text>
+  <line x1="56" y1="460" x2="194" y2="460" class="rule"/>
+  <text x="56" y="482" class="mono">.plan/targets.md</text>
+
+  <!-- 2 Pre-register -->
+  <rect x="246" y="272" width="170" height="226" rx="12" class="card"/>
+  <rect x="262" y="286" width="28" height="4" rx="2" fill="#8250df"/>
+  <text x="262" y="310" class="step" style="fill:#8250df">STEP 2</text>
+  <text x="262" y="334" class="title">Pre-register</text>
+  <text x="262" y="362" class="body">Test plan and</text>
+  <text x="262" y="382" class="body">verdict thresholds</text>
+  <text x="262" y="402" class="body">committed before</text>
+  <text x="262" y="422" class="body">anything runs</text>
+  <line x1="262" y1="460" x2="400" y2="460" class="rule"/>
+  <text x="262" y="482" class="mono">preregistration.md</text>
+
+  <!-- 3 Test -->
+  <rect x="452" y="272" width="170" height="226" rx="12" class="card"/>
+  <rect x="468" y="286" width="28" height="4" rx="2" fill="#3f51b5"/>
+  <text x="468" y="310" class="step accent">STEP 3</text>
+  <text x="468" y="334" class="title">Test at 3 levels</text>
+  <rect x="464" y="346" width="146" height="44" rx="8" fill="#eef1fb"/>
+  <text x="476" y="364" class="small accent" style="font-weight:700">L1 · Replicate</text>
+  <text x="476" y="381" class="small">authors' own setup</text>
+  <rect x="464" y="396" width="146" height="44" rx="8" fill="#e3e7f8"/>
+  <text x="476" y="414" class="small accent" style="font-weight:700">L2 · Re-test</text>
+  <text x="476" y="431" class="small">our protocol, 5+ seeds</text>
+  <rect x="464" y="446" width="146" height="44" rx="8" fill="#d6dcf4"/>
+  <text x="476" y="464" class="small accent" style="font-weight:700">L3 · Generalize</text>
+  <text x="476" y="481" class="small">new windows, live</text>
+
+  <!-- 4 Verdict -->
+  <rect x="658" y="272" width="170" height="226" rx="12" class="card"/>
+  <rect x="674" y="286" width="28" height="4" rx="2" fill="#1a7f37"/>
+  <text x="674" y="310" class="step" style="fill:#1a7f37">STEP 4</text>
+  <text x="674" y="334" class="title">Verdict</text>
+  <text x="674" y="362" class="body">By the rule fixed</text>
+  <text x="674" y="382" class="body">in step 2:</text>
+  <text x="675" y="408" class="small" style="fill:#1a7f37;font-weight:700">✓</text>
+  <text x="694" y="408" class="small">holds</text>
+  <circle cx="680" cy="422" r="5" fill="none" stroke="#9a6700" stroke-width="1.5"/>
+  <path d="M680,417 A5,5 0 0,0 680,427 Z" fill="#9a6700"/>
+  <text x="694" y="427" class="small">partly holds</text>
+  <text x="675" y="446" class="small" style="fill:#cf222e;font-weight:700">✗</text>
+  <text x="694" y="446" class="small">does not hold</text>
+  <text x="676" y="465" class="small strong">?</text>
+  <text x="694" y="465" class="small">inconclusive</text>
+  <text x="674" y="487" class="mono">claims.json</text>
+
+  <!-- 5 Authors' reply -->
+  <rect x="864" y="272" width="170" height="226" rx="12" class="card"/>
+  <rect x="880" y="286" width="28" height="4" rx="2" fill="#bf8700"/>
+  <text x="880" y="310" class="step" style="fill:#9a6700">STEP 5</text>
+  <text x="880" y="334" class="title">Authors' reply</text>
+  <text x="880" y="362" class="body">Draft goes to the</text>
+  <text x="880" y="382" class="body">authors 7 days</text>
+  <text x="880" y="402" class="body">ahead; their reply</text>
+  <text x="880" y="422" class="body">is printed verbatim</text>
+  <line x1="880" y1="460" x2="1018" y2="460" class="rule"/>
+  <text x="880" y="482" class="mono">reply.md</text>
+
+  <!-- 6 Publish -->
+  <rect x="1070" y="272" width="170" height="226" rx="12" class="card"/>
+  <rect x="1086" y="286" width="28" height="4" rx="2" fill="#0969da"/>
+  <text x="1086" y="310" class="step" style="fill:#0969da">STEP 6</text>
+  <text x="1086" y="334" class="title">Publish</text>
+  <text x="1086" y="362" class="body">Verdict table,</text>
+  <text x="1086" y="382" class="body">leaderboard,</text>
+  <text x="1086" y="402" class="body">monthly live report</text>
+  <text x="1086" y="422" class="body">and the site</text>
+  <line x1="1086" y1="460" x2="1224" y2="460" class="rule"/>
+  <text x="1086" y="482" class="mono">reports/&lt;id&gt;/</text>
+
+  <!-- pipeline arrows -->
+  <line x1="214" y1="385" x2="242" y2="385" class="flow" marker-end="url(#arrow)"/>
+  <line x1="420" y1="385" x2="448" y2="385" class="flow" marker-end="url(#arrow)"/>
+  <line x1="626" y1="385" x2="654" y2="385" class="flow" marker-end="url(#arrow)"/>
+  <line x1="832" y1="385" x2="860" y2="385" class="flow" marker-end="url(#arrow)"/>
+  <line x1="1038" y1="385" x2="1066" y2="385" class="flow" marker-end="url(#arrow)"/>
+
+  <!-- links between the lab and its instruments -->
+  <line x1="537" y1="502" x2="537" y2="566" class="link" marker-end="url(#arrow-accent)"/>
+  <text x="549" y="540" class="small accent" style="font-weight:600">L2 and L3 run here</text>
+  <line x1="1155" y1="566" x2="1155" y2="502" class="link" marker-end="url(#arrow-accent)"/>
+  <text x="1143" y="540" class="small accent" text-anchor="end" style="font-weight:600">results and evidence</text>
+
+  <!-- Instruments -->
+  <rect x="40" y="570" width="1200" height="326" rx="16" fill="#ffffff" stroke="#c5cae9" stroke-width="1.4"/>
+  <text x="64" y="604" class="eyebrow">INSTRUMENTS · ONE CAUSAL ENGINE FOR EVERY POLICY AND TRACK</text>
+  <text x="1216" y="604" class="mono" text-anchor="end">rl/bench</text>
+
+  <rect x="64" y="620" width="210" height="160" rx="10" class="tool"/>
+  <text x="82" y="648" class="title">Market data</text>
+  <text x="82" y="674" class="body">Yahoo · Binance Vision</text>
+  <text x="82" y="694" class="body">Sharadar · synthetic</text>
+  <text x="82" y="714" class="body">every input SHA-256'd</text>
+  <text x="82" y="764" class="mono">rl/marketdata/</text>
+
+  <rect x="299" y="620" width="210" height="160" rx="10" class="tool"/>
+  <text x="317" y="648" class="title">Policy</text>
+  <text x="317" y="674" class="body">history → long-only</text>
+  <text x="317" y="694" class="body">target weights</text>
+  <text x="317" y="714" class="body">1/N · RL · LSTM · LLM</text>
+  <text x="317" y="764" class="mono">submissions/&lt;id&gt;/</text>
+
+  <rect x="534" y="620" width="210" height="160" rx="10" class="tool"/>
+  <text x="552" y="648" class="title">Engine</text>
+  <text x="552" y="674" class="body">decide at close t,</text>
+  <text x="552" y="694" class="body">fill at open t+1,</text>
+  <text x="552" y="714" class="body">fees on traded value</text>
+  <text x="552" y="764" class="mono">rl/bench/engine.py</text>
+
+  <rect x="769" y="620" width="210" height="160" rx="10" class="tool"/>
+  <text x="787" y="648" class="title">Scoring</text>
+  <text x="787" y="674" class="body">Sharpe · CAGR · max DD</text>
+  <text x="787" y="694" class="body">α, β, ΔSharpe vs 1/N</text>
+  <text x="787" y="714" class="body">deflated Sharpe</text>
+  <text x="787" y="764" class="mono">rl/bench/scoring.py</text>
+
+  <rect x="1004" y="620" width="212" height="160" rx="10" class="tool"/>
+  <text x="1022" y="648" class="title">Records</text>
+  <text x="1022" y="674" class="body">per-seed equity curves,</text>
+  <text x="1022" y="694" class="body">data hash, versions,</text>
+  <text x="1022" y="714" class="body">commit</text>
+  <text x="1022" y="764" class="mono">leaderboard/</text>
+
+  <line x1="277" y1="700" x2="296" y2="700" class="flow" marker-end="url(#arrow)"/>
+  <line x1="512" y1="700" x2="531" y2="700" class="flow" marker-end="url(#arrow)"/>
+  <line x1="747" y1="700" x2="766" y2="700" class="flow" marker-end="url(#arrow)"/>
+  <line x1="982" y1="700" x2="1001" y2="700" class="flow" marker-end="url(#arrow)"/>
+
+  <rect x="64" y="800" width="368" height="80" rx="10" fill="#f6f8fa"/>
+  <rect x="64" y="800" width="5" height="80" rx="2" fill="#57606a"/>
+  <text x="84" y="826" class="track">Historical track</text>
+  <text x="84" y="848" class="small">train, select on validation, report the test</text>
+  <text x="84" y="866" class="small">window; every seed of every policy plotted</text>
+
+  <rect x="456" y="800" width="368" height="80" rx="10" fill="#f6f8fa"/>
+  <rect x="456" y="800" width="5" height="80" rx="2" fill="#3f51b5"/>
+  <text x="476" y="826" class="track">Live track</text>
+  <text x="476" y="848" class="small">policy frozen and hashed, publication stamped</text>
+  <text x="476" y="866" class="small">by CI; scored monthly on later sessions only</text>
+
+  <rect x="848" y="800" width="368" height="80" rx="10" fill="#f6f8fa"/>
+  <rect x="848" y="800" width="5" height="80" rx="2" fill="#1a7f37"/>
+  <text x="868" y="826" class="track">Decision ledger</text>
+  <text x="868" y="848" class="small">each decision committed before the US open,</text>
+  <text x="868" y="866" class="small">Mon–Fri; how LLM agents are scored (R3)</text>
+
+  <!-- Roadmap -->
+  <text x="64" y="938" class="eyebrow">ROADMAP</text>
+  <line x1="140" y1="962" x2="1120" y2="962" stroke="#d0d7de" stroke-width="2"/>
+  <circle cx="140" cy="962" r="8" fill="#1a7f37"/>
+  <circle cx="385" cy="962" r="8" fill="#ffffff" stroke="#3f51b5" stroke-width="2.5"/>
+  <circle cx="630" cy="962" r="8" fill="#ffffff" stroke="#3f51b5" stroke-width="2.5"/>
+  <circle cx="875" cy="962" r="8" fill="#ffffff" stroke="#3f51b5" stroke-width="2.5"/>
+  <circle cx="1120" cy="962" r="8" fill="#ffffff" stroke="#8c959f" stroke-width="2.5"/>
+  <text x="140" y="994" class="body strong" text-anchor="middle">R0 · our own paper</text>
+  <text x="140" y="1013" class="small" text-anchor="middle">published</text>
+  <text x="385" y="994" class="body strong" text-anchor="middle">R1 · FinRL ensemble</text>
+  <text x="385" y="1013" class="small" text-anchor="middle">due 2026-12-01</text>
+  <text x="630" y="994" class="body strong" text-anchor="middle">R2 · TradingAgents backtest</text>
+  <text x="630" y="1013" class="small" text-anchor="middle">due 2027-01-05</text>
+  <text x="875" y="994" class="body strong" text-anchor="middle">R3 · TradingAgents live</text>
+  <text x="875" y="1013" class="small" text-anchor="middle">due 2027-02-15</text>
+  <text x="1120" y="994" class="body strong" text-anchor="middle">Lab paper · audit pilot</text>
+  <text x="1120" y="1013" class="small" text-anchor="middle">2027 Q2</text>
+
+  <line x1="40" y1="1036" x2="1240" y2="1036" class="rule"/>
+  <text x="64" y="1064" class="small">Automated on GitHub Actions: <tspan class="mono" style="fill:#424a53">tests</tspan> · <tspan class="mono" style="fill:#424a53">bench</tspan> (PR checks, monthly live scoring) · <tspan class="mono" style="fill:#424a53">ledger</tspan> (pre-open decisions) · <tspan class="mono" style="fill:#424a53">pages</tspan> (site) · <tspan class="mono" style="fill:#424a53">publish</tspan> (PyPI)</text>
+</svg>
