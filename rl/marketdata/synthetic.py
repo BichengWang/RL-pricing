@@ -71,7 +71,7 @@ def generate_synthetic_data(
             "close": close.ravel(),
             "volume": volume.ravel(),
             "tic": np.tile(tickers, n_days),
-            "day": np.repeat(dates.dayofweek.to_numpy(), n_tickers),
+            "day": np.repeat(dates.day_of_week.to_numpy(), n_tickers),
         }
     )
     return frame[COLUMNS].sort_values(["date", "tic"]).reset_index(drop=True)

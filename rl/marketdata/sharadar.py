@@ -111,17 +111,17 @@ def convert_sharadar(
     end = None if end_date is None else pd.Timestamp(end_date)
 
     chunks = []
-    reader = pd.read_csv(
+    with pd.read_csv(
         source, usecols=lambda name: name in SOURCE_COLUMNS, chunksize=chunksize,
         dtype={"ticker": str},
-    )
-    for chunk in reader:
-        missing = set(SOURCE_COLUMNS) - set(chunk.columns)
-        if missing:
-            raise ValueError("Sharadar file is missing columns {}".format(sorted(missing)))
-        chunk = chunk[chunk["ticker"].isin(wanted)].copy()
-        chunk["date"] = pd.to_datetime(chunk["date"])
-        chunks.append(chunk)
+    ) as reader:
+        for chunk in reader:
+            missing = set(SOURCE_COLUMNS) - set(chunk.columns)
+            if missing:
+                raise ValueError("Sharadar file is missing columns {}".format(sorted(missing)))
+            chunk = chunk[chunk["ticker"].isin(wanted)].copy()
+            chunk["date"] = pd.to_datetime(chunk["date"])
+            chunks.append(chunk)
     raw = pd.concat(chunks, ignore_index=True)
     if raw.empty:
         raise ValueError("None of {} found in the Sharadar file".format(sorted(wanted)))
