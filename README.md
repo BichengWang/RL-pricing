@@ -1,18 +1,34 @@
 # RL-pricing: a reproducibility lab for trading AI
 
-[![tests](https://github.com/BichengWang/RL-pricing/actions/workflows/tests.yml/badge.svg)](https://github.com/BichengWang/RL-pricing/actions/workflows/tests.yml)
-[![bench](https://github.com/BichengWang/RL-pricing/actions/workflows/bench.yml/badge.svg)](https://github.com/BichengWang/RL-pricing/actions/workflows/bench.yml)
-[![arXiv](https://img.shields.io/badge/arXiv-2609.31870-b31b1b.svg)](https://arxiv.org/abs/2609.31870)
-[![site](https://img.shields.io/badge/site-reports%20%26%20leaderboard-3f51b5.svg)](https://bichengwang.github.io/RL-pricing/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+<p align="center">
+  <strong>Published trading-AI claims, re-tested under one pre-registered protocol.</strong><br>
+  Every verdict is published next to the authors' reply, including the verdicts against our own paper.
+</p>
 
-We re-test published trading-AI claims (deep RL, LLM agents, forecasters)
-under one pre-registered protocol, and publish every verdict next to the
-authors' reply. That includes the verdicts against our own paper. The instruments are public:
-a causal backtesting benchmark, a live track scored only on market data that
-did not exist when a policy was published, and a ledger of decisions
-committed before each US market open. The reports and the leaderboard are
-also on the [lab's site](https://bichengwang.github.io/RL-pricing/).
+<p align="center">
+  <a href="https://github.com/BichengWang/RL-pricing/actions/workflows/tests.yml"><img alt="tests" src="https://github.com/BichengWang/RL-pricing/actions/workflows/tests.yml/badge.svg"></a>
+  <a href="https://github.com/BichengWang/RL-pricing/actions/workflows/bench.yml"><img alt="bench" src="https://github.com/BichengWang/RL-pricing/actions/workflows/bench.yml/badge.svg"></a>
+  <a href="https://pypi.org/project/rl-pricing/"><img alt="PyPI" src="https://img.shields.io/pypi/v/rl-pricing.svg"></a>
+  <a href="https://arxiv.org/abs/2609.31870"><img alt="arXiv" src="https://img.shields.io/badge/arXiv-2609.31870-b31b1b.svg"></a>
+  <a href="https://bichengwang.github.io/RL-pricing/"><img alt="site" src="https://img.shields.io/badge/site-reports%20%26%20leaderboard-3f51b5.svg"></a>
+  <a href="https://github.com/BichengWang/RL-pricing/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+</p>
+
+<p align="center">
+  <a href="#verdicts">Verdicts</a> ·
+  <a href="#r0-our-own-paper">R0: our own paper</a> ·
+  <a href="#benchmark-findings">Findings</a> ·
+  <a href="#leaderboard">Leaderboard</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="#submit-a-policy">Submit a policy</a> ·
+  <a href="https://bichengwang.github.io/RL-pricing/">Site</a>
+</p>
+
+![How RL-pricing works: a claim is pre-registered, tested at three levels on one causal engine, judged by a fixed rule, sent to its authors and published with their reply](docs/architecture.svg)
+
+Three public instruments back every verdict: a causal backtesting benchmark,
+a live track scored only on market data that did not exist when a policy was
+published, and a ledger of decisions committed before each US market open.
 
 ## Verdicts
 
@@ -31,15 +47,17 @@ also on the [lab's site](https://bichengwang.github.io/RL-pricing/).
 Verdicts: ✅ holds, ◐ partly holds, ✗ does not hold, ? inconclusive. [How a verdict is decided](reports/README.md#how-a-verdict-is-decided).
 <!-- reports:end -->
 
-| Next | Claim under test | Due |
+**Next up**
+
+| Report | Claim under test | Due |
 | --- | --- | --- |
 | R1 | FinRL ensemble ([Yang et al., ICAIF 2020](https://arxiv.org/abs/2511.12120)): Sharpe 1.30 vs the DJIA's 0.47, 2016–2020 | 2026-12-01 |
 | R2 | [TradingAgents](https://arxiv.org/abs/2412.20138) backtest: Sharpe 5.6–8.2 on AAPL, GOOGL, AMZN in 2024 Q1, replicated with a check for whether the models remember that period | 2027-01-05 |
 | R3 | TradingAgents run live on the same three stocks for three months, each decision committed before the open ([pre-registration](reports/r3-tradingagents-live/preregistration.md)) | 2027-02-15 |
 
-Authors get each draft seven days before publication. To nominate a claim,
-open an issue titled `Nominate: <paper>` with the quoted claim and a link to
-the code.
+**Nominate a claim:** open an issue titled `Nominate: <paper>` with the
+quoted claim and a link to the code. Authors get each draft seven days before
+publication.
 
 ## How the lab works
 
@@ -349,6 +367,16 @@ original study is Wang & Zhang, *Deep Reinforcement Learning for Equity
 Trading: Benchmarking Actor-Critic Methods with Forward Retraining*,
 [arXiv:2609.31870](https://arxiv.org/abs/2609.31870)
 ([local PDF](docs/Wang_Zhang_2021_Deep_Learning_Stock_Trading_arxiv.pdf)).
+
+```bibtex
+@software{rl_pricing,
+  author  = {Wang, Bicheng and Zhang, Xinyi},
+  title   = {{RL-pricing}: an honest, live-forward-tested benchmark for reinforcement learning portfolio policies},
+  version = {1.0.0},
+  year    = {2026},
+  url     = {https://github.com/BichengWang/RL-pricing}
+}
+```
 
 ## License
 

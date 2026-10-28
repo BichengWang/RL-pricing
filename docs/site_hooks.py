@@ -26,6 +26,7 @@ SITE_PATHS = {"README.md": "index.md", "leaderboard/LEADERBOARD.md": "leaderboar
 SOURCES = (
     "docs/*.md",
     "docs/*.pdf",
+    "docs/*.svg",
     "reports/README.md",
     "reports/*/*.md",
     "reports/*/evidence/*.md",
