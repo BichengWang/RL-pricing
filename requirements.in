@@ -12,4 +12,4 @@ gymnasium>=0.29.1
 stable-baselines3>=2.3.2
 torch>=2.0
 
-# Test and lint tools are extras in setup.py: pip install -e ".[test]"
+# Test and lint tools are extras in pyproject.toml: pip install -e ".[test]"

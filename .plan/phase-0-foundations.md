@@ -47,7 +47,7 @@ only on TradingAgents' preflight, as designed. R3's 10-23 target was missed.
 | P0.15 | ◐ tooling | #99: `evidence/recall_probe.py`, `evidence/dry_run.py`, `addendum-template.md`. Runs need the owner's keys; the prereg sets no recall threshold, so the addendum states the reading |
 | P0.16 | ◐ owner sends | Draft in Gmail; send by 10-27, then record the date in `reply.md` |
 | P0.17 | ✅ done | All five `live` steps ran in a scratch clone on 10-25; `2026-10.md` rendered (45 strategy-task pairs, 3 tasks). Nothing needed fixing. Local canary entries without a run identity scored as holds, as `ledger.py` documents |
-| P0.18 | ✅ done | `rl-pricing` 0.5.0 on PyPI (release `v0.5.0`, 10-23). On 10-25 a clean Python 3.13 venv ran `pip install rl-pricing` and `rl-pricing bench tasks` |
+| P0.18 | ✅ done | `rl-pricing` 0.5.0 on PyPI (release `v0.5.0`, 10-23). On 10-25 a clean Python 3.13 venv ran `pip install rl-pricing` and `rl-pricing bench tasks`. 1.0.0 on 10-27: metadata in `pyproject.toml`, semantic versioning from [`CHANGELOG.md`](../CHANGELOG.md), import package still `rl` (decision 10-27) |
 | P0.19 | ✅ done | #97: hashes of the authors' repository at `5dbb44df` (184 files) and Yahoo `^DJI`/DIA; L1 probe (Python 3.7, TF 1.15.4, Stable-Baselines 2.10.1) trained A2C for 5 steps, run 40219347746. **L1 go**, decided 10-25. Sharadar files wait for P0.6 |
 | P0.20 | ✅ done | README limitation and launch kit corrected |
 

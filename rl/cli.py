@@ -11,6 +11,7 @@ from argparse import (
     ArgumentTypeError,
 )
 
+from rl import __version__
 from rl.config import config
 
 MODES = ("train", "backtest", "ensemble", "lstm", "download_data")
@@ -46,6 +47,7 @@ def build_parser():
         formatter_class=ArgumentDefaultsHelpFormatter,
         epilog="Benchmark and leaderboard: rl-pricing bench --help",
     )
+    parser.add_argument("--version", action="version", version="%(prog)s " + __version__)
     parser.add_argument(
         "--mode",
         dest="mode",

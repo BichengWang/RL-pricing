@@ -204,6 +204,12 @@ The `synthetic` task is offline random walks with no edge by construction.
 Real tasks download data on first use (`rl-pricing bench data us-sectors`)
 into `datasets/bench/`. PPO takes one to two minutes per seed on a laptop CPU.
 
+`pip install rl-pricing` installs the same commands without the reference
+submissions or the published records. Point `--submissions-root` at your own
+directory of submissions; the [PyPI page](https://pypi.org/project/rl-pricing/)
+walks through one. Changes between releases are in
+[`CHANGELOG.md`](CHANGELOG.md).
+
 ## Submit a policy
 
 A policy maps the history up to today's close to long-only target weights,
