@@ -1,4 +1,4 @@
-# R3 pre-registration addendum — 2026-10-25
+# R3 pre-registration addendum — [date]
 
 Complete and commit this addendum before the first TradingAgents ledger entry.
 The recall probe compares the models' recalled closes with the repo loader's
@@ -7,13 +7,14 @@ interpretation and the start decision remain for the owner.
 
 ## Recall probe
 
-Command run:
+Command run (`--start` is the first fill session: 2026-10-30 if the secrets
+are set before that morning's ledger runs, the pre-registered deadline):
 
 ```bash
-python reports/r3-tradingagents-live/evidence/recall_probe.py --start 2026-10-26 --output reports/r3-tradingagents-live/evidence/recall_probe_2026-10-25.json
+python reports/r3-tradingagents-live/evidence/recall_probe.py --start 2026-10-30
 ```
 
-Evidence file: `evidence/recall_probe_2026-10-25.json`
+Evidence file: `evidence/recall_probe_2026-10-30.json`
 
 | Requested model | Returned model ID | Mean absolute percentage error | Coverage | Input / output tokens |
 | --- | --- | ---: | ---: | ---: |

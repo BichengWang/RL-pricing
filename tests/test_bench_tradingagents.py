@@ -273,8 +273,22 @@ def tempfile_root():
     return tempfile.gettempdir()
 
 
-def _fake_agent_modules(monkeypatch, *, commit, record):
-    """Stand-ins for tradingagents and langchain_core, enough to build a graph."""
+def _fake_agent_modules(monkeypatch, *, commit, record, rejected=()):
+    """Stand-ins for tradingagents, openai and langchain_core, enough to build a graph.
+
+    The fake OpenAI client rejects the model ids in ``rejected`` as the API does
+    for a revoked key or a missing model.
+    """
+
+    class Models:
+        def retrieve(self, model):
+            if model in rejected:
+                raise PermissionError("model {} rejected".format(model))
+            return types.SimpleNamespace(id=model)
+
+    class OpenAI:
+        def __init__(self):
+            self.models = Models()
 
     class Graph:
         def __init__(self, selected_analysts, debug, config, callbacks):
@@ -291,6 +305,7 @@ def _fake_agent_modules(monkeypatch, *, commit, record):
             return {"final_trade_decision": "Rating: Buy"}, "Buy"
 
     modules = {
+        "openai": types.ModuleType("openai"),
         "tradingagents": types.ModuleType("tradingagents"),
         "tradingagents.default_config": types.ModuleType("tradingagents.default_config"),
         "tradingagents.graph": types.ModuleType("tradingagents.graph"),
@@ -298,6 +313,7 @@ def _fake_agent_modules(monkeypatch, *, commit, record):
         "langchain_core": types.ModuleType("langchain_core"),
         "langchain_core.callbacks": types.ModuleType("langchain_core.callbacks"),
     }
+    modules["openai"].OpenAI = OpenAI
     modules["tradingagents"].__version__ = "0.6.0"
     modules["tradingagents.default_config"].DEFAULT_CONFIG = {"data_vendors": {}, "max_tool_rounds": 20}
     modules["tradingagents.graph.trading_graph"].TradingAgentsGraph = Graph
@@ -326,6 +342,15 @@ def test_a_different_or_unknown_installed_commit_is_refused_at_construction(monk
     record = {}
     _fake_agent_modules(monkeypatch, commit=commit, record=record)
     with pytest.raises(RuntimeError, match="pins {}".format(ta.PINNED_COMMIT)):
+        TradingAgentsPolicy(workdir=str(tmp_path))
+    assert record == {}
+
+
+@pytest.mark.parametrize("rejected", ["gpt-6-sol", "gpt-6-luna"])
+def test_a_model_or_key_the_api_rejects_fails_construction_before_the_graph(monkeypatch, tmp_path, rejected):
+    record = {}
+    _fake_agent_modules(monkeypatch, commit=ta.PINNED_COMMIT, record=record, rejected={rejected})
+    with pytest.raises(RuntimeError, match="OpenAI preflight failed for model '{}'".format(rejected)):
         TradingAgentsPolicy(workdir=str(tmp_path))
     assert record == {}
 

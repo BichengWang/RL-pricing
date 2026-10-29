@@ -19,6 +19,13 @@ A major release is needed to break any of these:
 Other modules, including the share-trading toolkit's Python functions, may
 change in minor releases.
 
+## Unreleased
+
+- `TradingAgentsPolicy` asks the OpenAI API for both pinned models when it
+  is constructed. A revoked key or a missing model now fails the ledger run
+  with no entry, so a later run before the open can still record; before, it
+  wrote an `error:` hold that no later run could replace.
+
 ## 1.0.0 (2026-10-27)
 
 First stable release.
