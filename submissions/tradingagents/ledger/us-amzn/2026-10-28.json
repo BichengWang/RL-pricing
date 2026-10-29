@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "submission": "tradingagents",
+  "task": "us-amzn",
+  "decision_date": "2026-10-28",
+  "weights": {
+    "AMZN": 1.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.649312,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "AMZN",
+    "trade_date": "2026-10-28",
+    "signal": "Overweight",
+    "weight": 1.0,
+    "decision_sha256": "e8cffe03eb3e6c46e92268c7810e1d9ea301cb15515cfc4b4ab3d39491f73a3f",
+    "decision_head": "**Rating**: Overweight\n\n**Executive Summary**: Overweight AMZN and build in stages. Before Thursday's earnings, start with about 1/4 to 1/3 of a standard allocation near $254\u2013255 and don't chase above about $258. Add the second tranche only after the report, on a volume-backed daily close above $255\u2013256 plus specific capex and monetization guidance on the call. Add the final tranche only once free",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 138329,
+        "cached_input": 0,
+        "output": 24565,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 14646,
+        "cached_input": 0,
+        "output": 3421,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "ff7a5f2b3e8edc77332f36cab0e64214c79ed054a03c1f3e37367a49428505c2",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "40805285396",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-10-29T02:24:29+00:00"
+  },
+  "created_at": "2026-10-29T02:24:29+00:00"
+}

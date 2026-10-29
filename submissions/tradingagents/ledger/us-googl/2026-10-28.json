@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "submission": "tradingagents",
+  "task": "us-googl",
+  "decision_date": "2026-10-28",
+  "weights": {
+    "GOOGL": 1.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.6578900000000001,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "GOOGL",
+    "trade_date": "2026-10-28",
+    "signal": "Overweight",
+    "weight": 1.0,
+    "decision_sha256": "224fd5242d68f43633f81f1709afd99e8a6a261f5187f381682b06797cf35659",
+    "decision_head": "**Rating**: Overweight\n\n**Executive Summary**: Build GOOGL in stages toward about 1.25x a standard allocation. Start with a 0.4\u20130.5x tranche near $325, and move the stop down from $315.50 to a daily close below about $310 (roughly 1.8x the 8.07 ATR). Add the second ~0.3x tranche only on a close above $341 with RSI above 45 and MACD turning up. Add the last ~0.3x after the next quarterly report, an",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 130133,
+        "cached_input": 0,
+        "output": 23654,
+        "calls": 14
+      },
+      "claude-opus-5-5": {
+        "input": 13931,
+        "cached_input": 0,
+        "output": 5268,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "1e7da74d2704c46ab94a1081041c4b5ba9a23098dd00307cc7316ff403f3e229",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "40805285396",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-10-29T02:20:50+00:00"
+  },
+  "created_at": "2026-10-29T02:20:50+00:00"
+}
