@@ -5,7 +5,7 @@ The multi-agent LLM framework is installed separately with the pinned
 free of direct URLs so ``rl-pricing`` can be published to PyPI) and imported
 only when :class:`TradingAgentsPolicy` is constructed, so ``rl.bench`` can be
 imported and submissions validated without it. Construction checks the installed
-commit, asks the OpenAI API for both pinned models (a rejected key or a
+commit, asks the provider's API for both pinned models (a rejected key or a
 missing model fails here, before any decision can be recorded; listing a
 model is free) and builds the graph.
 
@@ -28,10 +28,11 @@ sell moves to cash rather than short. ``rating_weights`` overrides the table.
 
 Cost. ``last_cost_usd`` is token usage, collected with a LangChain callback on
 every model call, times ``prices_usd_per_mtok`` (USD per million tokens). The
-built-in table is copied from https://developers.openai.com/api/docs/pricing
-(standard tier, short context, read 2026-10-14); a submission pins the prices
-it was run with in its params. Cached input tokens bill at the cached rate,
-all other input tokens at the input rate, and reasoning tokens are part of the
+built-in table is copied from the OpenAI and Anthropic pricing pages (see
+``DEFAULT_PRICES_USD_PER_MTOK``); a submission pins the prices it was run
+with in its params. Cached input tokens bill at the cached rate (Anthropic
+cache writes, which TradingAgents does not request, would bill at the input
+rate), all other input tokens at the input rate, and reasoning tokens are part of the
 output count. A model missing from the table is billed at the most expensive
 listed rate and named in ``ledger_inputs["unpriced_models"]``.
 
@@ -84,8 +85,14 @@ DEFAULT_RATING_WEIGHTS: dict[str, float | None] = {
     "review": None,
 }
 
-#: USD per million tokens, OpenAI standard tier, short context
-#: (https://developers.openai.com/api/docs/pricing, read 2026-10-14).
+#: The key each supported provider reads from the environment (the names
+#: TradingAgents' ``llm_clients/api_key_env.py`` uses).
+API_KEY_ENV: dict[str, str] = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}
+
+#: USD per million tokens, standard tier, short context: OpenAI
+#: (https://developers.openai.com/api/docs/pricing, read 2026-10-14) and Anthropic
+#: (https://platform.claude.com/docs/en/about-claude/pricing, read 2026-10-29;
+#: ``cached_input`` is the cache-hit rate).
 DEFAULT_PRICES_USD_PER_MTOK: dict[str, dict[str, float]] = {
     "gpt-6-sol": {"input": 2.00, "cached_input": 0.20, "output": 10.00},
     "gpt-6.1-sol": {"input": 2.00, "cached_input": 0.10, "output": 10.00},
@@ -96,6 +103,9 @@ DEFAULT_PRICES_USD_PER_MTOK: dict[str, dict[str, float]] = {
     "gpt-5.6-luna": {"input": 0.20, "cached_input": 0.02, "output": 1.20},
     "gpt-4o": {"input": 2.50, "cached_input": 1.25, "output": 10.00},
     "gpt-4o-mini": {"input": 0.15, "cached_input": 0.075, "output": 0.60},
+    "claude-opus-5-5": {"input": 4.00, "cached_input": 0.20, "output": 20.00},
+    "claude-sonnet-5-5": {"input": 2.00, "cached_input": 0.10, "output": 10.00},
+    "claude-sonnet-5": {"input": 2.00, "cached_input": 0.20, "output": 10.00},
 }
 
 
@@ -183,6 +193,31 @@ def installed_commit() -> str | None:
     if not raw:
         return None
     return (json.loads(raw).get("vcs_info") or {}).get("commit_id")
+
+
+def check_models(provider: str, models) -> None:
+    """Retrieve each model from the provider's API with the environment's key.
+
+    Raises ``RuntimeError`` naming the model if the key is rejected or the
+    model is unavailable. Providers without a check here pass unchecked.
+    """
+    if provider == "openai":
+        import openai
+
+        client = openai.OpenAI()  # OPENAI_API_KEY, OPENAI_BASE_URL, as TradingAgents
+    elif provider == "anthropic":
+        import anthropic
+
+        client = anthropic.Anthropic()  # ANTHROPIC_API_KEY, ANTHROPIC_BASE_URL
+    else:
+        return
+    for model in dict.fromkeys(models):
+        try:
+            client.models.retrieve(model)
+        except Exception as error:
+            raise RuntimeError(
+                "{} preflight failed for model {!r}: {}: {}".format(provider, model, type(error).__name__, error)
+            ) from error
 
 
 class TradingAgentsPolicy(Policy):
@@ -288,23 +323,13 @@ class TradingAgentsPolicy(Policy):
                 "reinstall with pip install '{}'".format(commit, self.expected_commit, INSTALL_REQUIREMENT)
             )
         try:
-            import openai
             import tradingagents
             from tradingagents.default_config import DEFAULT_CONFIG
             from tradingagents.graph.trading_graph import TradingAgentsGraph
         except ImportError as error:
             raise ImportError("{} (import failed: {})".format(INSTALL_HINT, error)) from error
         self._agent_version = getattr(tradingagents, "__version__", None)
-        if self.llm_provider == "openai":
-            # Same client defaults as TradingAgents (OPENAI_API_KEY, OPENAI_BASE_URL).
-            client = openai.OpenAI()
-            for model in dict.fromkeys((self.deep_think_llm, self.quick_think_llm)):
-                try:
-                    client.models.retrieve(model)
-                except Exception as error:
-                    raise RuntimeError(
-                        "OpenAI preflight failed for model {!r}: {}: {}".format(model, type(error).__name__, error)
-                    ) from error
+        check_models(self.llm_provider, (self.deep_think_llm, self.quick_think_llm))
         return TradingAgentsGraph(
             selected_analysts=list(self.analysts),
             debug=False,

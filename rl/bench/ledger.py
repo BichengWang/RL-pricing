@@ -24,7 +24,8 @@ Recording (:func:`record_decision`)
     * Optional policy attributes read after ``act``: ``last_cost_usd`` (spend of
       the call, counted against the budget) and ``ledger_inputs`` (JSON-able
       provenance: model ids, agent commit, raw decision...).
-    * An LLM submission requires ``OPENAI_API_KEY``, ``FRED_API_KEY``,
+    * An LLM submission requires its provider's key (``OPENAI_API_KEY`` or
+      ``ANTHROPIC_API_KEY``, from ``params.llm_provider``), ``FRED_API_KEY``,
       ``SEC_EDGAR_USER_AGENT`` and a monthly budget cap. Its policy is built
       before recording even a budget hold, so missing credentials, a key or
       model the provider rejects, a mismatched TradingAgents pin or graph
@@ -82,6 +83,7 @@ import numpy as np
 from rl.bench import runner
 from rl.bench.engine import Backtest, check_weights, simulate
 from rl.bench.market import MarketData, MarketView, as_day
+from rl.bench.policies.tradingagents import API_KEY_ENV
 from rl.bench.submission import SUBMISSIONS_DIR, Submission, discover
 from rl.bench.tasks import Task, get_task
 
@@ -261,7 +263,10 @@ def record_decision(
     cap = None if submission.kind == "baseline" else _cap(budget)
     policy = None
     if submission.kind == "llm":
-        missing = [name for name in ("OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT")
+        provider = submission.params.get("llm_provider", "openai")
+        if provider not in API_KEY_ENV:
+            raise ValueError("LLM ledger preflight: unsupported llm_provider {!r}".format(provider))
+        missing = [name for name in (API_KEY_ENV[provider], "FRED_API_KEY", "SEC_EDGAR_USER_AGENT")
                    if not os.environ.get(name, "").strip()]
         if cap is None:
             missing.append(BUDGET_ENV)

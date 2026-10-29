@@ -32,33 +32,37 @@ def test_score_is_per_day_absolute_percentage_error_and_tracks_coverage():
     assert "no pass threshold" in result["verdict"]
 
 
+PARAMS = json.loads(probe.SUBMISSION.read_text())["params"]
+KEY = probe.KEY_ENV[PARAMS["llm_provider"]]
+
+
 def test_run_saves_raw_mocked_responses_ids_timestamps_and_usage(tmp_path, monkeypatch):
-    monkeypatch.setenv("OPENAI_API_KEY", "test-key")
+    monkeypatch.setenv(KEY, "test-key")
     monkeypatch.setattr(probe, "_actual_closes", lambda start: (
         ["2026-10-19", "2026-10-20"],
         {ticker: {"2026-10-19": 100.0, "2026-10-20": 101.0}
          for ticker in ("AAPL", "GOOGL", "AMZN")},
     ))
     calls = []
+    answer = json.dumps({
+        "closes": {ticker: {"2026-10-19": 100, "2026-10-20": 101} for ticker in ("AAPL", "GOOGL", "AMZN")},
+        "events": {"AAPL": "", "GOOGL": "", "AMZN": ""},
+    })
 
-    def mocked_response(model, prompt, api_key):
-        calls.append((model, prompt, api_key))
-        return {
-            "id": "resp_123", "model": model + "-2026-09-22",
-            "usage": {"input_tokens": 20, "output_tokens": 5},
-            "output": [{"content": [{"type": "output_text", "text": json.dumps({
-                "closes": {ticker: {"2026-10-19": 100, "2026-10-20": 101}
-                           for ticker in ("AAPL", "GOOGL", "AMZN")},
-                "events": {"AAPL": "", "GOOGL": "", "AMZN": ""},
-            })}]}],
-        }
+    def mocked_response(provider, model, prompt, api_key):
+        calls.append((provider, model, prompt, api_key))
+        payload = {"id": "msg_123", "model": model + "-2026-09-22", "usage": {"input_tokens": 20, "output_tokens": 5}}
+        if provider == "anthropic":  # Messages API; models often fence their JSON
+            return {**payload, "content": [{"type": "text", "text": "```json\n" + answer + "\n```"}]}
+        return {**payload, "output": [{"content": [{"type": "output_text", "text": answer}]}]}
 
     monkeypatch.setattr(probe, "_response", mocked_response)
     output = tmp_path / "probe.json"
     assert probe.run("2026-10-26", output) == 0
     result = json.loads(output.read_text())
-    assert [call[0] for call in calls] == ["gpt-6-sol", "gpt-6-luna"]
-    assert all(call[2] == "test-key" and "2026-10-26" in call[1] for call in calls)
+    assert [call[:2] for call in calls] == [(PARAMS["llm_provider"], PARAMS["deep_think_llm"]),
+                                           (PARAMS["llm_provider"], PARAMS["quick_think_llm"])]
+    assert all(call[3] == "test-key" and "2026-10-26" in call[2] for call in calls)
     assert len(result["models"]) == 2
     for model in result["models"]:
         assert model["returned_model"].endswith("2026-09-22")
@@ -68,7 +72,7 @@ def test_run_saves_raw_mocked_responses_ids_timestamps_and_usage(tmp_path, monke
 
 
 def test_missing_key_fails_before_data_or_network(tmp_path, monkeypatch, capsys):
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.delenv(KEY, raising=False)
     monkeypatch.setattr(probe, "_actual_closes", lambda start: pytest.fail("must not load data"))
     assert probe.run("2026-10-26", tmp_path / "probe.json") != 0
-    assert "OPENAI_API_KEY is unset" in capsys.readouterr().err
+    assert "{} is unset".format(KEY) in capsys.readouterr().err

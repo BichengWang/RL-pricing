@@ -15,16 +15,21 @@ from urllib.request import Request, urlopen
 REPO = Path(__file__).resolve().parents[3]
 SUBMISSION = REPO / "submissions" / "tradingagents" / "submission.json"
 OUTPUT_DIR = Path(__file__).resolve().parent
-API_URL = "https://api.openai.com/v1/responses"
+API_URLS = {
+    "openai": "https://api.openai.com/v1/responses",
+    "anthropic": "https://api.anthropic.com/v1/messages",
+}
+KEY_ENV = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}
 
 # Pinned prompt: request an independently parseable estimate and a short account
-# of events. No tools are sent to the Responses API.
+# of events. No tools are sent to the API.
 PROMPT = """Without using tools or looking anything up, recall the daily closing prices for AAPL, GOOGL, and AMZN for each trading session on {dates}, the five trading sessions immediately before {start}. Also name notable company or market events affecting each stock during those dates. Return only JSON with this shape: {{"closes": {{"AAPL": {{"YYYY-MM-DD": 123.45}}, "GOOGL": {{"YYYY-MM-DD": 123.45}}, "AMZN": {{"YYYY-MM-DD": 123.45}}}}, "events": {{"AAPL": "...", "GOOGL": "...", "AMZN": "..."}}}}. Use numbers for prices; use null if you do not recall a price. Do not infer prices from current quotes."""
 
 
 def parse_prices(response_text: str) -> dict[str, dict[str, float | None]]:
-    """Parse the pinned JSON response, rejecting malformed price entries."""
-    payload = json.loads(response_text)
+    """Parse the pinned JSON response (fences or prose around it are ignored),
+    rejecting malformed price entries."""
+    payload = json.loads(response_text[response_text.find("{"):response_text.rfind("}") + 1])
     closes = payload.get("closes")
     if not isinstance(closes, dict):
         raise ValueError("response JSON must contain a 'closes' object")
@@ -70,19 +75,25 @@ def score_prices(
     }
 
 
-def _response(model: str, prompt: str, api_key: str) -> dict:
-    body = json.dumps({"model": model, "input": prompt}).encode("utf-8")
-    request = Request(API_URL, data=body, headers={
-        "Authorization": "Bearer " + api_key,
-        "Content-Type": "application/json",
-    })
-    with urlopen(request, timeout=120) as response:
+def _response(provider: str, model: str, prompt: str, api_key: str) -> dict:
+    if provider == "anthropic":
+        body = {"model": model, "max_tokens": 4096, "messages": [{"role": "user", "content": prompt}]}
+        headers = {"x-api-key": api_key, "anthropic-version": "2023-06-01"}
+    else:
+        body = {"model": model, "input": prompt}
+        headers = {"Authorization": "Bearer " + api_key}
+    request = Request(API_URLS[provider], data=json.dumps(body).encode("utf-8"),
+                      headers={**headers, "Content-Type": "application/json"})
+    with urlopen(request, timeout=300) as response:
         return json.loads(response.read())
 
 
 def _output_text(payload: dict) -> str:
     texts = []
-    for item in payload.get("output", []):
+    for item in payload.get("content", []):  # Anthropic Messages API
+        if item.get("type") == "text":
+            texts.append(item.get("text", ""))
+    for item in payload.get("output", []):  # OpenAI Responses API
         for part in item.get("content", []):
             if part.get("type") == "output_text":
                 texts.append(part.get("text", ""))
@@ -110,9 +121,11 @@ def _actual_closes(start: str) -> tuple[list[str], dict[str, dict[str, float]]]:
 
 
 def run(start: str, output: Path) -> int:
-    api_key = os.environ.get("OPENAI_API_KEY")
+    params = json.loads(SUBMISSION.read_text())["params"]
+    provider = params.get("llm_provider", "openai")
+    api_key = os.environ.get(KEY_ENV[provider])
     if not api_key:
-        print("OPENAI_API_KEY is unset; recall probe requires an OpenAI API key", file=sys.stderr)
+        print("{} is unset; recall probe requires a {} API key".format(KEY_ENV[provider], provider), file=sys.stderr)
         return 2
     try:
         start_day = date.fromisoformat(start)
@@ -120,8 +133,6 @@ def run(start: str, output: Path) -> int:
         print("--start must be a date in YYYY-MM-DD form", file=sys.stderr)
         return 2
 
-    spec = json.loads(SUBMISSION.read_text())
-    params = spec["params"]
     sessions, actual = _actual_closes(start_day.isoformat())
     prompt = PROMPT.format(start=start_day.isoformat(), dates=", ".join(sessions))
     result = {
@@ -130,6 +141,7 @@ def run(start: str, output: Path) -> int:
         "sessions": sessions,
         "tickers": ["AAPL", "GOOGL", "AMZN"],
         "actual_close_source": "rl.bench.data.load_task_data; loader close values (dividend adjusted)",
+        "provider": provider,
         "prompt": prompt,
         "models": [],
     }
@@ -142,10 +154,10 @@ def run(start: str, output: Path) -> int:
         model = params[tier]
         timestamp = datetime.now(timezone.utc).isoformat()
         try:
-            response = _response(model, prompt, api_key)
+            response = _response(provider, model, prompt, api_key)
         except (HTTPError, URLError, TimeoutError, json.JSONDecodeError) as error:
             save_result()
-            print("OpenAI request failed for {}: {}".format(model, error), file=sys.stderr)
+            print("{} request failed for {}: {}".format(provider, model, error), file=sys.stderr)
             return 1
         raw = _output_text(response)
         try:

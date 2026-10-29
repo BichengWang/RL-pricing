@@ -3,9 +3,9 @@
   "kind": "llm",
   "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
   "params": {
-    "llm_provider": "openai",
-    "deep_think_llm": "gpt-6-sol",
-    "quick_think_llm": "gpt-6-luna",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
     "max_debate_rounds": 1,
     "max_risk_discuss_rounds": 1,
     "analysts": [
@@ -23,18 +23,18 @@
       "prediction_markets": "polymarket"
     },
     "config_overrides": {
-      "openai_reasoning_effort": "medium"
+      "anthropic_effort": "medium"
     },
     "prices_usd_per_mtok": {
-      "gpt-6-sol": {
+      "claude-opus-5-5": {
+        "input": 4.0,
+        "cached_input": 0.2,
+        "output": 20.0
+      },
+      "claude-sonnet-5": {
         "input": 2.0,
         "cached_input": 0.2,
         "output": 10.0
-      },
-      "gpt-6-luna": {
-        "input": 0.1,
-        "cached_input": 0.01,
-        "output": 0.5
       }
     },
     "max_age_days": 7,
@@ -50,5 +50,5 @@
     "Tauric Research (Y. Xiao, E. Sun, D. Luo, W. Wang)"
   ],
   "url": "https://github.com/TauricResearch/TradingAgents",
-  "description": "TradingAgents (arXiv 2412.20138) at release v0.6.0, commit 1394a3f, run before every US open by the decision ledger on AAPL, GOOGL and AMZN, one account per ticker. Each day it analyses the last closed session with four analysts, a bull/bear debate, a trader and a three-way risk debate, and its Portfolio Manager's rating is traded long/flat: Buy and Overweight go fully long, Sell and Underweight go to cash, Hold and an unparsable REVIEW keep the position. The paper trades buy/sell/hold and its figures draw long and short arrows; this engine is long-only, so a Sell here is flat, not short. Models are the release defaults, deliberately: quick tier gpt-6-luna ($0.10/$0.50 per million tokens) for analysts, researchers, debaters and trader; deep tier gpt-6-sol ($2/$10) for the research and portfolio managers. The paper used gpt-4o-mini and gpt-4o for the quick tier and o1-preview for the deep tier; this run keeps the two-tier design but uses the release's current defaults, so it tests the framework on current models, not on the paper's models. One debate round per team (the release default); reasoning effort medium; every other setting is the release default. Memory is off by construction: each decision runs in a fresh temporary directory, so the agent does not learn from earlier days. max_age_days=7 stops the policy from being replayed over history by the historical or live-replay runners, since current models' training data covers the paper's 2024 window. Cost is tracked from reported token usage at the prices pinned in params. trials=1: no configuration was tuned on any data."
+  "description": "TradingAgents (arXiv 2412.20138) at release v0.6.0, commit 1394a3f, run before every US open by the decision ledger on AAPL, GOOGL and AMZN, one account per ticker. Each day it analyses the last closed session with four analysts, a bull/bear debate, a trader and a three-way risk debate, and its Portfolio Manager's rating is traded long/flat: Buy and Overweight go fully long, Sell and Underweight go to cash, Hold and an unparsable REVIEW keep the position. The paper trades buy/sell/hold and its figures draw long and short arrows; this engine is long-only, so a Sell here is flat, not short. Models are Anthropic's, the first entries of the release's own model picker for that provider: quick tier claude-sonnet-5 ($2/$10 per million tokens) for analysts, researchers, debaters and trader; deep tier claude-opus-5-5 ($4/$20) for the research and portfolio managers. The pre-registration named the release's OpenAI defaults (gpt-6-luna, gpt-6-sol); the provider was changed before the first entry because the lab's key is Anthropic's, as recorded in the R3 addendum. The paper used gpt-4o-mini and gpt-4o for the quick tier and o1-preview for the deep tier; this run keeps the two-tier design on current models, so it tests the framework, not the paper's models. One debate round per team (the release default); effort medium; every other setting is the release default. Memory is off by construction: each decision runs in a fresh temporary directory, so the agent does not learn from earlier days. max_age_days=7 stops the policy from being replayed over history by the historical or live-replay runners, since current models' training data covers the paper's 2024 window. Cost is tracked from reported token usage at the prices pinned in params. trials=1: no configuration was tuned on any data."
 }
