@@ -226,7 +226,21 @@ def evaluate(
     benchmark = _benchmark(task, data, history, start, validation_start)
     fit = {"history_end": str(history.dates[-1]), "validation_start": str(validation_start)}
     record = _record(task, submission, "historical", data, fit, runs, benchmark)
-    return _store(Path(out_root) / "historical" / task.id / "{}.json".format(submission.id), record)
+    record["submission_sha256"] = submission.fingerprint()
+    return _store(_historical_path(out_root, task, submission), record)
+
+
+def _historical_path(out_root, task: Task, submission: Submission) -> Path:
+    return Path(out_root) / "historical" / task.id / "{}.json".format(submission.id)
+
+
+def historical_is_current(task: Task, submission: Submission, out_root=LEADERBOARD_DIR) -> bool:
+    """Whether the stored historical record was computed from this submission as it is now."""
+    try:
+        record = json.loads(_historical_path(out_root, task, submission).read_text())
+    except FileNotFoundError:
+        return False
+    return record.get("submission_sha256") == submission.fingerprint()
 
 
 def freeze(

@@ -21,6 +21,12 @@ change in minor releases.
 
 ## Unreleased
 
+- Historical records store `submission_sha256`, a hash of the submission's
+  `name`, `kind`, `policy`, `params`, `trials` and shipped files.
+  `rl-pricing bench run-all --stale` recomputes only the records whose
+  submission changed, and `run-all` without `--task` covers every task with a
+  live track. CI runs it after each merge, so contributors no longer commit
+  historical records.
 - `TradingAgentsPolicy` asks the provider's API (OpenAI or Anthropic) for
   both pinned models when it is constructed. A revoked key or a missing model
   now fails the ledger run with no entry, so a later run before the open can

@@ -26,6 +26,7 @@ on which the submission commits a decision before every session open
 
 from __future__ import annotations
 
+import hashlib
 import importlib
 import importlib.util
 import json
@@ -112,6 +113,31 @@ class Submission:
         if self.directory is None:
             raise ValueError("Submission {} has no directory".format(self.id))
         return self.directory / "ledger" / task_id
+
+    def fingerprint(self) -> str:
+        """SHA-256 of everything that shapes this submission's historical record.
+
+        It covers the fields a record stores (``name``, ``kind``, ``policy``,
+        ``params``, ``trials``) and every file shipped in the directory except
+        ``submission.json``, the CI-written ``frozen/`` and ``ledger/``,
+        ``__pycache__`` and dotfiles. Editing ``description``, ``authors`` or
+        ``url`` keeps a record current; any other change makes it stale.
+        """
+        spec = {"name": self.name, "kind": self.kind, "policy": self.policy, "params": self.params, "trials": self.trials}
+        digest = hashlib.sha256(json.dumps(spec, sort_keys=True, separators=(",", ":")).encode())
+        if self.directory is None:
+            return digest.hexdigest()
+        for path in sorted(self.directory.rglob("*"), key=lambda p: p.relative_to(self.directory).as_posix()):
+            parts = path.relative_to(self.directory).parts
+            if (
+                not path.is_file()
+                or parts == ("submission.json",)
+                or parts[0] in ("frozen", "ledger")
+                or any(part == "__pycache__" or part.startswith(".") for part in parts)
+            ):
+                continue
+            digest.update(b"\0" + "/".join(parts).encode() + b"\0" + hashlib.sha256(path.read_bytes()).digest())
+        return digest.hexdigest()
 
 
 def discover(root=SUBMISSIONS_DIR) -> dict[str, Submission]:

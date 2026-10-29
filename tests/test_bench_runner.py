@@ -346,3 +346,34 @@ def test_submission_can_ship_its_own_policy_file(tmp_path, data):
     missing = Submission(**{**Submission.load(directory).__dict__, "policy": "absent.py:FirstAsset"})
     with pytest.raises(FileNotFoundError):
         missing.policy_class()
+
+
+def test_run_all_stale_recomputes_only_records_whose_submission_changed(tmp_path, capsys):
+    root, out = tmp_path / "subs", tmp_path / "out"
+    make_submission(root, "conc", "test_bench_runner:Concentrated")
+    shipped = root / "first"
+    shipped.mkdir()
+    (shipped / "policy.py").write_text(
+        "from test_bench_runner import Concentrated as First\n"
+    )
+    spec = {"name": "First", "kind": "other", "policy": "policy.py:First", "description": "v1"}
+    (shipped / "submission.json").write_text(json.dumps(spec))
+    argv = ["bench", "run-all", "--task", "synthetic", "--stale", "--submissions-root", str(root), "--out-root", str(out)]
+
+    def written():
+        assert cli.main(argv) == 0
+        return sorted(line.split("/")[-1] for line in capsys.readouterr().out.splitlines() if line.startswith("Wrote"))
+
+    assert written() == ["conc.json", "first.json"]
+    # Imports leave bytecode behind; descriptions don't change results.
+    (shipped / "__pycache__").mkdir(exist_ok=True)
+    (shipped / "__pycache__" / "policy.cpython-313.pyc").write_bytes(b"stale bytecode")
+    (shipped / "submission.json").write_text(json.dumps({**spec, "description": "v2"}))
+    assert written() == []
+    (shipped / "policy.py").write_text("from test_bench_runner import TiltPolicy as First\n")
+    assert written() == ["first.json"]
+    (shipped / "submission.json").write_text(json.dumps({**spec, "trials": 3}))
+    assert written() == ["first.json"]
+    # Without --stale every record is recomputed.
+    assert cli.main(argv[:4] + argv[5:]) == 0
+    assert capsys.readouterr().out.count("Wrote") == 2

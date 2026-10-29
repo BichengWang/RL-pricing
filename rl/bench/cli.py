@@ -38,10 +38,18 @@ def build_parser() -> ArgumentParser:
     run.add_argument("--submission", required=True)
     run.add_argument("--seeds", type=int, help="number of seeds (default: 5 if stochastic, else 1)")
 
-    run_all = commands.add_parser("run-all", parents=[common], help="historical track: every submission on a task")
-    run_all.add_argument("--task", required=True, choices=sorted(TASKS))
+    run_all = commands.add_parser(
+        "run-all",
+        parents=[common],
+        help="historical track: every submission on a task (omit --task for every task with a live track)",
+    )
+    run_all.add_argument("--task", choices=sorted(TASKS))
     run_all.add_argument("--kind", help="only submissions of this kind")
     run_all.add_argument("--seeds", type=int, help="number of seeds (default: 5 if stochastic, else 1)")
+    run_all.add_argument(
+        "--stale", action="store_true",
+        help="skip submissions whose record was computed from their current definition (CI after a merge)",
+    )
 
     freeze = commands.add_parser(
         "freeze",
@@ -145,21 +153,30 @@ def _cmd_run(options) -> int:
 def _cmd_run_all(options) -> int:
     from rl.bench.data import load_task_data
 
-    task = get_task(options.task)
-    data = load_task_data(task, end=task.test_end)
-    failures = []
-    for submission in discover(options.submissions_root).values():
-        if (options.kind and submission.kind != options.kind) or submission.ledger:
-            continue
-        try:
-            path = runner.evaluate(
-                task, submission, data=data, seeds=_seeds(options.seeds), out_root=options.out_root
-            )
-        except Exception:
-            log.exception("%s failed on %s", submission.id, task.id)
-            failures.append(submission.id)
-        else:
-            print("Wrote {}".format(path))
+    tasks = [get_task(options.task)] if options.task else [t for t in TASKS.values() if t.live]
+    submissions = [
+        s for s in discover(options.submissions_root).values() if not s.ledger and options.kind in (None, s.kind)
+    ]
+    written, failures = 0, []
+    for task in tasks:
+        data = None
+        for submission in submissions:
+            if options.stale and runner.historical_is_current(task, submission, options.out_root):
+                continue
+            if data is None:
+                data = load_task_data(task, end=task.test_end)
+            try:
+                path = runner.evaluate(
+                    task, submission, data=data, seeds=_seeds(options.seeds), out_root=options.out_root
+                )
+            except Exception:
+                log.exception("%s failed on %s", submission.id, task.id)
+                failures.append("{}/{}".format(task.id, submission.id))
+            else:
+                written += 1
+                print("Wrote {}".format(path))
+    if not written and not failures:
+        print("Nothing to do")
     if failures:
         print("Failed: {}".format(", ".join(failures)), file=sys.stderr)
         return 1

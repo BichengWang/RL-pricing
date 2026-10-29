@@ -10,10 +10,21 @@ on:
     branches: [main]
     paths:
       - "submissions/**"
+  # Auto Merge lands pull requests with GITHUB_TOKEN, whose pushes start no
+  # workflows, so its completion stands in for `push` (see the `merged` job).
+  workflow_run:
+    workflows: [Auto Merge]
+    types: [completed]
   schedule:
     # Monthly, on the 2nd, after the previous month's sessions have settled.
     - cron: "0 6 2 * *"
   workflow_dispatch:
+    inputs:
+      job:
+        description: "live: score and write the monthly report; merged: freeze and score merged submissions"
+        type: choice
+        options: [live, merged]
+        default: live
 
 permissions:
   contents: read
@@ -53,10 +64,43 @@ jobs:
           rl-pricing bench leaderboard --out-root "$RUNNER_TEMP/board" --no-readme > /dev/null
           cat "$RUNNER_TEMP/board/LEADERBOARD.md" >> "$GITHUB_STEP_SUMMARY"
 
+  merged:
+    # Go on only if the pull request Auto Merge ran for is merged and changed
+    # a submission (CI-written frozen/ and ledger/ files aside).
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      changed: ${{ steps.check.outputs.changed }}
+    steps:
+      - id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          changed=false
+          for pr in $(gh api "repos/$REPO/commits/$SHA/pulls" --jq '.[] | select(.merged_at != null) | .number'); do
+            if gh api --paginate "repos/$REPO/pulls/$pr/files" --jq '.[].filename' \
+                | grep -E '^submissions/[^/]+/' | grep -vqE '^submissions/[^/]+/(frozen|ledger)/'; then
+              echo "#$pr changed a submission"
+              changed=true
+            fi
+          done
+          echo "changed=$changed" >> "$GITHUB_OUTPUT"
+
   freeze:
     # Merged submissions are frozen on today's data for every task with a live
     # track (unless they arrive already frozen), then stamped as published.
-    if: github.event_name == 'push'
+    # CI also computes their historical records on those tasks; a record is
+    # recomputed only when its submission changed (`run-all --stale`).
+    needs: merged
+    if: >-
+      !cancelled() && (github.event_name == 'push'
+      || (github.event_name == 'workflow_dispatch' && inputs.job == 'merged')
+      || needs.merged.outputs.changed == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 350
     permissions:
@@ -85,21 +129,25 @@ jobs:
         run: rl-pricing bench freeze
       - name: Publish new freezes
         run: rl-pricing bench publish
-      - name: Commit frozen policies and publication times
+      - name: Historical records for new or changed submissions
+        run: rl-pricing bench run-all --stale
+      - name: Render leaderboard
+        run: rl-pricing bench leaderboard
+      - name: Commit frozen policies, publication times and records
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add submissions leaderboard
+          git add submissions leaderboard README.md
           if git diff --cached --quiet; then
-            echo "Nothing to freeze"
+            echo "Nothing to freeze or score"
           else
-            git commit -m "bench: freeze new submissions [skip ci]"
+            git commit -m "bench: freeze and score merged submissions [skip ci]"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
           fi
 
   live:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.job != 'merged')
     runs-on: ubuntu-latest
     timeout-minutes: 350
     permissions:
