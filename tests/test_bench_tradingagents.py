@@ -213,7 +213,8 @@ def test_the_submission_validates_without_the_extra_or_keys(monkeypatch, capsys)
     from rl.bench import cli
 
     monkeypatch.setitem(sys.modules, "tradingagents", None)
-    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    for name in ta.API_KEY_ENV.values():
+        monkeypatch.delenv(name, raising=False)
     submission = Submission.load(SUBMISSION)
     assert submission.kind == "llm" and submission.ledger == ("us-aapl", "us-googl", "us-amzn")
     monkeypatch.setattr(cli, "discover", lambda root: {submission.id: submission})
@@ -274,10 +275,10 @@ def tempfile_root():
 
 
 def _fake_agent_modules(monkeypatch, *, commit, record, rejected=()):
-    """Stand-ins for tradingagents, openai and langchain_core, enough to build a graph.
+    """Stand-ins for tradingagents, the provider SDKs and langchain_core, enough to build a graph.
 
-    The fake OpenAI client rejects the model ids in ``rejected`` as the API does
-    for a revoked key or a missing model.
+    The fake OpenAI and Anthropic clients reject the model ids in ``rejected``
+    as the APIs do for a revoked key or a missing model.
     """
 
     class Models:
@@ -286,7 +287,7 @@ def _fake_agent_modules(monkeypatch, *, commit, record, rejected=()):
                 raise PermissionError("model {} rejected".format(model))
             return types.SimpleNamespace(id=model)
 
-    class OpenAI:
+    class Client:
         def __init__(self):
             self.models = Models()
 
@@ -306,6 +307,7 @@ def _fake_agent_modules(monkeypatch, *, commit, record, rejected=()):
 
     modules = {
         "openai": types.ModuleType("openai"),
+        "anthropic": types.ModuleType("anthropic"),
         "tradingagents": types.ModuleType("tradingagents"),
         "tradingagents.default_config": types.ModuleType("tradingagents.default_config"),
         "tradingagents.graph": types.ModuleType("tradingagents.graph"),
@@ -313,7 +315,8 @@ def _fake_agent_modules(monkeypatch, *, commit, record, rejected=()):
         "langchain_core": types.ModuleType("langchain_core"),
         "langchain_core.callbacks": types.ModuleType("langchain_core.callbacks"),
     }
-    modules["openai"].OpenAI = OpenAI
+    modules["openai"].OpenAI = Client
+    modules["anthropic"].Anthropic = Client
     modules["tradingagents"].__version__ = "0.6.0"
     modules["tradingagents.default_config"].DEFAULT_CONFIG = {"data_vendors": {}, "max_tool_rounds": 20}
     modules["tradingagents.graph.trading_graph"].TradingAgentsGraph = Graph
@@ -346,12 +349,19 @@ def test_a_different_or_unknown_installed_commit_is_refused_at_construction(monk
     assert record == {}
 
 
-@pytest.mark.parametrize("rejected", ["gpt-6-sol", "gpt-6-luna"])
-def test_a_model_or_key_the_api_rejects_fails_construction_before_the_graph(monkeypatch, tmp_path, rejected):
+@pytest.mark.parametrize("provider,deep,quick,rejected", [
+    ("openai", "gpt-6-sol", "gpt-6-luna", "gpt-6-sol"),
+    ("openai", "gpt-6-sol", "gpt-6-luna", "gpt-6-luna"),
+    ("anthropic", "claude-opus-5-5", "claude-sonnet-5", "claude-opus-5-5"),
+    ("anthropic", "claude-opus-5-5", "claude-sonnet-5", "claude-sonnet-5"),
+])
+def test_a_model_or_key_the_api_rejects_fails_construction_before_the_graph(
+    monkeypatch, tmp_path, provider, deep, quick, rejected,
+):
     record = {}
     _fake_agent_modules(monkeypatch, commit=ta.PINNED_COMMIT, record=record, rejected={rejected})
-    with pytest.raises(RuntimeError, match="OpenAI preflight failed for model '{}'".format(rejected)):
-        TradingAgentsPolicy(workdir=str(tmp_path))
+    with pytest.raises(RuntimeError, match="{} preflight failed for model '{}'".format(provider, rejected)):
+        TradingAgentsPolicy(workdir=str(tmp_path), llm_provider=provider, deep_think_llm=deep, quick_think_llm=quick)
     assert record == {}
 
 

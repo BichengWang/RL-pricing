@@ -70,7 +70,8 @@ def clean(monkeypatch):
     CALLS.clear()
     for name in (
         "GITHUB_RUN_ID", "GITHUB_RUN_ATTEMPT", "GITHUB_REPOSITORY", "GITHUB_WORKFLOW_REF",
-        "GITHUB_TOKEN", ledger.BUDGET_ENV, "OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT",
+        "GITHUB_TOKEN", ledger.BUDGET_ENV, "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "FRED_API_KEY",
+        "SEC_EDGAR_USER_AGENT",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -344,7 +345,7 @@ def copy_participant(root, sub_id):
 
 
 @pytest.mark.parametrize("missing,cap,commit", [
-    ("OPENAI_API_KEY", "40", ta.PINNED_COMMIT),
+    ("ANTHROPIC_API_KEY", "40", ta.PINNED_COMMIT),  # the provider's key, from submission.json
     ("FRED_API_KEY", "40", ta.PINNED_COMMIT),
     ("SEC_EDGAR_USER_AGENT", "40", ta.PINNED_COMMIT),
     (None, None, ta.PINNED_COMMIT),
@@ -353,7 +354,7 @@ def copy_participant(root, sub_id):
     (None, "-1", ta.PINNED_COMMIT),
     (None, "40", "0" * 40),
     (None, "40", None),
-    ("OPENAI_API_KEY", "0", ta.PINNED_COMMIT),  # preflight also precedes budget holds
+    ("ANTHROPIC_API_KEY", "0", ta.PINNED_COMMIT),  # preflight also precedes budget holds
     (None, "0", "0" * 40),
 ])
 def test_llm_preflight_failure_writes_no_entry_but_canary_records(
@@ -364,7 +365,7 @@ def test_llm_preflight_failure_writes_no_entry_but_canary_records(
     paid = copy_participant(root, "tradingagents")
     paid.directory.rename(root / "aaa-paid")
     canary = copy_participant(root, "ledger-canary")
-    for name in ("OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT"):
+    for name in ("ANTHROPIC_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT"):
         if name != missing:
             monkeypatch.setenv(name, "test-only")
     if cap is not None:

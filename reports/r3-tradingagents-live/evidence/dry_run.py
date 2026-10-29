@@ -14,11 +14,13 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parents[3]
 SUBMISSION_FILE = REPO / "submissions" / "tradingagents" / "submission.json"
 TASKS = ("us-aapl", "us-googl", "us-amzn")
-REQUIRED_ENV = ("OPENAI_API_KEY", "FRED_API_KEY", "SEC_EDGAR_USER_AGENT", "LEDGER_MONTHLY_BUDGET_USD")
+KEY_ENV = {"openai": "OPENAI_API_KEY", "anthropic": "ANTHROPIC_API_KEY"}
 
 
 def run(refresh: bool = False) -> int:
-    missing = [name for name in REQUIRED_ENV if not os.environ.get(name)]
+    provider = json.loads(SUBMISSION_FILE.read_text())["params"].get("llm_provider", "openai")
+    required = (KEY_ENV[provider], "FRED_API_KEY", "SEC_EDGAR_USER_AGENT", "LEDGER_MONTHLY_BUDGET_USD")
+    missing = [name for name in required if not os.environ.get(name)]
     if missing:
         print("dry run requires local environment values for: {}".format(", ".join(missing)), file=sys.stderr)
         return 2

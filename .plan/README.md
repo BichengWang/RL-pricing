@@ -1,7 +1,7 @@
 # RL-pricing plan: the reproducibility lab for trading AI
 
-Status: 2026-10-28; audit and next steps in
-[`phase-0-foundations.md`](phase-0-foundations.md#status-2026-10-28). Owner:
+Status: 2026-10-29; audit and next steps in
+[`phase-0-foundations.md`](phase-0-foundations.md#status-2026-10-29). Owner:
 Bicheng Wang. This directory is the source of truth for direction; change
 [`decisions.md`](decisions.md) first when direction changes.
 
@@ -113,7 +113,7 @@ RL-pricing/
 | Engine, tasks, scoring, multi-seed runner | ✅ | Every L2 test |
 | Live track (freeze, CI publication, monthly replay) | ✅ | Leaderboard policies |
 | Share-trading toolkit (`--mode train/ensemble`) | ✅ | R0, R1 replication |
-| Decision ledger (daily, committed before the open) | ◐ Canary verified in production (3 entries, ledger equals engine, 10-28); R3 waits for the owner's OpenAI key and the addendum (P0.15) | R3 and any LLM agent |
+| Decision ledger (daily, committed before the open) | ◐ Canary verified in production (3 entries, ledger equals engine, 10-28); R3 starts on Anthropic models (addendum 2026-10-29) | R3 and any LLM agent |
 | Reports scaffolding and verdict table | ✅ | All reports |
 | Licensed survivorship-free US equities | ◐ Sharadar chosen; written confirmation pending (P0.6) | R1 (Dow 30 as of 2016 includes delisted names) |
 | CI-computed historical records, protocol version on records | 🔜 Phase 1 | Third-party submissions |
