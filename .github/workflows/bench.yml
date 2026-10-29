@@ -5,6 +5,7 @@ on:
     paths:
       - "submissions/**"
       - "rl/bench/**"
+      - "leaderboard/**"
       - ".github/workflows/bench.yml"
   push:
     branches: [main]
@@ -39,10 +40,10 @@ jobs:
         with:
           fetch-depth: 0
       - name: Reject edits to bot-owned results
-        # Publication times, live and ledger records, monthly reports and ledger
-        # entries are written only by workflows on main.
+        # Publication times, historical, live and ledger records, monthly
+        # reports and ledger entries are written only by workflows on main.
         run: |
-          if git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^leaderboard/(publications\.json|live/|ledger/|reports/)|^submissions/[^/]+/ledger/'; then
+          if git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^leaderboard/(publications\.json|historical/|live/|ledger/|reports/)|^submissions/[^/]+/ledger/'; then
             echo "::error::these paths are written by CI only"
             exit 1
           fi
