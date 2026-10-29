@@ -23,14 +23,15 @@ from 10-30.
 
 ## Status (2026-10-29)
 
-Checked after the 10-28 close. The R3 gate is met. The owner supplied an
+Checked after the 10-28 close. **R3 started.** The owner supplied an
 Anthropic key on 10-29, so R3 runs on Claude Opus 5.5 and Sonnet 5 instead
 of the pre-registered OpenAI models. That change, the recall probe, the
 measured cost and a $60 monthly cap are in
 [`addendum-2026-10-29.md`](../reports/r3-tradingagents-live/addendum-2026-10-29.md),
-committed before the first entry. The secrets are set once it's on `main`, so
-the next ledger run records decision 10-28 and the first fill is **10-29**
-(63 sessions).
+merged 02:15 UTC (#106, #107). The secrets were set at 02:15:25 UTC, and
+dispatched ledger run 40805285396 (started 02:15:33 UTC, green) committed
+decision 10-28 for all three stocks: Overweight on each, $1.96 in total. The
+first fill is **10-29** (63 sessions).
 
 Ledger runs since the #98 cron (P0.12). Only 5 of the 9 scheduled runs
 fired; each weekday's first run started 3 h 00 m to 3 h 43 m before the
@@ -49,7 +50,7 @@ first run starts after 13:00 UTC). From 11-02 the open is 14:30 UTC.
 | P0.2 | ✅ done | `rl-pricing bench reports` renders `reports/README.md` and the README block |
 | P0.3 | ◐ notice missing | `reply.md` still says "pending"; see P0.16 |
 | P0.4 | ◐ verified in production | `ledger score` on 10-28 (local, against the GitHub API): 3 entries, 2 verified and priced, the 10-27 entry pending its fill's price (its run check passes), 0 unverified, 0 missed. Its equity through the 10-27 close, 1.0, 0.9994711595, 1.0087419437, equals `simulate(data, EqualWeightBuyHold().act, start=first + 1)` to 10 decimals. Closes at 5 fills (10-30) |
-| P0.5 | ◐ starting | Anthropic (addendum 2026-10-29); the ledger preflight requires the provider's key from `params.llm_provider`. Closes with the first TradingAgents entry |
+| P0.5 | ✅ done | First entries on 10-29 (`b44c206`): AAPL, GOOGL and AMZN Overweight → long, $0.65–0.66 each. The ledger preflight requires the key of `params.llm_provider` |
 | P0.6 | ◐ owner | Sharadar chosen; written confirmation and purchase not recorded |
 | P0.7 | ✅ done | README limitation corrected on 10-25 (P0.20) |
 | P0.8 | ◐ dry run passed | P0.17. First CI run 11-02 06:00 UTC |
@@ -67,8 +68,9 @@ first run starts after 13:00 UTC). From 11-02 the open is 14:30 UTC.
 | P0.20 | ✅ done | README limitation and launch kit corrected |
 
 R3 timing: the canary filled 10-26, 10-27 and 10-28 (decisions 10-23, 10-26,
-10-27). The first ledger run after the secrets are set records TradingAgents'
-decision 10-28 if it starts before the 10-29 open, giving 63 sessions.
+10-27) and recorded decision 10-28 in the same run as TradingAgents. Exit
+criterion "TradingAgents has at least 3 live entries" is met after the 10-30
+and 11-02 morning runs.
 
 ## Next steps (2026-10-19 → 2026-11-05)
 

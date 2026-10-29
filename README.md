@@ -53,7 +53,7 @@ Verdicts: ✅ holds, ◐ partly holds, ✗ does not hold, ? inconclusive. [How a
 | --- | --- | --- |
 | R1 | FinRL ensemble ([Yang et al., ICAIF 2020](https://arxiv.org/abs/2511.12120)): Sharpe 1.30 vs the DJIA's 0.47, 2016–2020 | 2026-12-01 |
 | R2 | [TradingAgents](https://arxiv.org/abs/2412.20138) backtest: Sharpe 5.6–8.2 on AAPL, GOOGL, AMZN in 2024 Q1, replicated with a check for whether the models remember that period | 2027-01-05 |
-| R3 | TradingAgents run live on the same three stocks for three months, each decision committed before the open ([pre-registration](reports/r3-tradingagents-live/preregistration.md)) | 2027-02-15 |
+| R3 | TradingAgents run live on the same three stocks for three months, each decision committed before the open; first fill 2026-10-29 ([pre-registration](reports/r3-tradingagents-live/preregistration.md), [addendum](reports/r3-tradingagents-live/addendum-2026-10-29.md)) | 2027-02-15 |
 
 **Nominate a claim:** open an issue titled `Nominate: <paper>` with the
 quoted claim and a link to the code. Authors get each draft seven days before
