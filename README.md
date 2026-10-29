@@ -274,11 +274,14 @@ Set `trials` honestly to the number of configurations you tried.
 Then:
 
 1. `rl-pricing bench validate` and `rl-pricing bench run --task <task> --submission <id>` locally.
-2. Open a pull request with `submissions/<id>/` and your `leaderboard/historical/` records.
-   CI checks that the submission builds and the baselines reproduce.
-3. On merge, CI freezes the policy on today's data (or publishes your
-   committed freeze from `rl-pricing bench freeze`) and the monthly job scores
-   it live from then on.
+2. Open a pull request with `submissions/<id>/` only: CI writes every record
+   under `leaderboard/` and rejects pull requests that edit them. It checks
+   that the submission builds and the baselines reproduce.
+3. On merge, CI computes your historical records on every task with a live
+   track and freezes the policy on today's data (or publishes your committed
+   freeze from `rl-pricing bench freeze`); the monthly job scores it live
+   from then on. A later change to the submission recomputes its records;
+   editing only `description`, `authors` or `url` does not.
 
 ## Tasks
 
