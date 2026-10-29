@@ -130,7 +130,10 @@ jobs:
       - name: Score ledger decisions
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: rl-pricing bench ledger score
+        # --refresh: ledger-only tasks (us-aapl, us-googl, us-amzn) are not
+        # refreshed by `bench live`, and the restored cache can end a session
+        # before the month's last close.
+        run: rl-pricing bench ledger score --refresh
       - name: Monthly report
         run: rl-pricing bench monthly
       - name: Render leaderboard and verdicts
