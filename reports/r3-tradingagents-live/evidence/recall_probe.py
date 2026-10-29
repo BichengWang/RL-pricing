@@ -181,10 +181,9 @@ def run(start: str, output: Path) -> int:
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start", required=True, help="R3 start date (YYYY-MM-DD)")
-    parser.add_argument("--output", type=Path,
-                        default=OUTPUT_DIR / "recall_probe_2026-10-25.json")
+    parser.add_argument("--output", type=Path, help="default: evidence/recall_probe_<start>.json")
     args = parser.parse_args(argv)
-    return run(args.start, args.output)
+    return run(args.start, args.output or OUTPUT_DIR / "recall_probe_{}.json".format(args.start))
 
 
 if __name__ == "__main__":

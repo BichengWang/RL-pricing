@@ -5,7 +5,9 @@ The multi-agent LLM framework is installed separately with the pinned
 free of direct URLs so ``rl-pricing`` can be published to PyPI) and imported
 only when :class:`TradingAgentsPolicy` is constructed, so ``rl.bench`` can be
 imported and submissions validated without it. Construction checks the installed
-commit and builds the graph before any decision can be recorded.
+commit, asks the OpenAI API for both pinned models (a rejected key or a
+missing model fails here, before any decision can be recorded; listing a
+model is free) and builds the graph.
 
 Single-asset convention. ``act`` calls ``TradingAgentsGraph.propagate(ticker,
 date)`` for ``view.tickers[0]`` with ``date`` = the decision session (the last
@@ -286,12 +288,23 @@ class TradingAgentsPolicy(Policy):
                 "reinstall with pip install '{}'".format(commit, self.expected_commit, INSTALL_REQUIREMENT)
             )
         try:
+            import openai
             import tradingagents
             from tradingagents.default_config import DEFAULT_CONFIG
             from tradingagents.graph.trading_graph import TradingAgentsGraph
         except ImportError as error:
             raise ImportError("{} (import failed: {})".format(INSTALL_HINT, error)) from error
         self._agent_version = getattr(tradingagents, "__version__", None)
+        if self.llm_provider == "openai":
+            # Same client defaults as TradingAgents (OPENAI_API_KEY, OPENAI_BASE_URL).
+            client = openai.OpenAI()
+            for model in dict.fromkeys((self.deep_think_llm, self.quick_think_llm)):
+                try:
+                    client.models.retrieve(model)
+                except Exception as error:
+                    raise RuntimeError(
+                        "OpenAI preflight failed for model {!r}: {}: {}".format(model, type(error).__name__, error)
+                    ) from error
         return TradingAgentsGraph(
             selected_analysts=list(self.analysts),
             debug=False,

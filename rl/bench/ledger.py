@@ -26,9 +26,10 @@ Recording (:func:`record_decision`)
       provenance: model ids, agent commit, raw decision...).
     * An LLM submission requires ``OPENAI_API_KEY``, ``FRED_API_KEY``,
       ``SEC_EDGAR_USER_AGENT`` and a monthly budget cap. Its policy is built
-      before recording even a budget hold, so missing credentials, a mismatched
-      TradingAgents pin or graph construction failure writes no entry. Other
-      participants still record, and the command reports failure.
+      before recording even a budget hold, so missing credentials, a key or
+      model the provider rejects, a mismatched TradingAgents pin or graph
+      construction failure writes no entry. Other participants still record,
+      and the command reports failure.
     * If this month's summed ``cost_usd`` of the submission is at or above
       ``LEDGER_MONTHLY_BUDGET_USD`` the entry is a hold with reason
       ``"budget cap"`` (non-LLM policies are not built). Baselines cost nothing
