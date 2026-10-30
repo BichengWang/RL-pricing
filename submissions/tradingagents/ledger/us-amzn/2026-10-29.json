@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "submission": "tradingagents",
+  "task": "us-amzn",
+  "decision_date": "2026-10-29",
+  "weights": null,
+  "hold": true,
+  "reason": "error: AnthropicInvalidRequestError: Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'You have reached your specified API usage limits. You will regain access on 2026-11-01 at 00:00 UTC.'}, 'request_id': 'req_011CgYJBbwuqF4991wRw6a8Z'}",
+  "cost_usd": 0.0,
+  "inputs": {
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "66bdf48f794b451cb6d55a6532fbe71b34e1f6a891cd23feb762cf9d3f28a24a",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "41043779445",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-10-30T10:53:37+00:00"
+  },
+  "created_at": "2026-10-30T10:53:37+00:00"
+}
