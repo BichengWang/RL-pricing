@@ -7,16 +7,18 @@ same notice as any author under the lab protocol.
 
 ## Notice status
 
-**pending: owner to send draft to Xinyi Zhang by 2026-10-27.**
+**Sent 2026-11-01 23:19 UTC** (15:19 PST) by email from the repository owner
+to Xinyi Zhang (`xyzh@stanford.edu`). The 2026-10-27 target was missed: a
+draft saved on 10-28 was never sent.
 
-Seven days before publication the draft goes to her by email. The package:
+The email named the repository and this folder in words rather than as links,
+because the mail tool used rewrote every link into a redirect. It pointed to:
 
-- `reports/r0-wang-zhang-2026/report.md` (the draft),
-- `reports/r0-wang-zhang-2026/evidence/` (per-run results, `analyze.py`, `summary.json`),
-- the reproduction commands (`report.md`, section Reproduce).
+- `reports/r0-wang-zhang-2026/report.md` (the draft, with its Reproduce section),
+- `reports/r0-wang-zhang-2026/evidence/` (per-run results, `analyze.py`, `summary.json`).
 
-Earliest publication date: seven days after the notice is sent (2026-11-03 if
-sent on 2026-10-27).
+Earliest publication date: **2026-11-08**, seven days after the notice. The
+email says the report will not be announced before then.
 
 ## Reply
 
