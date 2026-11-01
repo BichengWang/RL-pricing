@@ -15,8 +15,8 @@ because the LSTM we could run is not the paper's pipeline. Steps of the
 protocol this report skipped or changed: the pre-registration is **post hoc**
 ([`preregistration.md`](preregistration.md)); no L1 replication (the paper's
 PDF gives no fill timing or fees, and our runs fix both); the S&P 500 baseline was
-replaced by 1/N; the co-author notice has not been sent yet
-([`reply.md`](reply.md)). Nothing below says anyone was wrong; it says
+replaced by 1/N; the co-author notice was sent on 2026-11-01, so the report
+is announced no earlier than 2026-11-08 ([`reply.md`](reply.md)). Nothing below says anyone was wrong; it says
 which claims hold under which setup.
 
 Numbers are cited as **[S]** `evidence/paper-2021-share-env.json` (per-run
