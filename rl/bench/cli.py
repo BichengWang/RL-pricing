@@ -64,7 +64,10 @@ def build_parser() -> ArgumentParser:
     freeze.add_argument("--task", choices=sorted(TASKS))
     freeze.add_argument("--submission")
     freeze.add_argument("--seeds", type=int, help="number of seeds (default: 3 if stochastic, else 1)")
-    freeze.add_argument("--force", action="store_true", help="replace an existing freeze")
+    freeze.add_argument("--force", action="store_true", help="replace an existing freeze (a new cohort)")
+    freeze.add_argument(
+        "--stale", action="store_true", help="also re-freeze, as a new cohort, submissions changed since their freeze"
+    )
     freeze.add_argument("--refresh", action="store_true", help="ignore the local data cache")
 
     live = commands.add_parser("live", parents=[common], help="live track: score frozen policies on new sessions")
@@ -175,7 +178,8 @@ def _cmd_run_all(options) -> int:
 
     tasks = [get_task(options.task)] if options.task else [t for t in TASKS.values() if t.live]
     submissions = [
-        s for s in discover(options.submissions_root).values() if not s.ledger and options.kind in (None, s.kind)
+        s for s in discover(options.submissions_root).values()
+        if not s.ledger and not s.is_retired() and options.kind in (None, s.kind)
     ]
     written, failures = 0, []
     for task in tasks:
@@ -203,13 +207,22 @@ def _cmd_run_all(options) -> int:
     return 0
 
 
+def _should_freeze(task, submission, options) -> bool:
+    if not (submission.frozen_dir(task.id) / runner.FREEZE_FILE).exists():
+        return True
+    return options.force or (options.stale and not runner.freeze_is_current(task, submission, options.out_root))
+
+
 def _cmd_freeze(options) -> int:
     from rl.bench.data import load_task_data
 
     if options.task and options.submission:
-        submission = _submission(options.submissions_root, options.submission)
+        task, submission = get_task(options.task), _submission(options.submissions_root, options.submission)
+        if submission.is_retired() or (options.stale and not _should_freeze(task, submission, options)):
+            print("{} is retired or up to date on {}".format(submission.id, task.id))
+            return 0
         path = runner.freeze(
-            get_task(options.task), submission, seeds=_seeds(options.seeds), force=options.force,
+            task, submission, seeds=_seeds(options.seeds), force=options.force or options.stale,
             refresh=options.refresh,
         )
         print("Froze {}".format(path))
@@ -224,12 +237,14 @@ def _cmd_freeze(options) -> int:
     for task in tasks:
         data = None
         for submission in submissions:
-            if (submission.frozen_dir(task.id) / runner.FREEZE_FILE).exists() and not options.force:
-                continue
-            if data is None:
-                data = load_task_data(task, refresh=options.refresh)
             try:
-                path = runner.freeze(task, submission, data=data, seeds=_seeds(options.seeds), force=options.force)
+                if submission.is_retired() or not _should_freeze(task, submission, options):
+                    continue
+                if data is None:
+                    data = load_task_data(task, refresh=options.refresh)
+                path = runner.freeze(
+                    task, submission, data=data, seeds=_seeds(options.seeds), force=options.force or options.stale
+                )
             except Exception:
                 log.exception("%s failed to freeze on %s", submission.id, task.id)
                 failures.append("{}/{}".format(task.id, submission.id))
@@ -248,7 +263,7 @@ def _cmd_live(options) -> int:
     failures = []
     loaded = {}
     for task, submission_id in _frozen_pairs(options.submissions_root, options.task, options.submission):
-        if submission_id not in submissions or not task.live:
+        if submission_id not in submissions or submissions[submission_id].is_retired() or not task.live:
             continue
         if task.id not in loaded:
             loaded[task.id] = load_task_data(task, refresh=options.refresh)
@@ -267,7 +282,7 @@ def _cmd_live(options) -> int:
 
 def _cmd_leaderboard(options) -> int:
     readme = None if options.no_readme else options.readme
-    summary = leaderboard.write_leaderboard(options.out_root, readme=readme)
+    summary = leaderboard.write_leaderboard(options.out_root, readme=readme, submissions_root=options.submissions_root)
     print((Path(options.out_root) / "LEADERBOARD.md").read_text())
     print("{} tables written to {}".format(len(summary["sections"]), options.out_root))
     return 0
@@ -285,9 +300,11 @@ def _cmd_validate(options) -> int:
     for submission in found.values():
         for task in TASKS.values():
             try:
+                if submission.ledger:
+                    ledger.declared_max_cost(submission)
                 if submission.kind == "llm" and submission.ledger:
                     # Paid graphs require credentials; record performs the live preflight.
-                    inspect.signature(submission.policy_class()).bind(**submission.params)
+                    inspect.signature(submission.policy_class()).bind(**runner.policy_params(submission))
                 else:
                     runner.build_policy(submission, task)
             except Exception as error:

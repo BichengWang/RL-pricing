@@ -29,6 +29,8 @@ from pathlib import Path
 import numpy as np
 
 from rl.bench import scoring
+from rl.bench.runner import READABLE_SCHEMAS
+from rl.bench.submission import SUBMISSIONS_DIR, discover
 from rl.bench.tasks import TASKS
 
 log = logging.getLogger(__name__)
@@ -59,7 +61,7 @@ def _load(root: Path) -> list[dict]:
     for track in TRACKS:
         for path in sorted((root / track).glob("*/*.json")):
             record = json.loads(path.read_text())
-            if record.get("schema") != 1:
+            if record.get("schema") not in READABLE_SCHEMAS:
                 raise ValueError("{} has unsupported schema {!r}".format(path, record.get("schema")))
             records.append(record)
     return records
@@ -85,7 +87,7 @@ def _entry(record: dict, as_of: str) -> dict | None:
         value = scoring.annualised_sharpe(returns, record["periods_per_year"])
         sharpe = float(value) if math.isfinite(value) else None
     fit = record.get("fit") or {}
-    return {
+    entry = {
         "track": record["track"],
         "task": record["task"],
         "submission": record["submission"],
@@ -105,10 +107,18 @@ def _entry(record: dict, as_of: str) -> dict | None:
         "_equity": equity,
         "_benchmark": benchmark,
     }
+    if record.get("cohort", 1) > 1:
+        entry["cohort"] = record["cohort"]
+    if record.get("code_changed"):
+        entry["code_changed"] = True
+    if record.get("policy_versions", 1) > 1:
+        entry["policy_versions"] = record["policy_versions"]
+    return entry
 
 
 def _key(entry: dict) -> str:
-    return "{}/{}/{}".format(entry["track"], entry["task"], entry["submission"])
+    cohort = "/{}".format(entry["cohort"]) if entry.get("cohort") else ""
+    return "{}/{}/{}{}".format(entry["track"], entry["task"], entry["submission"], cohort)
 
 
 def _order(entry: dict) -> tuple:
@@ -159,7 +169,13 @@ def _title(task_id: str) -> str:
 
 
 def _label(entry: dict) -> str:
-    return entry["name"] + (" (ledger)" if entry["track"] == "ledger" else "")
+    return (
+        entry["name"]
+        + (" (ledger)" if entry["track"] == "ledger" else "")
+        + (" (cohort {})".format(entry["cohort"]) if entry.get("cohort") else "")
+        + (" (code changed)" if entry.get("code_changed") else "")
+        + (" (decisions span {} policy versions)".format(entry["policy_versions"]) if entry.get("policy_versions") else "")
+    )
 
 
 def _where(entry: dict) -> str:
@@ -335,11 +351,14 @@ def _write_text(path: Path, text: str) -> None:
     os.replace(temporary, path)
 
 
-def write_monthly_report(root="leaderboard", month: str | None = None, *, now: dt.datetime | None = None) -> Path:
+def write_monthly_report(
+    root="leaderboard", month: str | None = None, *, now: dt.datetime | None = None, submissions_root=SUBMISSIONS_DIR
+) -> Path:
     """Write ``<root>/reports/<month>.md`` (+ ``.png``, ``.json``) and return the markdown path.
 
     ``month`` is ``YYYY-MM``; the default is the last completed UTC month.
     Sessions after the month's last day are ignored. Re-running is idempotent.
+    Submissions under ``submissions_root`` that are retired today are left out.
     """
     root = Path(root)
     if month is None:
@@ -347,7 +366,9 @@ def write_monthly_report(root="leaderboard", month: str | None = None, *, now: d
     if not _MONTH.match(month):
         raise ValueError("month must look like YYYY-MM, got {!r}".format(month))
     as_of = _month_end(month)
-    entries = [e for e in (_entry(record, as_of) for record in _load(root)) if e is not None]
+    retired = {s.id for s in discover(submissions_root).values() if s.is_retired()}
+    records = [record for record in _load(root) if record["submission"] not in retired]
+    entries = [e for e in (_entry(record, as_of) for record in records) if e is not None]
     entries.sort(key=_order)
 
     directory = root / REPORTS_DIR
@@ -370,7 +391,7 @@ def write_monthly_report(root="leaderboard", month: str | None = None, *, now: d
 
 
 def _cmd_monthly(options) -> int:
-    path = write_monthly_report(options.out_root, options.month)
+    path = write_monthly_report(options.out_root, options.month, submissions_root=options.submissions_root)
     print(path.read_text())
     print("Wrote {}".format(path))
     return 0

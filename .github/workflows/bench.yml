@@ -107,7 +107,9 @@ jobs:
 
   freeze:
     # Merged submissions are frozen on today's data for every task with a live
-    # track (unless they arrive already frozen), then stamped as published.
+    # track, then stamped as published. A submission whose definition changed
+    # since its freeze is frozen again as the next cohort: the old cohort keeps
+    # its publication and live record, the new one starts its own live track.
     # CI also computes their historical records on those tasks; a record is
     # recomputed only when its submission changed (`run-all --stale`).
     needs: merged
@@ -139,8 +141,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e ".[test]"
-      - name: Freeze submissions that have no freeze yet
-        run: rl-pricing bench freeze
+      - name: Freeze new submissions, and re-freeze changed ones as a new cohort
+        run: rl-pricing bench freeze --stale
       - name: Publish new freezes
         run: rl-pricing bench publish
       - name: Historical records for new or changed submissions
@@ -172,6 +174,8 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # ledger scoring reads the history that added each entry
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"

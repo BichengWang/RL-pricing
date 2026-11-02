@@ -43,6 +43,57 @@ change in minor releases.
 - The ledger's paid-agent preflight requires the key of the submission's
   `llm_provider` (`OPENAI_API_KEY` or `ANTHROPIC_API_KEY`); the price table
   lists Claude Opus 5.5, Sonnet 5.5 and Sonnet 5.
+- **Breaking:** historical, live and ledger records, `freeze.json` and ledger
+  entries are written as schema 2: they add `protocol_version: "2"` and
+  `code: {package_version, git_commit, code_sha256}`, the hash of the policy's
+  source and of the `rl.bench` modules it imports. Readers (`leaderboard`,
+  `monthly`, the live and ledger scorers) still load schema 1; consumers that
+  accept only `schema: 1` must accept 2.
+- `rl-pricing bench live` compares the current `code_sha256` with the frozen
+  one. A frozen policy replayed on other code gets `code_changed: true` and
+  both hashes in its record, and the leaderboard and monthly report mark the
+  row. A schema 1 freeze has no hash and is recorded as
+  `code_identity: "unrecorded"`.
+- **Breaking:** `rl-pricing bench freeze --force` and the new `--stale` start a
+  new cohort instead of overwriting: `freeze.json` gets `cohort: <n>`, the
+  earlier cohorts move to `frozen/<task>/cohorts/<n>/`, and each cohort keeps
+  its own publication (`publications.json` key `submission/task/<n>`, cohort 1
+  keeps `submission/task`) and live record (`<id>.json` for cohort 1,
+  `<id>.cohort-<n>.json` after). The leaderboard labels the cohorts of a
+  submission that has several. An interrupted re-freeze is completed by the
+  next `freeze` and never deletes an archived cohort. CI now runs
+  `freeze --stale`, so changing a submission after its freeze no longer
+  strands its live track.
+- Ledger entries (schema 2) store `decision_sha256`, `policy_sha256` (the
+  policy's own module only) and `code`. A ledger record keeps `code` for the
+  code that scored it; the code behind the decisions is in `decision_code` and
+  `code_hashes`, and the row is marked only when decisions span several
+  `policy_sha256` values (`policy_versions`), not when the harness changed.
+- Ledger scoring (schema 2 entries) requires that the Actions jobs API (the
+  run's own attempt) shows the run's `Commit and push ledger entries` step
+  succeeded before the open, and that the repository history shows the commit
+  that added the entry file was authored by `github-actions[bot]` with the
+  workflow's message, added exactly the entry's bytes and descends from the
+  run's `head_sha`; `verified_by` names the rule (`push-time`, or `run-start`
+  for the schema 1 entries written under the old one). This ties an entry to a
+  commit and the commit to a run, but git authorship is not a signature:
+  someone with push rights can forge it, and the pushed commit SHA the push
+  step writes to its step summary is not readable through the API, so it is
+  not checked. Jobs that cannot be read (404) or a shallow clone make scoring
+  fail without rewriting any record; the `live` job now fetches full history.
+  Finished runs and their jobs are cached on disk.
+- **Breaking:** the ledger's monthly cap is hard. A ledger participant that
+  declares `max_cost_per_decision_usd` (a param, or a class attribute: 0.70 for
+  `TradingAgentsPolicy`, from the largest decision of the R3 dry run) has it
+  validated, and an LLM participant must declare it; if the month's spend plus
+  that reservation would exceed `LEDGER_MONTHLY_BUDGET_USD`, checked just before
+  the policy runs, nothing is written and the command fails, where it used to
+  write a `budget cap` hold. A decision that reports no usage is billed the
+  reservation.
+- `submission.json` accepts `retired: "YYYY-MM-DD"`. After that date `run-all`,
+  `freeze`, `live`, `ledger record` and `ledger score` skip the submission, and
+  the leaderboard lists its records under "Retired" instead of ranking them;
+  the monthly report leaves it out.
 - `claims.json` accepts `"verdict": null` for a pre-registered claim that has
   not been tested; `rl-pricing bench reports` validates it and leaves it out of
   the verdict tables until a verdict is set.

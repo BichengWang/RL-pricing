@@ -1,7 +1,7 @@
 """Aggregate result records into the leaderboard.
 
 All metrics are recomputed from the equity curves stored in the records
-(``leaderboard/<track>/<task>/<submission>.json``, schema 1):
+(``leaderboard/<track>/<task>/<submission>.json``, schema 1 or 2):
 
 * Per seed, :func:`rl.bench.scoring.metrics` against the record's own 1/N
   benchmark; the table shows the mean (and, for Sharpe, the standard
@@ -17,6 +17,12 @@ All metrics are recomputed from the equity curves stored in the records
   of a per-period Sharpe over ``n`` sessions under i.i.d. returns, which a
   handful of near-identical strategies can undercut by chance), ``1/n`` is used.
 
+A live row whose frozen policy replayed on different code (``code_changed``)
+is marked, and so is a ledger row whose decisions come from several versions
+of the policy's own source (``policy_versions``). Once a live submission has
+a later cohort, its earlier cohorts are labelled. Submissions with a
+``retired`` date are not ranked; their records are listed apart.
+
 Live results are grouped by freeze date and ledger results by the date of the
 first verified decision, so every table covers the same window. Tasks are
 ordered ranked first, then re-evaluations
@@ -26,6 +32,7 @@ published setup, not as a ranking), then the synthetic demo.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 import json
 import logging
 import math
@@ -35,6 +42,8 @@ from pathlib import Path
 import numpy as np
 
 from rl.bench import figures, scoring
+from rl.bench.runner import READABLE_SCHEMAS
+from rl.bench.submission import SUBMISSIONS_DIR, discover
 from rl.bench.tasks import TASKS
 
 log = logging.getLogger(__name__)
@@ -67,11 +76,11 @@ LEARNED_KINDS = ("rl", "forecast", "llm")
 
 
 def load_records(root="leaderboard") -> list[dict]:
-    """Every schema-1 record under ``root/<track>/<task>/*.json``."""
+    """Every schema 1 or 2 record under ``root/<track>/<task>/*.json``."""
     records = []
     for path in sorted(Path(root).glob("*/*/*.json")):
         record = json.loads(path.read_text())
-        if record.get("schema") != 1:
+        if record.get("schema") not in READABLE_SCHEMAS:
             raise ValueError("{} has unsupported schema {!r}".format(path, record.get("schema")))
         records.append(record)
     return records
@@ -120,6 +129,12 @@ def _analyze_record(record: dict) -> dict:
     }
     if record.get("contamination"):
         row["contamination"] = record["contamination"]
+    if record.get("code_changed"):
+        row["code_changed"] = True
+    if record.get("policy_versions", 1) > 1:
+        row["policy_versions"] = record["policy_versions"]
+    if record.get("cohort", 1) > 1 or record.get("superseded"):
+        row["cohort"] = record.get("cohort", 1)
     keys = per_seed[0].keys()
     stats = {key: _mean_sd([m[key] for m in per_seed]) for key in keys}
     row["sharpe"], row["sharpe_sd"] = stats["sharpe"]
@@ -220,9 +235,34 @@ def _sections(records: list[dict]) -> list[dict]:
     return sections
 
 
-def build(root="leaderboard") -> dict:
-    """Analyse every record under ``root`` into the summary document."""
-    return {"schema": 1, "sections": _sections(load_records(root))}
+def _retired_row(record: dict, retired: str) -> dict:
+    row = _analyze_record(record)
+    del row["_returns"], row["_benchmark"]
+    return {**row, "track": record["track"], "task": record["task"], "retired": retired}
+
+
+def build(root="leaderboard", retired: Mapping[str, str] | None = None) -> dict:
+    """Analyse every record under ``root`` into the summary document.
+
+    ``retired`` maps retired submission ids to their retirement dates: their
+    records stay out of the ranked sections and are listed under ``retired``.
+    """
+    retired = retired or {}
+    records = load_records(root)
+    latest: dict[tuple, int] = {}
+    for r in records:
+        key = (r["track"], r["task"], r["submission"])
+        latest[key] = max(latest.get(key, 1), r.get("cohort", 1))
+    records = [
+        {**r, "superseded": True} if r.get("cohort", 1) < latest[(r["track"], r["task"], r["submission"])] else r
+        for r in records
+    ]
+    summary = {"schema": 1, "sections": _sections([r for r in records if r["submission"] not in retired])}
+    gone = [r for r in records if r["submission"] in retired]
+    if gone:
+        gone.sort(key=lambda r: (TRACKS.index(r["track"]), r["task"], r["submission"], r.get("cohort", 1)))
+        summary["retired"] = [_retired_row(r, retired[r["submission"]]) for r in gone]
+    return summary
 
 
 # --- rendering -------------------------------------------------------------
@@ -244,6 +284,12 @@ def _row_cells(row: dict, link_prefix: str | None, ranked: bool = True) -> list[
         name = "[{}]({}/{}/)".format(name, link_prefix, row["id"])
     if row.get("contamination") == "possible":
         name += " (contamination: possible)"
+    if row.get("cohort"):
+        name += " (cohort {})".format(row["cohort"])
+    if row.get("code_changed"):
+        name += " (code changed)"
+    if row.get("policy_versions"):
+        name += " (decisions span {} policy versions)".format(row["policy_versions"])
     sharpe = _fmt(row["sharpe"], "{:.2f}")
     if row["sharpe"] is not None and math.isfinite(row["sharpe"]) and row.get("seeds", 1) > 1:
         sharpe += " ± {:.2f}".format(row["sharpe_sd"])
@@ -344,6 +390,43 @@ def render_markdown(summary: dict, link_prefix: str | None = "../submissions") -
                 ),
                 "",
             ]
+    if summary.get("retired"):
+        lines += [
+            "## Retired",
+            "",
+            "Retired submissions are not ranked and are not updated; their records stay as last written.",
+            "",
+            *_table(
+                ("Strategy", "Kind", "Track", "Task", "Retired after", "Sharpe", "CAGR", "Max DD", "Seeds"),
+                [
+                    [
+                        row["name"] if link_prefix is None else "[{}]({}/{}/)".format(row["name"], link_prefix, row["id"]),
+                        row["kind"],
+                        row["track"],
+                        "`{}`".format(row["task"]),
+                        row["retired"],
+                        _fmt(row["sharpe"], "{:.2f}"),
+                        _pct(row.get("cagr")),
+                        _pct(row.get("max_drawdown")),
+                        str(row["seeds"]),
+                    ]
+                    for row in summary["retired"]
+                ],
+            ),
+            "",
+        ]
+    if any(row.get("code_changed") for section in sections for row in section["rows"]):
+        lines += [
+            "*(code changed)*: the frozen policy was replayed on code that differs from the code at its "
+            "freeze; the record lists both hashes, and the row does not show the frozen policy alone.",
+            "",
+        ]
+    if any(row.get("policy_versions") for section in sections for row in section["rows"]):
+        lines += [
+            "*(decisions span N policy versions)*: the policy's own source changed while this ledger row was "
+            "being decided; the record lists the code behind each decision.",
+            "",
+        ]
     lines += [
         "◆ marks the 1/N buy-and-hold benchmark (equal weights at the start of the period, never "
         "rebalanced); every ΔSharpe is measured against it over the same sessions.",
@@ -415,14 +498,25 @@ def _clean(value):
     return value
 
 
-def write_leaderboard(root="leaderboard", *, readme="README.md", link_prefix: str | None = "../submissions") -> dict:
-    """Write ``LEADERBOARD.md`` and ``summary.json`` under ``root``; refresh the README block."""
+def write_leaderboard(
+    root="leaderboard",
+    *,
+    readme="README.md",
+    link_prefix: str | None = "../submissions",
+    submissions_root=SUBMISSIONS_DIR,
+) -> dict:
+    """Write ``LEADERBOARD.md`` and ``summary.json`` under ``root``; refresh the README block.
+
+    Submissions under ``submissions_root`` that are retired today are listed apart, not ranked.
+    """
     root = Path(root)
-    summary = build(root)
+    retired = {s.id: s.retired for s in discover(submissions_root).values() if s.is_retired()}
+    summary = build(root, retired)
     root.mkdir(parents=True, exist_ok=True)
     (root / "LEADERBOARD.md").write_text(render_markdown(summary, link_prefix))
     (root / "summary.json").write_text(json.dumps(_clean(summary), indent=1) + "\n")
-    figures.render_sharpe_figure(load_records(root), root / "sharpe.png", figures.load_reported(root))
+    ranked = [r for r in load_records(root) if r["submission"] not in retired]
+    figures.render_sharpe_figure(ranked, root / "sharpe.png", figures.load_reported(root))
     if readme is not None and not update_readme(readme, render_headline(summary)):
         log.info("No leaderboard markers in %s; README left unchanged", readme)
     return summary

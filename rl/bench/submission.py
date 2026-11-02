@@ -13,6 +13,10 @@ Each submission lives in ``submissions/<id>/submission.json``::
       "description": "..."
     }
 
+Add ``"retired": "YYYY-MM-DD"`` to stop a submission after that date: it is
+skipped by ``run-all``, ``freeze``, ``live`` and the ledger, leaves the ranking
+and is listed under "Retired" with its records intact.
+
 ``policy`` is ``package.module:Class`` for installed code, or
 ``policy.py:Class`` for a file shipped in the submission directory.
 ``trials`` counts the configurations evaluated on validation data before
@@ -26,6 +30,8 @@ on which the submission commits a decision before every session open
 
 from __future__ import annotations
 
+import ast
+import datetime as dt
 import hashlib
 import importlib
 import importlib.util
@@ -42,6 +48,7 @@ from rl.bench.policy import Policy
 KINDS = ("baseline", "rl", "forecast", "llm", "other")
 SUBMISSIONS_DIR = Path("submissions")
 _ID = re.compile(r"^[a-z0-9][a-z0-9-]{0,62}$")
+_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
 @dataclass(frozen=True)
@@ -56,6 +63,7 @@ class Submission:
     url: str = ""
     description: str = ""
     ledger: tuple[str, ...] = ()
+    retired: str | None = None
     directory: Path | None = None
     info_sources: tuple[dict, ...] = ()
     model_cutoffs: tuple[dict, ...] = ()
@@ -94,6 +102,13 @@ class Submission:
             if url.scheme not in ("https", "http") or not url.netloc:
                 raise ValueError("model cutoff source_url must be an HTTP(S) URL")
         object.__setattr__(self, "model_cutoffs", tuple(dict(entry) for entry in self.model_cutoffs))
+        if self.retired is not None and not _is_date(self.retired):
+            raise ValueError("retired must be a YYYY-MM-DD date")
+
+    def is_retired(self, today: dt.date | None = None) -> bool:
+        """Whether ``today`` (default: the current UTC date) is after the ``retired`` date."""
+        today = today or dt.datetime.now(dt.timezone.utc).date()
+        return self.retired is not None and today > dt.date.fromisoformat(self.retired)
 
     @classmethod
     def load(cls, directory) -> Submission:
@@ -101,7 +116,7 @@ class Submission:
         spec = json.loads((directory / "submission.json").read_text())
         allowed = {
             "name", "kind", "policy", "params", "trials", "authors", "url", "description", "ledger",
-            "info_sources", "model_cutoffs", "contamination",
+            "info_sources", "model_cutoffs", "contamination", "retired",
         }
         unknown = set(spec) - allowed
         if unknown:
@@ -171,6 +186,61 @@ class Submission:
             digest.update(b"\0" + "/".join(parts).encode() + b"\0" + hashlib.sha256(path.read_bytes()).digest())
         return digest.hexdigest()
 
+    def code_sources(self) -> dict[str, bytes]:
+        """Source files that define this submission's policy, by path.
+
+        The policy's module (a file shipped in the submission directory, or an
+        importable module) and every ``rl.bench`` module and package it imports
+        directly or transitively. Imports are read from the source, so the
+        result does not depend on what happens to be loaded; third-party
+        packages are identified by the versions in the record instead.
+        """
+        module_name = self.policy.partition(":")[0]
+        sources: dict[str, bytes] = {}
+        pending: list[str] = []
+        if module_name.endswith(".py"):
+            if self.directory is None:
+                raise ValueError("Submission {} has no directory to load {} from".format(self.id, module_name))
+            source = (self.directory / module_name).read_bytes()
+            sources["submissions/{}/{}".format(self.id, module_name)] = source
+            pending.extend(_bench_imports(source, None))
+        else:
+            pending.append(module_name)
+        while pending:
+            name = pending.pop()
+            try:
+                spec = importlib.util.find_spec(name)
+            except ModuleNotFoundError:  # "from module import name" where name is not a submodule
+                continue
+            if spec is None or not (spec.origin or "").endswith(".py"):
+                continue
+            label = _module_label(name, spec)
+            if label in sources:
+                continue
+            source = Path(spec.origin).read_bytes()
+            sources[label] = source
+            pending.extend(_bench_imports(source, name if spec.submodule_search_locations else name.rpartition(".")[0]))
+            if name.startswith("rl.bench."):  # importing a module runs its parent packages
+                pending.append(name.rpartition(".")[0])
+        return sources
+
+    def code_sha256(self) -> str:
+        """SHA-256 over the sorted (path, bytes) of :meth:`code_sources`."""
+        return _digest(self.code_sources())
+
+    def policy_sha256(self) -> str:
+        """SHA-256 of the policy's own module alone, without the ``rl.bench`` code it imports.
+
+        It changes only when the policy's source does, not when the harness around it is edited.
+        """
+        module_name = self.policy.partition(":")[0]
+        if module_name.endswith(".py"):
+            if self.directory is None:
+                raise ValueError("Submission {} has no directory to load {} from".format(self.id, module_name))
+            return _digest({"submissions/{}/{}".format(self.id, module_name): (self.directory / module_name).read_bytes()})
+        spec = importlib.util.find_spec(module_name)
+        return _digest({_module_label(module_name, spec): Path(spec.origin).read_bytes()})
+
 
 def discover(root=SUBMISSIONS_DIR) -> dict[str, Submission]:
     """Every submission under ``root``, keyed by id."""
@@ -180,3 +250,36 @@ def discover(root=SUBMISSIONS_DIR) -> dict[str, Submission]:
         submission = Submission.load(spec.parent)
         found[submission.id] = submission
     return found
+
+
+def _module_label(name: str, spec) -> str:
+    return name.replace(".", "/") + ("/__init__.py" if spec.submodule_search_locations else ".py")
+
+
+def _digest(sources: dict[str, bytes]) -> str:
+    digest = hashlib.sha256()
+    for label, source in sorted(sources.items()):
+        digest.update(label.encode() + b"\0" + len(source).to_bytes(8, "big") + source)
+    return digest.hexdigest()
+
+
+def _bench_imports(source: bytes, package: str | None) -> set[str]:
+    """``rl.bench`` module names that ``source`` imports; ``package`` resolves relative imports."""
+    names: set[str] = set()
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Import):
+            names.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level and package is None:
+                continue
+            base = importlib.util.resolve_name("." * node.level + (node.module or ""), package) if node.level else node.module
+            names.add(base)
+            names.update("{}.{}".format(base, alias.name) for alias in node.names)
+    return {name for name in names if name == "rl.bench" or name.startswith("rl.bench.")}
+
+
+def _is_date(value) -> bool:
+    try:
+        return isinstance(value, str) and bool(_DATE.match(value)) and dt.date.fromisoformat(value) is not None
+    except ValueError:
+        return False

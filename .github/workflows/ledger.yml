@@ -4,9 +4,10 @@ name: ledger
 # Weekdays at 04:17, 07:17 and 10:17 UTC leave room for scheduler delays before
 # the US open (13:30 UTC in summer, 14:30 UTC in winter). Later runs and holidays
 # find the latest session already recorded and do nothing.
-# Entries are scored only if their run is a run of this file on main that started
-# before the fill session's open (see rl/bench/ledger.py), so never move the
-# decision logic out of this workflow.
+# Entries are scored only if their run is a run of this file on main whose
+# "Commit and push ledger entries" step finished before the fill session's open
+# (see rl/bench/ledger.py), so never move the decision logic out of this
+# workflow and never rename that step without changing PUSH_STEP there.
 
 on:
   schedule:
@@ -60,8 +61,9 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           SEC_EDGAR_USER_AGENT: ${{ vars.SEC_EDGAR_USER_AGENT }}
         run: rl-pricing bench ledger record --refresh
-      - name: Commit entries
+      - name: Commit and push ledger entries
         # Also after a failed record step: entries written before the failure must be committed.
+        id: push
         if: ${{ !cancelled() }}
         run: |
           git config user.name "github-actions[bot]"
@@ -72,7 +74,16 @@ jobs:
           if git diff --cached --quiet; then
             echo "No new entries"
           else
+            # Author and subject are what rl/bench/ledger.py (COMMIT_AUTHOR, COMMIT_SUBJECT) checks at scoring.
             git commit -m "ledger: record decisions [skip ci]"
             git pull --rebase origin "${GITHUB_REF_NAME}"
             git push origin "HEAD:${GITHUB_REF_NAME}"
+            commit="$(git rev-parse HEAD)"
+            echo "commit=${commit}" >> "$GITHUB_OUTPUT"
+            {
+              echo "Pushed \`${commit}\` from run ${GITHUB_RUN_ID} attempt ${GITHUB_RUN_ATTEMPT}:"
+              echo
+              git diff-tree --no-commit-id --name-only -r "${commit}" -- ':(glob)submissions/*/ledger/**' |
+                while read -r entry; do echo "- \`${entry}\` decision_sha256 $(jq -r .decision_sha256 "${entry}")"; done
+            } | tee -a "$GITHUB_STEP_SUMMARY"
           fi
