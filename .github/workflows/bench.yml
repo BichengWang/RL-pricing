@@ -57,6 +57,8 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e ".[test]"
       - name: Validate submissions
+        env:
+          SEC_EDGAR_USER_AGENT: ${{ vars.SEC_EDGAR_USER_AGENT }}
         run: |
           rl-pricing bench validate
           # Lookahead check for each non-LLM submission this pull request adds or changes.

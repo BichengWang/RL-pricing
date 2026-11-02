@@ -25,14 +25,23 @@ from rl.bench.market import FIELDS, MarketData, MarketView, as_day
 CUTS = 3
 
 
-def _replay(submission, task, saved: Path, seed, prices: MarketData, panel: InfoPanel, start: int, last: int) -> list:
-    """Decisions at sessions ``start - 1`` through ``last`` of ``prices``."""
-    policy = runner.build_policy(submission, task)
-    policy.load(saved)
+def _seed(seed) -> None:
     random.seed(seed)
     np.random.seed(seed)
     if "torch" in sys.modules:
         sys.modules["torch"].manual_seed(seed)
+
+
+def _replay(submission, task, saved: Path, seed, prices: MarketData, panel: InfoPanel, start: int, last: int) -> list:
+    """Decisions at sessions ``start - 1`` through ``last`` of ``prices``.
+
+    Seeded before construction (torch is imported by the first build in
+    :func:`check_causal`), and again before ``reset``.
+    """
+    _seed(seed)
+    policy = runner.build_policy(submission, task)
+    policy.load(saved)
+    _seed(seed)
     policy.reset()
     crypto = task.source == "binance"
     decisions = []

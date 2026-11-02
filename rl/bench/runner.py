@@ -30,7 +30,7 @@ from pathlib import Path
 import numpy as np
 
 from rl.bench.engine import Backtest, simulate
-from rl.bench.info import InfoPanel, historical_contamination, load_task_info
+from rl.bench.info import InfoPanel, historical_contamination, load_task_info, session_close
 from rl.bench.market import MarketData, MarketView, as_day
 from rl.bench.policies.baselines import EqualWeightBuyHold
 from rl.bench.policy import Policy
@@ -150,6 +150,18 @@ def _run(
     return simulate(data, act, start=start, transaction_cost=task.transaction_cost)
 
 
+def _load_info(task: Task, submission: Submission, data: MarketData, refresh: bool = False) -> InfoPanel | None:
+    """The declared sources as of the last decision close in ``data``, or ``None`` if none are declared.
+
+    Later items cannot reach any decision, so leaving them out keeps ``info_sha256``
+    a property of the information the record used, not of when the source was downloaded.
+    """
+    if not (task.info_sources or submission.info_sources):
+        return None
+    panel = load_task_info(task, submission, refresh=refresh)
+    return panel.truncated(session_close(data.dates[-2], crypto=task.source == "binance"))
+
+
 def _benchmark(task: Task, data: MarketData, history: MarketData, start: int, validation_start) -> Backtest:
     policy = EqualWeightBuyHold()
     return _run(task, policy, data, start, 0, history, validation_start)
@@ -221,9 +233,9 @@ def evaluate(
 ) -> Path:
     """Historical track: fit before ``task.test_start``, trade the test window."""
     _require_replayable(submission)
-    info = load_task_info(task, submission) if task.info_sources or submission.info_sources else None
-    contamination = historical_contamination(submission, task, info or InfoPanel())
     data = _data_for(task, data, end=task.test_end).between(None, task.test_end)
+    info = _load_info(task, submission, data)
+    contamination = historical_contamination(submission, task, info or InfoPanel())
     start = data.index_of(task.test_start)
     history = data.rows(0, start)
     validation_start = as_day(task.validation_start)
@@ -388,7 +400,7 @@ def update_live(
         log.info("%s on %s: no sessions after its publication on %s yet", submission.id, task.id, published)
         return None
     history = data.rows(0, start)
-    info = load_task_info(task, submission, refresh=refresh) if task.info_sources or submission.info_sources else None
+    info = _load_info(task, submission, data, refresh=refresh)
     runs = []
     for seed in frozen["seeds"]:
         policy = build_policy(submission, task)

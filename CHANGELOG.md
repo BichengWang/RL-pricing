@@ -58,7 +58,8 @@ change in minor releases.
   the leaderboard shows.
 - `rl-pricing bench check-causal --task <t> --submission <id>` runs the policy
   on truncated windows and on poisoned future prices and items and fails if an
-  earlier decision changes. CI runs it on every non-LLM submission.
+  earlier decision changes. CI runs it on every non-LLM submission a pull
+  request adds or changes.
 
 ## 1.0.0 (2026-10-27)
 

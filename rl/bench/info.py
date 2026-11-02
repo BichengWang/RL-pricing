@@ -217,7 +217,7 @@ def load_task_info(task, submission=None, *, cache_dir=None, refresh=False) -> I
 
 def _cache_bytes(path: Path, content: bytes):
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary = path.with_name("{}.{}.tmp".format(path.name, os.getpid()))
     temporary.write_bytes(content)
     temporary.replace(path)
 
@@ -235,12 +235,23 @@ def _sec_get(url: str, path: Path, user_agent: str, *, refresh=False, limit=None
 
 
 def _accepted(header: str, accession: str) -> datetime:
-    """EDGAR's acceptance instant from a filing's SGML header, a New York wall clock."""
-    stamp = re.search(r"ACCEPTANCE-DATETIME(?:&gt;|>)(\d{14})", header)
-    if accession not in header or stamp is None:
-        raise ValueError("EDGAR header for {} has no acceptance time".format(accession))
-    wall = datetime.strptime(stamp.group(1), "%Y%m%d%H%M%S").replace(tzinfo=ZoneInfo("America/New_York"))
-    return timestamp(wall)
+    """EDGAR's acceptance instant from a filing's SGML header, a New York wall clock.
+
+    Filings from before EDGAR stamped acceptance carry only ``<FILING-DATE>``;
+    they are placed at the end of that day in New York, after its close, so a
+    policy sees them from the next session.
+    """
+    if accession not in header:
+        raise ValueError("EDGAR header for {} names another filing".format(accession))
+    stamp = re.search(r"<ACCEPTANCE-DATETIME>(\d{14})", header)
+    if stamp:
+        wall = datetime.strptime(stamp.group(1), "%Y%m%d%H%M%S")
+    else:
+        filed = re.search(r"<FILING-DATE>(\d{8})", header)
+        if filed is None:
+            raise ValueError("EDGAR header for {} has neither acceptance nor filing date".format(accession))
+        wall = datetime.strptime(filed.group(1), "%Y%m%d").replace(hour=23, minute=59, second=59)
+    return timestamp(wall.replace(tzinfo=ZoneInfo("America/New_York")))
 
 
 def _edgar(task, spec: dict, cache: Path, refresh: bool) -> list[InfoItem]:
@@ -249,7 +260,8 @@ def _edgar(task, spec: dict, cache: Path, refresh: bool) -> list[InfoItem]:
     Filing lists come from the submissions API (``refresh`` re-downloads them).
     Their ``acceptanceDateTime`` is NOT used: SEC's JSON mixes UTC and New York
     clocks that both end in ``Z``, so each filing's time is read from its
-    immutable ``-index-headers.html`` instead, cached permanently.
+    immutable ``<accession>.hdr.sgml`` instead (served for every year, unlike the
+    ``-index-headers.html`` page), cached permanently.
     """
     user_agent = os.environ.get("SEC_EDGAR_USER_AGENT", "").strip()
     if not user_agent:
@@ -280,14 +292,14 @@ def _edgar(task, spec: dict, cache: Path, refresh: bool) -> list[InfoItem]:
                     continue
                 accession = batch["accessionNumber"][index]
                 document = batch["primaryDocument"][index]
-                if not re.fullmatch(r"\d{10}-\d{2}-\d{6}", accession) or not re.fullmatch(r"[\w.\-]+", document):
+                if not re.fullmatch(r"\d{10}-\d{2}-\d{6}", accession) or not re.fullmatch(r"[\w.\-]*", document):
                     raise ValueError("Unexpected EDGAR accession or document")
                 folder = "https://www.sec.gov/Archives/edgar/data/{}/{}/".format(cik, accession.replace("-", ""))
                 header = _sec_get(
-                    folder + accession + "-index-headers.html", cache / "headers" / (accession + ".html"), user_agent
+                    folder + accession + ".hdr.sgml", cache / "headers" / (accession + ".sgml"), user_agent
                 ).decode("utf-8", errors="replace")
                 text = ""
-                if spec.get("download_text", False):
+                if spec.get("download_text", False) and document:
                     limit = spec.get("max_text_bytes", TEXT_LIMIT)
                     raw = _sec_get(
                         folder + document, cache / "documents" / "{}-{}-{}".format(accession, limit, document),

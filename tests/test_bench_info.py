@@ -145,44 +145,53 @@ def test_jsonl_source_loads_relative_to_the_submission_with_model_scores(tmp_pat
     panel = load_task_info(TASK, submission)
     (loaded,) = panel.at_session("2018-03-13").items()
     assert loaded.id == "n1" and loaded.fields["n"] == 3
-    assert (loaded.fields["score"].value, loaded.fields["score"].model) == ("0.7" and 0.7, "scorer-1")
+    assert (loaded.fields["score"].value, loaded.fields["score"].model) == (0.7, "scorer-1")
     assert panel.models == {"scorer-1"}
 
 
+ACCEPTED = "<SEC-HEADER>{acc}.hdr.sgml : 20180315\n<ACCEPTANCE-DATETIME>{stamp}\n<ACCESSION-NUMBER>{acc}\n<TYPE>{form}\n"
+FILED_ONLY = "<SEC-HEADER>{acc}.hdr.sgml : 20180315\n<ACCESSION-NUMBER>{acc}\n<TYPE>{form}\n<FILING-DATE>{filed}\n<FILER>\n"
+
+
 def edgar_cache(tmp_path):
-    """Cached EDGAR responses: SEC's JSON acceptance times are wrong on purpose, headers are right."""
+    """Cached EDGAR responses in SEC's real shapes: the JSON's acceptance times are wrong on purpose."""
     cache = tmp_path / "cache" / "info" / "sec-edgar"
     (cache / "headers").mkdir(parents=True)
     (cache / "company_tickers.json").write_text(json.dumps({
         "0": {"cik_str": 1, "ticker": "AAA", "title": "A"},
         "1": {"cik_str": 2, "ticker": "OTHER", "title": "B"},
     }))
-    filings = [
-        ("0000000001-18-000001", "8-K", "2018-03-09", "20180309160500"),   # EST, after the close
-        ("0000000001-18-000002", "10-Q", "2018-03-12", "20180312160500"),  # EDT, after the close
-        ("0000000001-18-000003", "4", "2018-03-12", "20180312100000"),     # not a requested form
-        ("0000000001-09-000009", "10-K", "2009-12-01", None),              # before the task: never fetched
+    filings = [  # accession, form, filing date, header
+        ("0000000001-18-000001", "8-K", "2018-03-09", ACCEPTED.format(acc="0000000001-18-000001", form="8-K", stamp="20180309160500")),
+        ("0000000001-18-000002", "10-Q", "2018-03-12", ACCEPTED.format(acc="0000000001-18-000002", form="10-Q", stamp="20180312160500")),
+        ("0000000001-18-000003", "4", "2018-03-12", ACCEPTED.format(acc="0000000001-18-000003", form="4", stamp="20180312100000")),
+        # Pre-acceptance-era header: only a filing date, and no primary document in the listing.
+        ("0000000001-18-000004", "8-K", "2018-03-14", FILED_ONLY.format(acc="0000000001-18-000004", form="8-K", filed="20180314")),
+        ("0000000001-09-000009", "10-K", "2009-12-01", None),  # before the task starts: never fetched
     ]
     (cache / "CIK0000000001.json").write_text(json.dumps({"filings": {"files": [], "recent": {
         "form": [f[1] for f in filings],
         "filingDate": [f[2] for f in filings],
         "accessionNumber": [f[0] for f in filings],
-        "primaryDocument": ["doc.htm"] * len(filings),
+        "primaryDocument": ["" if f[0].endswith("4") else "doc.htm" for f in filings],
         "primaryDocDescription": ["Current report"] * len(filings),
         "acceptanceDateTime": ["2018-03-09T12:00:00.000Z"] * len(filings),
     }}}))
-    for accession, _, _, stamp in filings:
-        if stamp:
-            (cache / "headers" / (accession + ".html")).write_text(
-                "<PRE>&lt;ACCEPTANCE-DATETIME&gt;{}\nACCESSION NUMBER:\t\t{}\n</PRE>".format(stamp, accession)
-            )
+    for accession, _, _, header in filings:
+        if header:
+            (cache / "headers" / (accession + ".sgml")).write_text(header)
+    return cache
 
 
-def test_edgar_filings_use_header_acceptance_times_offline(tmp_path, monkeypatch, data):
+@pytest.fixture
+def edgar(tmp_path, monkeypatch):
     monkeypatch.setenv("SEC_EDGAR_USER_AGENT", "Test test@example.com")
     monkeypatch.setattr(info_module.urllib.request, "urlopen", lambda *a, **k: pytest.fail("network used"))
-    edgar_cache(tmp_path)
-    task = dataclasses.replace(TASK, info_sources=({"source": "sec-edgar"},))
+    return edgar_cache(tmp_path), dataclasses.replace(TASK, info_sources=({"source": "sec-edgar"},))
+
+
+def test_edgar_filings_use_header_acceptance_times_offline(edgar, data):
+    _, task = edgar
     panel = load_task_info(task)
     assert visible(panel, "2018-03-09") == []
     assert visible(panel, "2018-03-12") == ["0000000001-18-000001"]
@@ -208,19 +217,44 @@ def test_edgar_filings_use_header_acceptance_times_offline(tmp_path, monkeypatch
     assert recorder.seen["2018-03-13"] == ["1", "2"]
 
 
+def test_edgar_header_without_an_acceptance_stamp_is_placed_after_its_filing_days_close(edgar):
+    _, task = edgar
+    panel = load_task_info(task)
+    assert "0000000001-18-000004" not in visible(panel, "2018-03-14")
+    assert visible(panel, "2018-03-15") == [
+        "0000000001-18-000001", "0000000001-18-000002", "0000000001-18-000004"
+    ]
+
+
+def test_edgar_header_that_names_another_filing_or_no_date_is_an_error(edgar):
+    cache, task = edgar
+    headers = cache / "headers"
+    (headers / "0000000001-18-000004.sgml").write_text("<ACCESSION-NUMBER>0000000001-18-000004\n")
+    with pytest.raises(ValueError, match="neither acceptance nor filing date"):
+        load_task_info(task)
+    (headers / "0000000001-18-000004.sgml").write_text(FILED_ONLY.format(acc="x", form="8-K", filed="20180314"))
+    with pytest.raises(ValueError, match="names another filing"):
+        load_task_info(task)
+
+
+def test_edgar_text_download_is_capped_and_hashed(edgar):
+    cache, task = edgar
+    documents = cache / "documents"
+    documents.mkdir()
+    (documents / "0000000001-18-000001-8-doc.htm").write_bytes(b"0123456789abcdef")
+    (documents / "0000000001-18-000002-8-doc.htm").write_bytes(b"short")
+    task = dataclasses.replace(task, info_sources=({"source": "sec-edgar", "download_text": True, "max_text_bytes": 8},))
+    items = {i.id[-1]: i for i in load_task_info(task).at_session("2018-03-15").items()}
+    assert items["1"].text == "01234567"
+    assert items["1"].text_sha256 == hashlib.sha256(b"01234567").hexdigest()
+    assert items["2"].text == "short"
+    assert items["4"].text == ""  # no primary document: metadata only
+
+
 def test_edgar_requires_a_contact_user_agent(monkeypatch):
     monkeypatch.delenv("SEC_EDGAR_USER_AGENT", raising=False)
     task = dataclasses.replace(TASK, info_sources=({"source": "sec-edgar"},))
     with pytest.raises(ValueError, match="SEC_EDGAR_USER_AGENT"):
-        load_task_info(task)
-
-
-def test_edgar_header_without_an_acceptance_time_is_an_error(tmp_path, monkeypatch):
-    monkeypatch.setenv("SEC_EDGAR_USER_AGENT", "Test test@example.com")
-    edgar_cache(tmp_path)
-    (tmp_path / "cache" / "info" / "sec-edgar" / "headers" / "0000000001-18-000001.html").write_text("<PRE></PRE>")
-    task = dataclasses.replace(TASK, info_sources=({"source": "sec-edgar"},))
-    with pytest.raises(ValueError, match="no acceptance time"):
         load_task_info(task)
 
 
@@ -293,6 +327,18 @@ def test_test_window_before_the_cutoff_is_refused_unless_labelled(tmp_path, data
     record = run_record(scored_submission(tmp_path, cutoff("2018-06-30"), contamination="possible"), tmp_path, data)
     assert record["contamination"] == "possible"
     assert "contamination: possible" in leaderboard.render_markdown(leaderboard.build(tmp_path / "out"))
+
+
+def test_info_hash_ignores_items_after_the_last_decision(tmp_path, data):
+    submission = make_submission(
+        tmp_path / "subs", "late", "test_bench_info:Conc", info_sources=[{"source": "jsonl", "path": "news.jsonl"}]
+    )
+    write_jsonl(submission.directory / "news.jsonl", [news("n1", "2018-03-12T14:00:00Z")])
+    before = run_record(submission, tmp_path, data)["info_sha256"]
+    write_jsonl(submission.directory / "news.jsonl", [
+        news("n1", "2018-03-12T14:00:00Z"), news("n2", "2024-01-02T14:00:00Z"),
+    ])
+    assert run_record(submission, tmp_path, data)["info_sha256"] == before
 
 
 def test_cutoff_before_the_test_window_needs_no_label(tmp_path, data):
@@ -386,6 +432,25 @@ def test_an_info_view_that_shows_later_items_fails(tmp_path, data, monkeypatch, 
     with pytest.raises(ValueError) as failure:
         check_causal(TASK, submission, data=data, info=daily_news(data))
     assert all(check in str(failure.value) for check in failing)
+
+
+class DrawsAtConstruction(Policy):
+    """Random state drawn in ``__init__`` and ignored by history: causal, but only if seeded first."""
+
+    stochastic = True
+
+    def __init__(self):
+        self.bias = np.random.random()
+
+    def act(self, view):
+        weights = np.zeros(len(view.tickers))
+        weights[0] = self.bias
+        return weights
+
+
+def test_construction_time_randomness_is_seeded(tmp_path, data):
+    submission = make_submission(tmp_path, "drawn", "test_bench_info:DrawsAtConstruction")
+    assert check_causal(TASK, submission, data=data, seed=5)
 
 
 def test_the_check_compares_stochastic_policies_under_a_fixed_seed(tmp_path, data):

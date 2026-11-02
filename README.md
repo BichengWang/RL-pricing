@@ -304,7 +304,7 @@ Set `trials` honestly to the number of configurations you tried.
 Then:
 
 1. `rl-pricing bench validate`, `rl-pricing bench check-causal --task synthetic --submission <id>` (lookahead
-   check, also run by CI on every non-LLM submission) and
+   check, also run by CI on each non-LLM submission a pull request changes) and
    `rl-pricing bench run --task <task> --submission <id>` locally.
 2. Open a pull request with `submissions/<id>/` only: CI writes every record
    under `leaderboard/` and rejects pull requests that edit them. It checks
