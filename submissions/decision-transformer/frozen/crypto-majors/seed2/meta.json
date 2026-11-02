@@ -1,0 +1,578 @@
+{
+  "policy": "DecisionTransformerPolicy",
+  "hidden": 64,
+  "tickers": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "EOSUSDT",
+    "BCCUSDT",
+    "NEOUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "XRPUSDT",
+    "ONTUSDT"
+  ],
+  "best_step": 2500,
+  "best_sharpe": 0.005900795323148142,
+  "provenance": {
+    "seed": 2,
+    "behaviour_mix": [
+      {
+        "policy": "EqualWeightRebalance",
+        "episodes": 8
+      },
+      {
+        "policy": "EqualWeightRebalance+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "Momentum",
+        "episodes": 8
+      },
+      {
+        "policy": "Momentum+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "MinimumVariance",
+        "episodes": 8
+      },
+      {
+        "policy": "MinimumVariance+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "InverseVolatility",
+        "episodes": 8
+      },
+      {
+        "policy": "InverseVolatility+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "TrendFollowing",
+        "episodes": 8
+      },
+      {
+        "policy": "TrendFollowing+Dirichlet",
+        "episodes": 8
+      }
+    ],
+    "sessions": [
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2025-04-03",
+        "last_fill": "2025-08-09",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2022-07-25",
+        "last_fill": "2022-11-30",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2024-11-29",
+        "last_fill": "2025-04-06",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2020-04-26",
+        "last_fill": "2020-09-01",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2020-12-23",
+        "last_fill": "2021-04-30",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2023-10-10",
+        "last_fill": "2024-02-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2024-05-30",
+        "last_fill": "2024-10-05",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2020-07-30",
+        "last_fill": "2020-12-05",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2021-12-18",
+        "last_fill": "2022-04-25",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2019-08-01",
+        "last_fill": "2019-12-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2024-09-19",
+        "last_fill": "2025-01-25",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2023-07-13",
+        "last_fill": "2023-11-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2019-10-02",
+        "last_fill": "2020-02-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2023-09-16",
+        "last_fill": "2024-01-22",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2019-02-06",
+        "last_fill": "2019-06-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2024-06-15",
+        "last_fill": "2024-10-21",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2020-06-19",
+        "last_fill": "2020-10-25",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2019-10-27",
+        "last_fill": "2020-03-03",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2021-02-15",
+        "last_fill": "2021-06-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2024-03-19",
+        "last_fill": "2024-07-25",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2023-07-08",
+        "last_fill": "2023-11-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2023-01-02",
+        "last_fill": "2023-05-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2023-10-01",
+        "last_fill": "2024-02-06",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2024-08-04",
+        "last_fill": "2024-12-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2021-03-08",
+        "last_fill": "2021-07-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2025-01-12",
+        "last_fill": "2025-05-20",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2023-11-22",
+        "last_fill": "2024-03-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2019-12-31",
+        "last_fill": "2020-05-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2023-09-22",
+        "last_fill": "2024-01-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2019-02-26",
+        "last_fill": "2019-07-04",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2023-04-10",
+        "last_fill": "2023-08-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2020-12-14",
+        "last_fill": "2021-04-21",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2021-09-04",
+        "last_fill": "2022-01-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2020-12-09",
+        "last_fill": "2021-04-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2022-10-15",
+        "last_fill": "2023-02-20",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2021-05-15",
+        "last_fill": "2021-09-20",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2022-12-12",
+        "last_fill": "2023-04-19",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2025-02-13",
+        "last_fill": "2025-06-21",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2019-12-22",
+        "last_fill": "2020-04-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2021-09-22",
+        "last_fill": "2022-01-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2020-06-24",
+        "last_fill": "2020-10-30",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2023-11-20",
+        "last_fill": "2024-03-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2020-07-03",
+        "last_fill": "2020-11-08",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2021-02-04",
+        "last_fill": "2021-06-12",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2020-05-19",
+        "last_fill": "2020-09-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2023-01-19",
+        "last_fill": "2023-05-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2019-09-15",
+        "last_fill": "2020-01-21",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2022-08-11",
+        "last_fill": "2022-12-17",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2023-03-29",
+        "last_fill": "2023-08-04",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2023-08-31",
+        "last_fill": "2024-01-06",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2019-02-10",
+        "last_fill": "2019-06-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2019-12-02",
+        "last_fill": "2020-04-08",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2022-02-09",
+        "last_fill": "2022-06-17",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2020-04-06",
+        "last_fill": "2020-08-12",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2020-10-28",
+        "last_fill": "2021-03-05",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2023-02-05",
+        "last_fill": "2023-06-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2019-07-08",
+        "last_fill": "2019-11-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2021-08-16",
+        "last_fill": "2021-12-22",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2021-09-02",
+        "last_fill": "2022-01-08",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2025-05-23",
+        "last_fill": "2025-09-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2022-08-04",
+        "last_fill": "2022-12-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2019-09-12",
+        "last_fill": "2020-01-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2022-11-24",
+        "last_fill": "2023-04-01",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2021-11-20",
+        "last_fill": "2022-03-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2020-07-16",
+        "last_fill": "2020-11-21",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2023-07-18",
+        "last_fill": "2023-11-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2021-07-19",
+        "last_fill": "2021-11-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2019-09-04",
+        "last_fill": "2020-01-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2025-04-21",
+        "last_fill": "2025-08-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2019-09-30",
+        "last_fill": "2020-02-05",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2023-01-22",
+        "last_fill": "2023-05-30",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2021-06-13",
+        "last_fill": "2021-10-19",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2021-09-28",
+        "last_fill": "2022-02-03",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2023-02-09",
+        "last_fill": "2023-06-17",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2019-03-04",
+        "last_fill": "2019-07-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2023-12-10",
+        "last_fill": "2024-04-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2024-12-27",
+        "last_fill": "2025-05-04",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2021-01-16",
+        "last_fill": "2021-05-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2019-11-16",
+        "last_fill": "2020-03-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2023-09-18",
+        "last_fill": "2024-01-24",
+        "steps": 128
+      }
+    ],
+    "training_sha256": "5b7b25442158407a9496a0c3955d0ee10a9e23fb8f47e5d7da68557ce966df25",
+    "training_start": "2018-07-01",
+    "training_end": "2025-10-31",
+    "validation_start": "2025-11-01",
+    "tickers": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT",
+      "EOSUSDT",
+      "BCCUSDT",
+      "NEOUSDT",
+      "ADAUSDT",
+      "LTCUSDT",
+      "XRPUSDT",
+      "ONTUSDT"
+    ],
+    "transaction_cost": 0.001,
+    "episode_length": 128,
+    "noise_mix": 0.2,
+    "weight_floor": 0.0001,
+    "reward": "PortfolioEnv net log return"
+  },
+  "transaction_cost": 0.001,
+  "context": 10,
+  "layers": 2,
+  "heads": 2,
+  "return_scale": 10.0,
+  "targets": [
+    0.0006988814377848485,
+    0.0031173909668922306,
+    0.005465830080777334,
+    0.014935682857867505
+  ],
+  "rate": 0.005465830080777334
+}

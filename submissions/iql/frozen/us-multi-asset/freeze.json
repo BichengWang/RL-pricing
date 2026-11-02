@@ -1,0 +1,28 @@
+{
+  "task": "us-multi-asset",
+  "submission": "iql",
+  "policy": "rl.bench.policies.iql:IQLPolicy",
+  "params": {
+    "steps": 1000,
+    "eval_every": 125,
+    "episodes_per_behaviour": 2
+  },
+  "fitted_through": "2026-10-30",
+  "validation_start": "2023-10-30",
+  "frozen_at": "2026-11-02T19:41:49+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "17a292ae79a925da1e75c0eb0d578b32858500f1c9cdc048088d9b202e0495cb",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.pt": "348bd397cd999d8a14496cabaa2f916bb30f639df7be619966c96409941ff6d3",
+    "seed0/meta.json": "6766d82e18c33a100943932aebe722df07dfc8f7692fa09e34036974f63d77c1",
+    "seed1/actor.pt": "ae7336157b189c1f16504005800980c1fdcf5601c6ff6e86594a14414d02642d",
+    "seed1/meta.json": "acb673f77fb0e715861ab5139ebeee480ddb0b6a041792cfad8c05340b2f99de",
+    "seed2/actor.pt": "cfbba61fd3612d87bd1d455dcf8e2ac516396d8831983cd743cf31d5f8eea0fb",
+    "seed2/meta.json": "96ee5e13c2278bac45a12cf03bc7d0f6400dddb0501ac4a41687dabc2950cb98"
+  }
+}

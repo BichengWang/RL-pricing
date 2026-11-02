@@ -1,0 +1,327 @@
+{
+  "policy": "BCPolicy",
+  "hidden": 64,
+  "tickers": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "EFA",
+    "EEM",
+    "TLT",
+    "IEF",
+    "LQD",
+    "GLD",
+    "VNQ"
+  ],
+  "best_step": 250,
+  "best_sharpe": 0.08490436517302626,
+  "provenance": {
+    "seed": 2,
+    "behaviour_mix": [
+      {
+        "policy": "EqualWeightRebalance",
+        "episodes": 4
+      },
+      {
+        "policy": "EqualWeightRebalance+Dirichlet",
+        "episodes": 4
+      },
+      {
+        "policy": "Momentum",
+        "episodes": 4
+      },
+      {
+        "policy": "Momentum+Dirichlet",
+        "episodes": 4
+      },
+      {
+        "policy": "MinimumVariance",
+        "episodes": 4
+      },
+      {
+        "policy": "MinimumVariance+Dirichlet",
+        "episodes": 4
+      },
+      {
+        "policy": "InverseVolatility",
+        "episodes": 4
+      },
+      {
+        "policy": "InverseVolatility+Dirichlet",
+        "episodes": 4
+      },
+      {
+        "policy": "TrendFollowing",
+        "episodes": 4
+      },
+      {
+        "policy": "TrendFollowing+Dirichlet",
+        "episodes": 4
+      }
+    ],
+    "sessions": [
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2022-09-13",
+        "last_fill": "2023-03-17",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2015-05-18",
+        "last_fill": "2015-11-17",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2021-10-06",
+        "last_fill": "2022-04-08",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2009-04-08",
+        "last_fill": "2009-10-09",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2011-01-21",
+        "last_fill": "2011-07-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2018-08-31",
+        "last_fill": "2019-03-08",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2016-02-11",
+        "last_fill": "2016-08-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2014-04-15",
+        "last_fill": "2014-10-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2019-03-18",
+        "last_fill": "2019-09-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2009-01-09",
+        "last_fill": "2009-07-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2010-02-10",
+        "last_fill": "2010-08-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2017-04-27",
+        "last_fill": "2017-10-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2007-06-20",
+        "last_fill": "2007-12-20",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2008-10-17",
+        "last_fill": "2009-04-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2013-10-22",
+        "last_fill": "2014-04-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2012-03-01",
+        "last_fill": "2012-08-31",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2021-11-17",
+        "last_fill": "2022-05-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2007-07-31",
+        "last_fill": "2008-02-01",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2018-11-20",
+        "last_fill": "2019-05-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2013-07-15",
+        "last_fill": "2014-01-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2016-11-03",
+        "last_fill": "2017-05-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2019-03-19",
+        "last_fill": "2019-09-19",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2006-02-09",
+        "last_fill": "2006-08-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2014-03-13",
+        "last_fill": "2014-09-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2017-05-08",
+        "last_fill": "2017-11-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2022-04-25",
+        "last_fill": "2022-10-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2015-09-04",
+        "last_fill": "2016-03-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2008-01-24",
+        "last_fill": "2008-07-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2007-09-18",
+        "last_fill": "2008-03-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2016-10-12",
+        "last_fill": "2017-04-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2012-07-09",
+        "last_fill": "2013-01-11",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2013-09-04",
+        "last_fill": "2014-03-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2006-04-20",
+        "last_fill": "2006-10-20",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2011-01-04",
+        "last_fill": "2011-07-08",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2021-01-20",
+        "last_fill": "2021-07-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2011-08-18",
+        "last_fill": "2012-02-22",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2006-01-13",
+        "last_fill": "2006-07-19",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2014-08-28",
+        "last_fill": "2015-03-04",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2022-09-19",
+        "last_fill": "2023-03-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2006-03-15",
+        "last_fill": "2006-09-15",
+        "steps": 128
+      }
+    ],
+    "training_sha256": "907665611504fd77575b8b5aff175a084f02d97cb3539c6e8bab1b60bc6e000a",
+    "training_start": "2005-01-03",
+    "training_end": "2023-10-27",
+    "validation_start": "2023-10-30",
+    "tickers": [
+      "SPY",
+      "QQQ",
+      "IWM",
+      "EFA",
+      "EEM",
+      "TLT",
+      "IEF",
+      "LQD",
+      "GLD",
+      "VNQ"
+    ],
+    "transaction_cost": 0.0005,
+    "episode_length": 128,
+    "noise_mix": 0.2,
+    "weight_floor": 0.0001,
+    "reward": "PortfolioEnv net log return"
+  },
+  "transaction_cost": 0.0005
+}

@@ -1,0 +1,576 @@
+{
+  "policy": "DecisionTransformerPolicy",
+  "hidden": 64,
+  "tickers": [
+    "XLB",
+    "XLE",
+    "XLF",
+    "XLI",
+    "XLK",
+    "XLP",
+    "XLU",
+    "XLV",
+    "XLY"
+  ],
+  "best_step": 1000,
+  "best_sharpe": 0.11604736855881694,
+  "provenance": {
+    "seed": 1,
+    "behaviour_mix": [
+      {
+        "policy": "EqualWeightRebalance",
+        "episodes": 8
+      },
+      {
+        "policy": "EqualWeightRebalance+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "Momentum",
+        "episodes": 8
+      },
+      {
+        "policy": "Momentum+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "MinimumVariance",
+        "episodes": 8
+      },
+      {
+        "policy": "MinimumVariance+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "InverseVolatility",
+        "episodes": 8
+      },
+      {
+        "policy": "InverseVolatility+Dirichlet",
+        "episodes": 8
+      },
+      {
+        "policy": "TrendFollowing",
+        "episodes": 8
+      },
+      {
+        "policy": "TrendFollowing+Dirichlet",
+        "episodes": 8
+      }
+    ],
+    "sessions": [
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2005-12-08",
+        "last_fill": "2006-06-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2005-07-18",
+        "last_fill": "2006-01-19",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2001-09-27",
+        "last_fill": "2002-04-03",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2008-03-05",
+        "last_fill": "2008-09-05",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2019-10-23",
+        "last_fill": "2020-04-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2000-11-02",
+        "last_fill": "2001-05-09",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2004-08-05",
+        "last_fill": "2005-02-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2009-10-12",
+        "last_fill": "2010-04-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2006-10-11",
+        "last_fill": "2007-04-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2014-09-29",
+        "last_fill": "2015-04-02",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2007-05-11",
+        "last_fill": "2007-11-12",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2006-01-04",
+        "last_fill": "2006-07-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2011-02-24",
+        "last_fill": "2011-08-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2004-01-08",
+        "last_fill": "2004-07-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2016-07-07",
+        "last_fill": "2017-01-09",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2016-01-29",
+        "last_fill": "2016-08-02",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2007-06-14",
+        "last_fill": "2007-12-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2001-11-26",
+        "last_fill": "2002-05-31",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2018-05-30",
+        "last_fill": "2018-11-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2000-04-06",
+        "last_fill": "2000-10-09",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2012-12-21",
+        "last_fill": "2013-06-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2001-07-31",
+        "last_fill": "2002-02-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2010-01-12",
+        "last_fill": "2010-07-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2014-01-22",
+        "last_fill": "2014-07-25",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2023-04-14",
+        "last_fill": "2023-10-17",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2021-11-22",
+        "last_fill": "2022-05-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2017-02-16",
+        "last_fill": "2017-08-21",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2003-01-16",
+        "last_fill": "2003-07-22",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2004-04-23",
+        "last_fill": "2004-10-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2010-11-08",
+        "last_fill": "2011-05-12",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2010-12-10",
+        "last_fill": "2011-06-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2008-12-26",
+        "last_fill": "2009-07-01",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2007-06-12",
+        "last_fill": "2007-12-12",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2002-07-17",
+        "last_fill": "2003-01-17",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2015-05-06",
+        "last_fill": "2015-11-05",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2003-04-25",
+        "last_fill": "2003-10-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2015-03-10",
+        "last_fill": "2015-09-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "1999-11-09",
+        "last_fill": "2000-05-12",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2006-08-07",
+        "last_fill": "2007-02-09",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2017-11-20",
+        "last_fill": "2018-05-25",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2007-11-29",
+        "last_fill": "2008-06-04",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2011-02-22",
+        "last_fill": "2011-08-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2007-05-24",
+        "last_fill": "2007-11-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2010-03-22",
+        "last_fill": "2010-09-22",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2004-05-14",
+        "last_fill": "2004-11-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2004-07-13",
+        "last_fill": "2005-01-12",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2016-08-26",
+        "last_fill": "2017-03-02",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2007-08-22",
+        "last_fill": "2008-02-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2012-06-14",
+        "last_fill": "2012-12-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2019-11-14",
+        "last_fill": "2020-05-20",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2021-12-01",
+        "last_fill": "2022-06-06",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2020-07-07",
+        "last_fill": "2021-01-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2015-03-27",
+        "last_fill": "2015-09-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2013-11-29",
+        "last_fill": "2014-06-05",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2016-02-23",
+        "last_fill": "2016-08-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2006-10-30",
+        "last_fill": "2007-05-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2002-12-10",
+        "last_fill": "2003-06-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "1999-12-22",
+        "last_fill": "2000-06-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2010-12-09",
+        "last_fill": "2011-06-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2008-01-22",
+        "last_fill": "2008-07-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2003-02-27",
+        "last_fill": "2003-08-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2017-05-17",
+        "last_fill": "2017-11-16",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2003-12-05",
+        "last_fill": "2004-06-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2001-12-07",
+        "last_fill": "2002-06-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2018-12-13",
+        "last_fill": "2019-06-19",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2010-07-15",
+        "last_fill": "2011-01-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2008-01-29",
+        "last_fill": "2008-07-31",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2012-05-14",
+        "last_fill": "2012-11-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2015-03-27",
+        "last_fill": "2015-09-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2007-07-13",
+        "last_fill": "2008-01-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2003-08-05",
+        "last_fill": "2004-02-06",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2010-09-23",
+        "last_fill": "2011-03-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2011-11-08",
+        "last_fill": "2012-05-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2003-02-25",
+        "last_fill": "2003-08-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2001-07-16",
+        "last_fill": "2002-01-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2004-04-20",
+        "last_fill": "2004-10-21",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2000-02-23",
+        "last_fill": "2000-08-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2015-03-18",
+        "last_fill": "2015-09-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2001-01-02",
+        "last_fill": "2001-07-06",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2006-12-14",
+        "last_fill": "2007-06-21",
+        "steps": 128
+      }
+    ],
+    "training_sha256": "25167115e412dc89e7017a30831298ac2169d1f4e4f7eee971fea27e79cc53d8",
+    "training_start": "1999-01-04",
+    "training_end": "2023-10-27",
+    "validation_start": "2023-10-30",
+    "tickers": [
+      "XLB",
+      "XLE",
+      "XLF",
+      "XLI",
+      "XLK",
+      "XLP",
+      "XLU",
+      "XLV",
+      "XLY"
+    ],
+    "transaction_cost": 0.0005,
+    "episode_length": 128,
+    "noise_mix": 0.2,
+    "weight_floor": 0.0001,
+    "reward": "PortfolioEnv net log return"
+  },
+  "transaction_cost": 0.0005,
+  "context": 10,
+  "layers": 2,
+  "heads": 2,
+  "return_scale": 10.0,
+  "targets": [
+    0.0002479335188043663,
+    0.0007089923863361491,
+    0.0010149073857434136,
+    0.0015741254229624246
+  ],
+  "rate": 0.0002479335188043663
+}

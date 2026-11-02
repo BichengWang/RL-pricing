@@ -1,0 +1,29 @@
+{
+  "task": "crypto-majors",
+  "submission": "decision-transformer",
+  "policy": "rl.bench.policies.decision_transformer:DecisionTransformerPolicy",
+  "params": {
+    "steps": 4000,
+    "eval_every": 500,
+    "episodes_per_behaviour": 8,
+    "context": 10
+  },
+  "fitted_through": "2026-11-01",
+  "validation_start": "2025-11-01",
+  "frozen_at": "2026-11-02T20:00:44+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "8748b372fa51351d6684ca9569d71ffe10e04a29bf1d92e0f85ea1f476595ab9",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.pt": "367999783911b6c44c929a9fc6d93b66fabdcd7995c7a8fa8ddb52eecc2d3a4c",
+    "seed0/meta.json": "afd961b182dd45446a62df86aa8673cb5c30ac04d21026b23586793bf35f47f4",
+    "seed1/actor.pt": "8f9b4ec140e38fc44879f2000e187801e2f3d60194570014dd0ffdac91f80db5",
+    "seed1/meta.json": "8005a4e65fc5cbf7dc26d4f109a74b4a2b86a59082716d6fe9133ac6da58783a",
+    "seed2/actor.pt": "16b2be1c4518175b6ef0692aa680f20e57c4321657bf79503e3b38d2e43e1f83",
+    "seed2/meta.json": "5929e62c693978105bd8003c16eb361189f95165004e08f121a319087bfe667a"
+  }
+}

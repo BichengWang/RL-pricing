@@ -1,0 +1,28 @@
+{
+  "task": "us-sectors",
+  "submission": "iql",
+  "policy": "rl.bench.policies.iql:IQLPolicy",
+  "params": {
+    "steps": 1000,
+    "eval_every": 125,
+    "episodes_per_behaviour": 2
+  },
+  "fitted_through": "2026-10-30",
+  "validation_start": "2023-10-30",
+  "frozen_at": "2026-11-02T19:22:01+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "4c929700956c0cb3ece9bab154d97032a84aac9b2a439feba3c34e685668953d",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.pt": "b773cbdbf10f11ccf55caa653f40158d85a2428c95961d7a767008ebe46c08fa",
+    "seed0/meta.json": "616773c4f1dd0766e0c8e1a0976d0df127f5c03a9efcac1a0d6cc9c96d5d82a5",
+    "seed1/actor.pt": "c251680e4d54c4a8e71205f820e637c62fb40c99ff898fb0b1a7fa84cc56b6e9",
+    "seed1/meta.json": "ed5727f7a115268d247a86dffc403747100774728d1140359dda7e76a4096a26",
+    "seed2/actor.pt": "90c66d8a9a3ce6457dbaa07fb74275d1b3e02f407338d70abff17feb38761764",
+    "seed2/meta.json": "7b6cde414cd52ab845f69be8d0014d7ebb2b1849b3a87ac1a4710e8ca41a94fa"
+  }
+}

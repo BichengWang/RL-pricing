@@ -1,0 +1,33 @@
+{
+  "task": "crypto-majors",
+  "submission": "cvar-ppo",
+  "policy": "rl.bench.policies.cvar_ppo:CVaRPPOPolicy",
+  "params": {
+    "timesteps": 200000,
+    "episode_length": 252,
+    "net_arch": [
+      64,
+      64
+    ],
+    "cvar_alpha": 0.8,
+    "cvar_penalty": 1.0
+  },
+  "fitted_through": "2026-11-01",
+  "validation_start": "2025-11-01",
+  "frozen_at": "2026-11-02T19:51:37+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "8748b372fa51351d6684ca9569d71ffe10e04a29bf1d92e0f85ea1f476595ab9",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.npz": "b19210da4b4c1d974fd4f7ca9119144092fb9bdcb77d79341cf0e299ac530c40",
+    "seed0/meta.json": "c47579d665d8937ed7aa933577fe3c34e1a91ccc86d4c75298e48c289f05107d",
+    "seed1/actor.npz": "60367e2c62305d34db5dc1d32963d091b389215105e51cfa5bf9c3de357acb2b",
+    "seed1/meta.json": "0a4bcdab8e525ef510b9115b0eb931c923803f896a37cc07d016e6fb1f57f57b",
+    "seed2/actor.npz": "76602bc49e81d744c536ea64e7f057d136d42a28a7925c09079d20604cb183af",
+    "seed2/meta.json": "183afbca3328f1b5f21830f6ac6795c4c4c4e79ed8946d32572a4639981cc446"
+  }
+}

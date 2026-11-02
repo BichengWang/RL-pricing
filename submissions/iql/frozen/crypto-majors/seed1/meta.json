@@ -1,0 +1,207 @@
+{
+  "policy": "IQLPolicy",
+  "hidden": 64,
+  "tickers": [
+    "BTCUSDT",
+    "ETHUSDT",
+    "BNBUSDT",
+    "EOSUSDT",
+    "BCCUSDT",
+    "NEOUSDT",
+    "ADAUSDT",
+    "LTCUSDT",
+    "XRPUSDT",
+    "ONTUSDT"
+  ],
+  "best_step": 500,
+  "best_sharpe": -0.037340104123236344,
+  "provenance": {
+    "seed": 1,
+    "behaviour_mix": [
+      {
+        "policy": "EqualWeightRebalance",
+        "episodes": 2
+      },
+      {
+        "policy": "EqualWeightRebalance+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "Momentum",
+        "episodes": 2
+      },
+      {
+        "policy": "Momentum+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "MinimumVariance",
+        "episodes": 2
+      },
+      {
+        "policy": "MinimumVariance+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "InverseVolatility",
+        "episodes": 2
+      },
+      {
+        "policy": "InverseVolatility+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "TrendFollowing",
+        "episodes": 2
+      },
+      {
+        "policy": "TrendFollowing+Dirichlet",
+        "episodes": 2
+      }
+    ],
+    "sessions": [
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2020-09-21",
+        "last_fill": "2021-01-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2020-08-12",
+        "last_fill": "2020-12-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2019-07-28",
+        "last_fill": "2019-12-03",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2021-05-02",
+        "last_fill": "2021-09-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2024-05-08",
+        "last_fill": "2024-09-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2025-01-26",
+        "last_fill": "2025-06-03",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2021-06-12",
+        "last_fill": "2021-10-18",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2023-03-21",
+        "last_fill": "2023-07-27",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2024-09-20",
+        "last_fill": "2025-01-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2020-08-22",
+        "last_fill": "2020-12-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2020-04-20",
+        "last_fill": "2020-08-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2025-03-25",
+        "last_fill": "2025-07-31",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2022-03-27",
+        "last_fill": "2022-08-02",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2024-10-27",
+        "last_fill": "2025-03-04",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2025-02-06",
+        "last_fill": "2025-06-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2024-08-24",
+        "last_fill": "2024-12-30",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2019-10-18",
+        "last_fill": "2020-02-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2020-01-31",
+        "last_fill": "2020-06-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2019-10-19",
+        "last_fill": "2020-02-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2025-02-18",
+        "last_fill": "2025-06-26",
+        "steps": 128
+      }
+    ],
+    "training_sha256": "5b7b25442158407a9496a0c3955d0ee10a9e23fb8f47e5d7da68557ce966df25",
+    "training_start": "2018-07-01",
+    "training_end": "2025-10-31",
+    "validation_start": "2025-11-01",
+    "tickers": [
+      "BTCUSDT",
+      "ETHUSDT",
+      "BNBUSDT",
+      "EOSUSDT",
+      "BCCUSDT",
+      "NEOUSDT",
+      "ADAUSDT",
+      "LTCUSDT",
+      "XRPUSDT",
+      "ONTUSDT"
+    ],
+    "transaction_cost": 0.001,
+    "episode_length": 128,
+    "noise_mix": 0.2,
+    "weight_floor": 0.0001,
+    "reward": "PortfolioEnv net log return"
+  },
+  "transaction_cost": 0.001
+}

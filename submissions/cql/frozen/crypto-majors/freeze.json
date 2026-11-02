@@ -1,0 +1,28 @@
+{
+  "task": "crypto-majors",
+  "submission": "cql",
+  "policy": "rl.bench.policies.cql:CQLPolicy",
+  "params": {
+    "steps": 4000,
+    "eval_every": 500,
+    "episodes_per_behaviour": 8
+  },
+  "fitted_through": "2026-11-01",
+  "validation_start": "2025-11-01",
+  "frozen_at": "2026-11-02T19:44:07+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "8748b372fa51351d6684ca9569d71ffe10e04a29bf1d92e0f85ea1f476595ab9",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.pt": "2fc5b3ec669871c9bfd274000977f66462945b86447d6f2acb67c794fcf8ee8c",
+    "seed0/meta.json": "b3bfd0731a48b554580341862dfaff77bded8540b76f95333bc05513331ea6ab",
+    "seed1/actor.pt": "daae6a48865dd57ab882422ae143278781610afe004512648d23256c8051c927",
+    "seed1/meta.json": "d622fa95d02d62f80861c722494358675f38600f935215990d10ef33168d7e16",
+    "seed2/actor.pt": "3269fa0371ee4946c4dec0f40ff3f60fa11e722fef900b5fe6213465ba98409a",
+    "seed2/meta.json": "c7e647ee4b94df112f4596864cb2886165f13546f492c5f0ac6527f792417bc3"
+  }
+}

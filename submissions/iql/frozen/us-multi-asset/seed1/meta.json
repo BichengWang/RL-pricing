@@ -1,0 +1,207 @@
+{
+  "policy": "IQLPolicy",
+  "hidden": 64,
+  "tickers": [
+    "SPY",
+    "QQQ",
+    "IWM",
+    "EFA",
+    "EEM",
+    "TLT",
+    "IEF",
+    "LQD",
+    "GLD",
+    "VNQ"
+  ],
+  "best_step": 1000,
+  "best_sharpe": 0.0944254270246482,
+  "provenance": {
+    "seed": 1,
+    "behaviour_mix": [
+      {
+        "policy": "EqualWeightRebalance",
+        "episodes": 2
+      },
+      {
+        "policy": "EqualWeightRebalance+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "Momentum",
+        "episodes": 2
+      },
+      {
+        "policy": "Momentum+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "MinimumVariance",
+        "episodes": 2
+      },
+      {
+        "policy": "MinimumVariance+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "InverseVolatility",
+        "episodes": 2
+      },
+      {
+        "policy": "InverseVolatility+Dirichlet",
+        "episodes": 2
+      },
+      {
+        "policy": "TrendFollowing",
+        "episodes": 2
+      },
+      {
+        "policy": "TrendFollowing+Dirichlet",
+        "episodes": 2
+      }
+    ],
+    "sessions": [
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2010-05-14",
+        "last_fill": "2010-11-15",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance",
+        "decision_start": "2010-01-27",
+        "last_fill": "2010-07-30",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2007-03-28",
+        "last_fill": "2007-09-28",
+        "steps": 128
+      },
+      {
+        "behaviour": "EqualWeightRebalance+Dirichlet",
+        "decision_start": "2012-01-10",
+        "last_fill": "2012-07-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2017-11-15",
+        "last_fill": "2018-05-22",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum",
+        "decision_start": "2010-10-27",
+        "last_fill": "2011-05-02",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2013-01-18",
+        "last_fill": "2013-07-24",
+        "steps": 128
+      },
+      {
+        "behaviour": "Momentum+Dirichlet",
+        "decision_start": "2010-03-29",
+        "last_fill": "2010-09-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2011-03-07",
+        "last_fill": "2011-09-07",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance",
+        "decision_start": "2010-02-24",
+        "last_fill": "2010-08-26",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2022-09-19",
+        "last_fill": "2023-03-23",
+        "steps": 128
+      },
+      {
+        "behaviour": "MinimumVariance+Dirichlet",
+        "decision_start": "2006-10-12",
+        "last_fill": "2007-04-19",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2015-02-10",
+        "last_fill": "2015-08-13",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility",
+        "decision_start": "2008-01-09",
+        "last_fill": "2008-07-14",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2010-12-27",
+        "last_fill": "2011-06-29",
+        "steps": 128
+      },
+      {
+        "behaviour": "InverseVolatility+Dirichlet",
+        "decision_start": "2018-09-27",
+        "last_fill": "2019-04-03",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2009-01-29",
+        "last_fill": "2009-08-03",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing",
+        "decision_start": "2013-04-10",
+        "last_fill": "2013-10-10",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2011-11-21",
+        "last_fill": "2012-05-25",
+        "steps": 128
+      },
+      {
+        "behaviour": "TrendFollowing+Dirichlet",
+        "decision_start": "2008-09-30",
+        "last_fill": "2009-04-03",
+        "steps": 128
+      }
+    ],
+    "training_sha256": "907665611504fd77575b8b5aff175a084f02d97cb3539c6e8bab1b60bc6e000a",
+    "training_start": "2005-01-03",
+    "training_end": "2023-10-27",
+    "validation_start": "2023-10-30",
+    "tickers": [
+      "SPY",
+      "QQQ",
+      "IWM",
+      "EFA",
+      "EEM",
+      "TLT",
+      "IEF",
+      "LQD",
+      "GLD",
+      "VNQ"
+    ],
+    "transaction_cost": 0.0005,
+    "episode_length": 128,
+    "noise_mix": 0.2,
+    "weight_floor": 0.0001,
+    "reward": "PortfolioEnv net log return"
+  },
+  "transaction_cost": 0.0005
+}

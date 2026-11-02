@@ -1,0 +1,28 @@
+{
+  "task": "us-multi-asset",
+  "submission": "cql",
+  "policy": "rl.bench.policies.cql:CQLPolicy",
+  "params": {
+    "steps": 4000,
+    "eval_every": 500,
+    "episodes_per_behaviour": 8
+  },
+  "fitted_through": "2026-10-30",
+  "validation_start": "2023-10-30",
+  "frozen_at": "2026-11-02T19:24:11+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "17a292ae79a925da1e75c0eb0d578b32858500f1c9cdc048088d9b202e0495cb",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.pt": "4653a59756885bf9b409b6c2bb66c7a6c143e5daa6b7239d1206e1e4033029b6",
+    "seed0/meta.json": "addb63de2a5768fd44530957e5e99a6a172ea40d40c3d67810a2d9727750e544",
+    "seed1/actor.pt": "c0a319bff673f1aba99c6cda20571a05666f494215f22b11ea3e4dba8b2ac5f1",
+    "seed1/meta.json": "f3040cf4bb0bc567d3da3596be9705e19b9626a5e7fd976bdaf3df3e143aaf76",
+    "seed2/actor.pt": "ab1dfcb500c51ce2cc7aa50ba535f9435dd4da3868ac6c73334eb107db201be7",
+    "seed2/meta.json": "bbd2d9a73f600c7ea7988cbea0e44950b460d08981d967146d0883e99fc3d044"
+  }
+}

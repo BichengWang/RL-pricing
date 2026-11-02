@@ -1,0 +1,33 @@
+{
+  "task": "us-sectors",
+  "submission": "cvar-ppo",
+  "policy": "rl.bench.policies.cvar_ppo:CVaRPPOPolicy",
+  "params": {
+    "timesteps": 200000,
+    "episode_length": 252,
+    "net_arch": [
+      64,
+      64
+    ],
+    "cvar_alpha": 0.8,
+    "cvar_penalty": 1.0
+  },
+  "fitted_through": "2026-10-30",
+  "validation_start": "2023-10-30",
+  "frozen_at": "2026-11-02T19:12:11+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "4c929700956c0cb3ece9bab154d97032a84aac9b2a439feba3c34e685668953d",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.npz": "965315c1859425e7e1187940946747ff2b8c7007a6f3689b2759749d17cb1492",
+    "seed0/meta.json": "8d36b2c8fcc5908ec2c9138dd4b84bde152bd6a01c6f330a3013561e2158c568",
+    "seed1/actor.npz": "4c58fa10eb0e7067528443471e28da9747d16f1009359f6f39bbb02aa5dfb936",
+    "seed1/meta.json": "394eed6687f6ba216277d8631065b4a7637ae1c86b96c2fc63ecff49426ad163",
+    "seed2/actor.npz": "912999f70a6ad12aaf4a26122110fe081ba5c5b62ee41debfd9474c708ade274",
+    "seed2/meta.json": "66d45e4b3c6389006cf379d69df5ab5214871cfe1101ab373c3d97adb379d54f"
+  }
+}

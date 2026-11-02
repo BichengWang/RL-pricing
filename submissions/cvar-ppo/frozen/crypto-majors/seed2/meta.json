@@ -1,0 +1,13 @@
+{
+  "algo": "ppo",
+  "layers": [
+    "dense",
+    "tanh",
+    "dense",
+    "tanh",
+    "dense"
+  ],
+  "output": "clip",
+  "best_step": 180000,
+  "best_sharpe": -0.03815010593652794
+}

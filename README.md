@@ -167,14 +167,13 @@ how many you tried.
 | Track | Task | # | Strategy | Sharpe | CAGR | Max DD | ΔSharpe vs 1/N | DSR |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | historical | `crypto-majors` | 1 | Minimum variance | 1.64 | 90.9% | -33.3% | +0.86 (p<0.001) | 1.00 |
-| historical | `crypto-majors` | 2 | Inverse volatility | 0.88 | 40.7% | -46.8% | +0.10 (p=0.089) | 0.94 |
-| historical | `crypto-majors` | 3 | Momentum (top 3) | 0.84 | 37.8% | -47.9% | +0.06 (p=0.401) | 0.93 |
-| historical | `crypto-majors` | 4 | **1/N buy and hold** ◆ | 0.78 | 32.7% | -44.5% | – | 0.91 |
-| historical | `crypto-majors` | 6 | PPO (tuned) | 0.71 ± 0.22 | 26.9% | -49.3% | -0.04 (p=0.621) | 0.43 |
+| historical | `crypto-majors` | 2 | Decision Transformer | 1.25 ± 0.20 | 68.9% | -33.9% | +0.59 (p=0.002) | 0.89 |
+| historical | `crypto-majors` | 3 | CQL | 1.21 ± 0.09 | 58.1% | -34.1% | +0.44 (p=0.022) | 0.82 |
+| historical | `crypto-majors` | 7 | **1/N buy and hold** ◆ | 0.78 | 32.7% | -44.5% | – | 0.91 |
 | historical | `us-multi-asset` | 1 | **1/N buy and hold** ◆ | 0.73 | 8.9% | -26.6% | – | 0.98 |
 | historical | `us-multi-asset` | 2 | Momentum (top 3) | 0.72 | 9.9% | -23.7% | -0.01 (p=0.506) | 0.98 |
 | historical | `us-multi-asset` | 3 | 1/N monthly rebalance | 0.69 | 8.0% | -25.8% | -0.04 (p=0.827) | 0.97 |
-| historical | `us-multi-asset` | 4 | A2C | 0.66 ± 0.02 | 7.1% | -23.8% | -0.06 (p=0.940) | 0.97 |
+| historical | `us-multi-asset` | 4 | IQL | 0.68 ± 0.07 | 6.8% | -23.3% | -0.04 (p=0.714) | 0.77 |
 | historical | `us-sectors` | 1 | 1/N monthly rebalance | 0.69 | 11.6% | -36.7% | +0.01 (p=0.449) | 0.97 |
 | historical | `us-sectors` | 2 | **1/N buy and hold** ◆ | 0.68 | 11.5% | -35.5% | – | 0.97 |
 | historical | `us-sectors` | 3 | A2C | 0.67 ± 0.01 | 10.3% | -34.3% | -0.01 (p=0.650) | 0.97 |

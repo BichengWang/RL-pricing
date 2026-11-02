@@ -1,0 +1,28 @@
+{
+  "task": "crypto-majors",
+  "submission": "bc",
+  "policy": "rl.bench.policies.offline:BCPolicy",
+  "params": {
+    "steps": 2000,
+    "eval_every": 250,
+    "episodes_per_behaviour": 4
+  },
+  "fitted_through": "2026-11-01",
+  "validation_start": "2025-11-01",
+  "frozen_at": "2026-11-02T19:42:09+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "8748b372fa51351d6684ca9569d71ffe10e04a29bf1d92e0f85ea1f476595ab9",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.pt": "7da457f83ad1589afb7ef4c18d5a1524494a2711fa12a8c26d8364c89928228e",
+    "seed0/meta.json": "745fc3f60b14d313562cad6bfdf367d649df5e1e981a4b9d073d369bf5f199f2",
+    "seed1/actor.pt": "f5fd0a81cc4d23aa175f1f21090d2968ea61c6be04d8f3e47dbe02f910a8bbe9",
+    "seed1/meta.json": "d63398bb21a689c830ff7d911dd554288842d9d3428a337052e2f4d1a23b0892",
+    "seed2/actor.pt": "b7264eb46d73c0243558dce6b4d032f0a4eaa4a2beb85ef27e6e2c87aa85fe32",
+    "seed2/meta.json": "021971e550bae222a87f8e6b0e23343eab2fa47a7e97b41e98ab13da85ce2f88"
+  }
+}

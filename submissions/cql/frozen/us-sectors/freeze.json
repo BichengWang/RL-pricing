@@ -1,0 +1,28 @@
+{
+  "task": "us-sectors",
+  "submission": "cql",
+  "policy": "rl.bench.policies.cql:CQLPolicy",
+  "params": {
+    "steps": 4000,
+    "eval_every": 500,
+    "episodes_per_behaviour": 8
+  },
+  "fitted_through": "2026-10-30",
+  "validation_start": "2023-10-30",
+  "frozen_at": "2026-11-02T19:04:24+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "4c929700956c0cb3ece9bab154d97032a84aac9b2a439feba3c34e685668953d",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.pt": "a1236414f476d0f1006501dc182c13c8d91a1bcf914aab55ea18183086a10bc7",
+    "seed0/meta.json": "7c114590227af8de2414311442aee9b2a6c7fc62933363fd460594a69639af59",
+    "seed1/actor.pt": "58094430d6ff5c27f48aff2d05b0e8033b21c7a79be9f8ba366ebf3ddc6c4e2e",
+    "seed1/meta.json": "c0866ecfe90b1e67cf5ae02fb78229eb7ea0911e9133caf8c49a0d32c40daeb2",
+    "seed2/actor.pt": "287a5db262dc0b917ec48585520e030d769e9e470d7c5ff8550ab4eb7b9146b6",
+    "seed2/meta.json": "f21d2141cef0cc0118026e1727b1a0e6dacaa027d5dac0f0dd6f939c3f8a9a47"
+  }
+}

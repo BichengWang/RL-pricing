@@ -1,0 +1,33 @@
+{
+  "task": "us-multi-asset",
+  "submission": "cvar-ppo",
+  "policy": "rl.bench.policies.cvar_ppo:CVaRPPOPolicy",
+  "params": {
+    "timesteps": 200000,
+    "episode_length": 252,
+    "net_arch": [
+      64,
+      64
+    ],
+    "cvar_alpha": 0.8,
+    "cvar_penalty": 1.0
+  },
+  "fitted_through": "2026-10-30",
+  "validation_start": "2023-10-30",
+  "frozen_at": "2026-11-02T19:31:59+00:00",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "data_sha256": "17a292ae79a925da1e75c0eb0d578b32858500f1c9cdc048088d9b202e0495cb",
+  "commit": "85431afea51df4797d5b0a30a31a8b1cfd9f11b5",
+  "artifacts": {
+    "seed0/actor.npz": "203314dbdccf8eff3ba945484f57e727e353f53932721ba6c0b3e4921a1f94e8",
+    "seed0/meta.json": "40175c35673c16b4deb5f6f864a0c3ffcc9885f5b202e8b6c5844da75a01522a",
+    "seed1/actor.npz": "c23a4bb41df92b1570c16e0b11540ea4e041b4bbbf977e25043fa6ebc8c4148d",
+    "seed1/meta.json": "c99bbddaea205da2de46f8816f86efb269b6166f82b4a8b09f5452a3d6eb8e50",
+    "seed2/actor.npz": "51447c3fac487f9d495346a7e41a3b52fc8ba23cfd17c7778686c2b27c1483c2",
+    "seed2/meta.json": "f6bb75d7c6ebb47c9f2265db56e392d90bc0cea421e1216fa9bd83949006a8ba"
+  }
+}
