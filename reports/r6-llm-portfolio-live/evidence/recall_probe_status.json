@@ -1,0 +1,8 @@
+{
+  "created_at_utc": "2026-11-02T20:35:22Z",
+  "probe": "pending",
+  "script": "recall_probe.py",
+  "reason": "No usable Anthropic API key is available in this environment: the shell's ANTHROPIC_API_KEY is the placeholder 'dummy-key' and ~/my-code/TradingAgents/.env holds the same placeholder; the models list API returns 401 for both.",
+  "required_before_switch": "Run 'ANTHROPIC_API_KEY=<key> python reports/r6-llm-portfolio-live/evidence/recall_probe.py --start <first decision date>' and commit evidence/recall_probe_<date>.json before LLM_PORTFOLIO_ENABLED is set to true.",
+  "max_spend_usd": 1.0
+}

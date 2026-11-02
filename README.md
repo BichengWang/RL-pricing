@@ -55,6 +55,7 @@ Verdicts: ✅ holds, ◐ partly holds, ✗ does not hold, ? inconclusive. [How a
 | R2 | [TradingAgents](https://arxiv.org/abs/2412.20138) backtest: Sharpe 5.6–8.2 on AAPL, GOOGL, AMZN in 2024 Q1, replicated with a check for whether the models remember that period | 2027-01-05 |
 | R3 | TradingAgents run live on the same three stocks for three months, each decision committed before the open; first fill 2026-10-29 ([pre-registration](reports/r3-tradingagents-live/preregistration.md), [addendum](reports/r3-tradingagents-live/addendum-2026-10-29.md)) | 2027-02-15 |
 | R5 | [FinRL-DeepSeek](https://arxiv.org/abs/2502.07393) (Benhenda, 2025): LLM-scored news makes CPPO better and PPO worse on the Nasdaq-100, 2019–2023, from two runs ([pre-registration](reports/r5-finrl-deepseek/preregistration.md)) | 2027-01-26 |
+| R6 | A frozen Claude Sonnet 5.5 allocates the nine US sector ETFs live against equal weight, under its own cost cap ([pre-registration](reports/r6-llm-portfolio-live/preregistration.md)) | 2027-03-01 |
 
 **Nominate a claim:** open an issue titled `Nominate: <paper>` with the
 quoted claim and a link to the code. Authors get each draft seven days before
