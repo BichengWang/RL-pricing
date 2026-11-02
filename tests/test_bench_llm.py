@@ -304,6 +304,34 @@ def test_every_registered_arm_passes_the_lookahead_check(arm, market):
     assert check_causal(TASK, submission, data=market, info=info, seed=0)
 
 
+def test_cli_check_causal_passes_for_every_arm_with_a_jsonl_fixture(tmp_path, market):
+    root = tmp_path / "subs"
+    root.mkdir()
+    fixture = tmp_path / "scores.jsonl"
+    fixture.write_text("".join(json.dumps(item.to_dict()) + "\n" for item in fixture_panel(market).items))
+    from rl import cli
+
+    for arm in ARM_IDS:
+        submission = tiny(discover(REPO / "submissions")[arm])
+        spec = {
+            "name": submission.name, "kind": submission.kind, "policy": submission.policy,
+            "params": submission.params, "trials": submission.trials,
+            "authors": list(submission.authors), "url": submission.url,
+            "description": submission.description, "tasks": list(submission.tasks),
+            "model_cutoffs": [dict(entry) for entry in submission.model_cutoffs],
+        }
+        if submission.info_sources:
+            spec["info_sources"] = [{"source": "jsonl", "path": "scores.jsonl"}]
+            spec["contamination"] = submission.contamination
+        directory = root / arm
+        directory.mkdir()
+        (directory / "submission.json").write_text(json.dumps(spec))
+        (directory / "scores.jsonl").write_bytes(fixture.read_bytes())
+        argv = ["bench", "check-causal", "--task", "synthetic", "--submission", arm,
+                "--submissions-root", str(root)]
+        assert cli.main(argv) == 0, arm
+
+
 # --- the score converter ---------------------------------------------------------------
 
 HEADER = "Unnamed: 0.1,Unnamed: 0,Date,Article_title,Stock_symbol,Url,Publisher,Author,Article,Lsa_summary,{column}\n"
