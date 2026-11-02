@@ -55,7 +55,7 @@ first run starts after 13:00 UTC). From 11-02 the open is 14:30 UTC.
 | P0.7 | ✅ done | README limitation corrected on 10-25 (P0.20) |
 | P0.8 | ◐ dry run passed | P0.17. First CI run 11-02 06:00 UTC |
 | P0.9 | ◐ | README lab-first. Launch kit (outside the repository) now cites `2026-10.md` and the applied metadata command |
-| P0.10 | ⏳ | Moved to 11-02 (decision 11-01). Medium story `medium.com/p/5185d13cde70` scheduled for 08:00 PT, LinkedIn and X at 08:30 PT; text in the owner's private publisher repository |
+| P0.10 | ⏳ | Moved to 11-02 (decision 11-01). Medium story `medium.com/p/81b449ec45a5` scheduled for 08:00 PT, LinkedIn and X at 08:30 PT; text in the owner's private publisher repository |
 | P0.11 | ✅ done | #98: `':(glob)submissions/*/ledger/**'`, staged only when `git status` shows entries. Dispatch run 40218696858 committed `a1e399f` |
 | P0.12 | ✅ done | #98: cron `17 4,7,10 * * 1-5`, checkout `ref: main`. Start times of 3 sessions above; first runs all before 12:00 UTC |
 | P0.13 | ✅ done | #98: an `llm` participant needs the three credentials and `LEDGER_MONTHLY_BUDGET_USD`; the graph and pin check run at construction. Run 40218696858: "LLM ledger preflight requires OPENAI_API_KEY, FRED_API_KEY, SEC_EDGAR_USER_AGENT, LEDGER_MONTHLY_BUDGET_USD", no TradingAgents entry, canary committed |
