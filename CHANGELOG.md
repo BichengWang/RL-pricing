@@ -19,7 +19,13 @@ A major release is needed to break any of these:
 Other modules, including the share-trading toolkit's Python functions, may
 change in minor releases.
 
-## Unreleased
+## 2.0.0 (2026-11-02)
+
+Modern policies on stronger instruments ([`.plan/v2.md`](.plan/v2.md)):
+offline and risk-aware RL entrants, a point-in-time information layer with a
+lookahead check, records tied to the code that produced them, push-time proof
+for ledger decisions, a hard per-entrant cost cap, the R5 pipeline and a live
+LLM portfolio entrant. Breaking changes are marked below.
 
 - `us-ndx80` joins the tasks as a re-evaluation (not ranked): the 80
   Nasdaq-100 names of FinRL-DeepSeek that Yahoo still serves, 2019-2023, with

@@ -410,7 +410,7 @@ Trading: Benchmarking Actor-Critic Methods with Forward Retraining*,
 @software{rl_pricing,
   author  = {Wang, Bicheng and Zhang, Xinyi},
   title   = {{RL-pricing}: an honest, live-forward-tested benchmark for reinforcement learning portfolio policies},
-  version = {1.0.0},
+  version = {2.0.0},
   year    = {2026},
   url     = {https://github.com/BichengWang/RL-pricing}
 }
