@@ -47,10 +47,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install -e .
+          pip install -e ".[agents]"
           pip install "$(python -c 'from rl.bench.policies.tradingagents import INSTALL_REQUIREMENT; print(INSTALL_REQUIREMENT)')"
       - name: Record decisions
         env:
+          # Off until the R6 pre-registration (with its recall probe) is merged
+          # and the owner flips the repository variable.
+          LLM_PORTFOLIO_ENABLED: ${{ vars.LLM_PORTFOLIO_ENABLED }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           LEDGER_MONTHLY_BUDGET_USD: ${{ vars.LEDGER_MONTHLY_BUDGET_USD }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -60,7 +63,12 @@ jobs:
           ALPHA_VANTAGE_API_KEY: ${{ secrets.ALPHA_VANTAGE_API_KEY }}
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
           SEC_EDGAR_USER_AGENT: ${{ vars.SEC_EDGAR_USER_AGENT }}
-        run: rl-pricing bench ledger record --refresh
+        run: |
+          if [ "${LLM_PORTFOLIO_ENABLED}" = "true" ]; then
+            rl-pricing bench ledger record --refresh
+          else
+            rl-pricing bench ledger record --refresh --exclude llm-portfolio
+          fi
       - name: Commit and push ledger entries
         # Also after a failed record step: entries written before the failure must be committed.
         id: push

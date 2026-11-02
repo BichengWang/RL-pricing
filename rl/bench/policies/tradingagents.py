@@ -248,6 +248,9 @@ class TradingAgentsPolicy(Policy):
     # $0.694 was the largest decision in the R3 dry run (2026-10-29), rounded up.
     max_cost_per_decision_usd = 0.70
 
+    #: The ledger checks these before it constructs the graph (its data tools read them).
+    ledger_env: ClassVar[tuple[str, ...]] = ("FRED_API_KEY", "SEC_EDGAR_USER_AGENT")
+
     def __init__(
         self,
         llm_provider: str = "openai",

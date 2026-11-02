@@ -110,6 +110,8 @@ MIT-licensed.
 [project.optional-dependencies]
 test = ["pytest>=7.0"]
 lint = ["ruff>=0.5"]
+# The official SDK for the API-LLM ledger entrant (rl.bench.policies.llm_portfolio).
+agents = ["anthropic>=0.40"]
 
 [project.scripts]
 rl-pricing = "rl.cli:entrypoint"

@@ -16,26 +16,34 @@ Recording (:func:`record_decision`)
     * Runs are idempotent: an existing entry is never overwritten, and a
       session older than the newest entry is never back-filled.
     * The policy is built from the submission, ``reset()`` and then ``act`` is
-      called once with the history through ``decision_date`` and the account's
-      current weights, obtained by replaying the earlier entries through the
-      engine. Ledger policies are **not fitted**: ``fit`` is never called
+      called once with the history through ``decision_date``, the account's
+      current weights (obtained by replaying the earlier entries through the
+      engine) and the task/submission's declared information items published
+      strictly before that close. Ledger policies are **not fitted**: ``fit`` is never called
       because fitted state is not stored in an entry and could not be audited.
       A policy that needs fitting should use the frozen live track instead.
     * Optional policy attributes read after ``act``: ``last_cost_usd`` (spend of
       the call, counted against the budget) and ``ledger_inputs`` (JSON-able
       provenance: model ids, agent commit, raw decision...).
     * An LLM submission requires its provider's key (``OPENAI_API_KEY`` or
-      ``ANTHROPIC_API_KEY``, from ``params.llm_provider``), ``FRED_API_KEY``,
-      ``SEC_EDGAR_USER_AGENT``, a monthly budget cap and a declared worst-case
-      cost of one decision, ``max_cost_per_decision_usd`` (a submission param,
-      or an attribute of the policy class). Its policy is built before
-      recording, so missing credentials, a key or model the provider rejects,
-      a mismatched TradingAgents pin or graph construction failure writes no
-      entry. Other participants still record, and the command reports failure.
+      ``ANTHROPIC_API_KEY``, from ``params.llm_provider``), every name in the
+      policy class's ``ledger_env`` (TradingAgents declares ``FRED_API_KEY`` and
+      ``SEC_EDGAR_USER_AGENT``; a policy that only reads market data needs
+      none), a monthly budget cap and a declared worst-case cost of one
+      decision, ``max_cost_per_decision_usd`` (a submission param, or an
+      attribute of the policy class). The cap is the smaller of
+      ``LEDGER_MONTHLY_BUDGET_USD`` and the submission's
+      ``monthly_budget_usd`` param, when both are set. Its policy is built
+      before recording, so missing credentials, a key or model the provider
+      rejects, a mismatched TradingAgents pin or graph construction failure
+      writes no entry. Other participants still record, and the command
+      reports failure.
     * The cap is hard: if this month's summed ``cost_usd`` of the submission
-      plus the declared worst case of this decision would exceed
-      ``LEDGER_MONTHLY_BUDGET_USD`` (or the month is already at it), nothing is
-      written, so no model is called and the command reports failure. A
+      plus the declared worst case of this decision would exceed the effective
+      monthly cap (the smaller of ``LEDGER_MONTHLY_BUDGET_USD`` and the
+      submission's ``monthly_budget_usd``, when set), or the month is already
+      at it, nothing is written, so no model is called and the command reports
+      failure. A
       decision that reports no cost is billed its declared worst case, never
       zero. Baselines cost nothing and ignore the cap. A policy whose ``act``
       raises (or returns weights the engine rejects) yields a hold with reason
@@ -103,6 +111,7 @@ import numpy as np
 from rl.bench import runner
 from rl.bench.data import DATA_ENV, DEFAULT_CACHE
 from rl.bench.engine import Backtest, check_weights, simulate
+from rl.bench.info import InfoPanel, InfoView, load_task_info
 from rl.bench.market import MarketData, MarketView, as_day
 from rl.bench.policies.tradingagents import API_KEY_ENV
 from rl.bench.submission import SUBMISSIONS_DIR, Submission, discover
@@ -154,6 +163,20 @@ def decision_sha256(entry: dict) -> str:
     """SHA-256 of the entry without its ``decision_sha256``, as canonical JSON."""
     payload = {key: value for key, value in entry.items() if key != "decision_sha256"}
     return hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+
+
+def declared_monthly_budget(submission: Submission) -> float | None:
+    """The submission's own monthly USD cap (``monthly_budget_usd``), or ``None``.
+
+    It applies to every task the submission runs and is combined with
+    ``LEDGER_MONTHLY_BUDGET_USD`` by taking the smaller cap.
+    """
+    declared = submission.params.get("monthly_budget_usd")
+    if declared is None:
+        return None
+    if isinstance(declared, bool) or not isinstance(declared, (int, float)) or not math.isfinite(declared) or declared < 0:
+        raise ValueError("monthly_budget_usd must be a non-negative finite number, got {!r}".format(declared))
+    return float(declared)
 
 
 def declared_max_cost(submission: Submission) -> float | None:
@@ -225,18 +248,21 @@ def _jsonable(value) -> dict:
 # --- recording ---------------------------------------------------------------
 
 
-def _cap(budget) -> float | None:
+def _cap(budget, submission: Submission | None = None) -> float | None:
+    """The effective monthly cap: the smaller of the CLI/env budget and the submission's own."""
     if budget is None:
         budget = os.environ.get(BUDGET_ENV, "").strip()
-    if budget == "":
-        return None
-    try:
-        cap = float(budget)
-    except ValueError:
-        cap = math.nan
-    if not math.isfinite(cap) or cap < 0:
-        raise ValueError("{} must be a non-negative number, got {!r}".format(BUDGET_ENV, budget))
-    return cap
+    env_cap = None
+    if budget != "":
+        try:
+            env_cap = float(budget)
+        except (TypeError, ValueError):
+            env_cap = math.nan
+        if not math.isfinite(env_cap) or env_cap < 0:
+            raise ValueError("{} must be a non-negative number, got {!r}".format(BUDGET_ENV, budget))
+    own_cap = declared_monthly_budget(submission) if submission is not None else None
+    caps = [cap for cap in (env_cap, own_cap) if cap is not None]
+    return min(caps) if caps else None
 
 
 def month_cost(submission: Submission, month: str, *, root=None) -> float:
@@ -279,13 +305,16 @@ def record_decision(
     budget=None,
     refresh: bool = False,
     root=None,
+    info: InfoPanel | None = None,
 ) -> Path | None:
     """Write the entry for the latest session in ``data`` (default: all data available).
 
     ``run`` overrides the Actions run identity read from the environment;
     ``budget`` (USD per month) overrides ``LEDGER_MONTHLY_BUDGET_USD``;
-    ``root`` replaces the submissions directory. Returns the entry's path
-    (existing or new), or ``None`` if recording would back-fill a session.
+    ``root`` replaces the submissions directory; ``info`` supplies an
+    already-loaded information panel instead of loading the declared sources.
+    Returns the entry's path (existing or new), or ``None`` if recording would
+    back-fill a session.
     """
     data = runner._data_for(task, data, refresh=refresh)
     if len(data) < 1:
@@ -324,14 +353,16 @@ def record_decision(
         "run": _run_identity(run, now),
         "created_at": runner._utc(now),
     }
-    cap = None if submission.kind == "baseline" else _cap(budget)
+    cap = None if submission.kind == "baseline" else _cap(budget, submission)
     policy = None
     if submission.kind == "llm":
         provider = submission.params.get("llm_provider", "openai")
         if provider not in API_KEY_ENV:
             raise ValueError("LLM ledger preflight: unsupported llm_provider {!r}".format(provider))
-        missing = [name for name in (API_KEY_ENV[provider], "FRED_API_KEY", "SEC_EDGAR_USER_AGENT")
-                   if not os.environ.get(name, "").strip()]
+        required = (API_KEY_ENV[provider],) + tuple(
+            getattr(submission.policy_class(), "ledger_env", ("FRED_API_KEY", "SEC_EDGAR_USER_AGENT"))
+        )
+        missing = [name for name in required if not os.environ.get(name, "").strip()]
         if cap is None:
             missing.append(BUDGET_ENV)
         if missing:
@@ -353,9 +384,16 @@ def record_decision(
                     submission.id, task.id, cap, spent, reservation
                 )
             )
+    info_view = InfoView()
+    if info is not None:
+        info_view = info.at_session(decision_date, crypto=task.source == "binance")
+    elif task.info_sources or submission.info_sources:
+        info_view = load_task_info(task, submission, refresh=refresh).at_session(
+            decision_date, crypto=task.source == "binance"
+        )
     try:
         policy.reset()
-        decision = policy.act(MarketView(history, current))
+        decision = policy.act(MarketView(history, current, info=info_view))
         if decision is not None:
             weights = check_weights(decision, len(history.tickers), decision_date)
             entry["weights"] = {ticker: float(w) for ticker, w in zip(history.tickers, weights)}
@@ -386,20 +424,25 @@ def record_all(
     run: Mapping | None = None,
     budget=None,
     refresh: bool = False,
+    exclude: tuple[str, ...] | list[str] = (),
 ) -> tuple[list[Path], list[str]]:
     """:func:`record_decision` for every ``(task, submission)`` listed under ``"ledger"``.
 
-    ``data`` optionally maps task ids to panels. Returns the entry paths and
-    one message per pair that failed (unknown task, construction or data
-    errors); a failing pair never stops the others.
+    ``data`` optionally maps task ids to panels; ``exclude`` skips submission
+    ids (the workflow keeps an entrant off until its repository switch is on).
+    Returns the entry paths and one message per pair that failed (unknown task,
+    construction or data errors); a failing pair never stops the others.
     """
     found = discover(root)
     if submission is not None and submission not in found:
         raise KeyError("Unknown submission {!r}; found {}".format(submission, sorted(found)))
     written, failures = [], []
     loaded: dict[str, MarketData] = dict(data or {})
+    skipped = set(exclude)
     for sub in found.values():
-        if submission not in (None, sub.id) or sub.is_retired((now or dt.datetime.now(dt.timezone.utc)).date()):
+        if submission not in (None, sub.id) or sub.id in skipped or sub.is_retired(
+            (now or dt.datetime.now(dt.timezone.utc)).date()
+        ):
             continue
         for task_id in sub.ledger:
             if task not in (None, task_id):
@@ -793,6 +836,7 @@ def _cmd_record(options) -> int:
         submission=options.submission,
         budget=options.budget,
         refresh=options.refresh,
+        exclude=options.exclude or (),
     )
     return _report("Recorded", written, failures)
 
@@ -822,6 +866,7 @@ def add_cli(commands, common) -> None:
     )
     record.add_argument("--task")
     record.add_argument("--submission")
+    record.add_argument("--exclude", action="append", metavar="ID", help="skip a submission id (repeatable)")
     record.add_argument("--budget", type=float, help="monthly USD cap per submission (default: ${})".format(BUDGET_ENV))
     record.add_argument("--refresh", action="store_true", help="ignore the local data cache")
     record.set_defaults(handler=_cmd_record)
