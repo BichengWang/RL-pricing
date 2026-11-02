@@ -123,13 +123,15 @@ def _unadjusted_closes(ticker: str, sessions: list[str], start: str) -> dict[str
     from rl.bench.data import DATA_ENV, DEFAULT_CACHE
     from rl.marketdata.yahoodownloader import YahooDownloader
 
+    def closes(frame):
+        frame["date"] = pd.to_datetime(frame["date"]).dt.strftime("%Y-%m-%d")
+        return dict(zip(frame["date"], frame["close"]))
+
     cache = Path(os.environ.get(DATA_ENV) or DEFAULT_CACHE) / "yahoo" / "{}.csv".format(ticker)
-    frame = pd.read_csv(cache) if cache.exists() else None
-    if frame is None:
+    values = closes(pd.read_csv(cache)) if cache.exists() else {}
+    if not all(day in values for day in sessions):
         first = (date.fromisoformat(sessions[0]) - timedelta(days=14)).isoformat()
-        frame = YahooDownloader(first, start, [ticker]).fetch_unadjusted()
-    frame["date"] = pd.to_datetime(frame["date"]).dt.strftime("%Y-%m-%d")
-    values = dict(zip(frame["date"], frame["close"]))
+        values = closes(YahooDownloader(first, start, [ticker]).fetch_unadjusted())
     return {day: float(values[day]) for day in sessions if day in values}
 
 
