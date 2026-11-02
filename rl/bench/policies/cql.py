@@ -9,7 +9,8 @@ cube actions; proposal densities use the same simplex measure. Fixed entropy
 and conservative coefficients replace automatic Lagrange tuning. The
 conservative log integral uses current-state actor and uniform proposals
 (no next-state proposals, which can have a different listing support).
-Net log rewards have a declared fixed scale. Replay needs only the actor.
+The Q target subtracts ``entropy_weight * log pi(a'|s')`` (soft backup),
+whereas CORL's default is ``backup_entropy=False``. Net log rewards have a declared fixed scale. Replay needs only the actor.
 """
 
 import copy
