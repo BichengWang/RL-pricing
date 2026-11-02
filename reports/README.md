@@ -77,8 +77,9 @@ reports/<id>/
 
 `claims.json` is a list of `{id, quote, source, metric, claimed, ours, ci95,
 level, verdict, note}`; `verdict` is one of `holds`, `partly`,
-`does-not-hold`, `inconclusive`. The verdict table above and the one in the
-main README are generated from every `claims.json`:
+`does-not-hold`, `inconclusive`, or `null` while the claim is pre-registered and
+untested (such claims are left out of the tables). The verdict table above and
+the one in the main README are generated from every `claims.json`:
 
 ```bash
 rl-pricing bench reports        # validate, then refresh both tables

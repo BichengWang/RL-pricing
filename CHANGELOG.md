@@ -35,6 +35,9 @@ change in minor releases.
 - The ledger's paid-agent preflight requires the key of the submission's
   `llm_provider` (`OPENAI_API_KEY` or `ANTHROPIC_API_KEY`); the price table
   lists Claude Opus 5.5, Sonnet 5.5 and Sonnet 5.
+- `claims.json` accepts `"verdict": null` for a pre-registered claim that has
+  not been tested; `rl-pricing bench reports` validates it and leaves it out of
+  the verdict tables until a verdict is set.
 
 ## 1.0.0 (2026-10-27)
 

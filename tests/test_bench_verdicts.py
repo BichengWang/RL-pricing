@@ -143,6 +143,16 @@ def test_table_link_prefix_and_pipe_escape(tmp_path):
     assert "(reports/README.md#how-a-verdict-is-decided)" in table
 
 
+def test_pending_claims_validate_but_are_not_rendered(tmp_path):
+    _write(tmp_path, "r1", [_claim(id="decided"), _claim(id="pending", ours=None, ci95=None, verdict=None)])
+    _write(tmp_path, "r2", [_claim(id="all-pending", ours=None, ci95=None, verdict=None)])
+    reports = verdicts.load_reports(tmp_path)
+    assert [c.verdict for c in reports[0].claims] == ["does-not-hold", None]
+    table = verdicts.render_table(reports)
+    assert "`decided`" in table and "pending" not in table and "[r2]" not in table
+    assert verdicts.render_table(reports[1:]) == "No reports yet."
+
+
 def test_no_reports():
     assert verdicts.render_table([]) == "No reports yet."
 

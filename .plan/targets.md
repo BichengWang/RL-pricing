@@ -23,7 +23,7 @@ is how targets are scored and which ones were chosen.
 | AlphaMix+, PRUDEX-Compass, TMLR 2023 | Risk-aware mixture-of-experts RL; best Sharpe (1.64) with lower seed variance | 4 | 3 | 3 | 4 | 4 | 3.55 | R4 candidate |
 | RD-Agent(Q), Microsoft, NeurIPS 2025 | CSI 300 test 2017–2020: IC 0.0532, annual return 14.21%, IR 1.74 | 5 | 2 | 4 | 3 | 2 | 3.45 | R4 candidate |
 | ai-hedge-fund (64k stars) | No formal performance claims; README says educational | 1 | 3 | 5 | 3 | 3 | 2.80 | Live ledger entrant only |
-| FinRL-DeepSeek, contest 2025 task 1 | PPO / CPPO-DeepSeek beat Nasdaq-100 in two runs | 2 | 3 | 3 | 2 | 3 | 2.55 | Backlog (already re-tested in "FinRL-DeepSeek Revisited") |
+| FinRL-DeepSeek, Benhenda, arXiv 2502.07393 (contest 2025 task 1) | PPO / CPPO-DeepSeek beat Nasdaq-100 in two runs; LLM infusion hurts PPO and helps CPPO | 2 | 3 | 3 | 2 | 3 | 2.55 | **R5** (v2.0.0, decided 2026-11-01); the one prior re-test is a two-seed reimplementation, not the authors' code |
 
 Novelty scores are our assessment from a web search on 2026-10-14, not an
 exhaustive literature review. Each pre-registration re-checks for prior
@@ -46,13 +46,18 @@ re-tests.
 - **R4 by gate.** AlphaMix+ fits our tasks and is cheap. RD-Agent(Q) is the more
   prestigious result, but needs China A-share data and a heavy LLM research
   loop. Decide by 2026-12-15 (P1.7) on data licence and a compute probe.
+- **R5 FinRL-DeepSeek.** The 2025 LLM-plus-RL trading paper whose training code,
+  agent-ready data and trained agents are all public (MIT code). Its claims are
+  qualitative and rest on two stochastic runs, so the test is seeds, next-open
+  fills and a recall probe for the LLMs that scored the news
+  ([pre-registration](../reports/r5-finrl-deepseek/preregistration.md)).
 
 ## Sources
 
 - FinRL ensemble: Yang et al., ICAIF 2020; arXiv repost 2511.12120; SSRN 3690996.
 - TradingAgents: arXiv 2412.20138 v7 (2025-06-03), Table 1; QuantHarness, arXiv 2509.09995.
 - ai-hedge-fund: README; issue #720 (recall measured 2026-09-24); PR #721.
-- FinRL-DeepSeek: arXiv 2502.07393; "FinRL-DeepSeek Revisited" (ResearchGate, 2026).
+- FinRL-DeepSeek: arXiv 2502.07393 v1; code `benstaf/FinRL_DeepSeek`; "FinRL-DeepSeek Revisited" (Cambridge Open Engage, 2026-09-15; two seeds, own reimplementation).
 - AlphaMix+: PRUDEX-Compass, TMLR 2023, arXiv 2302.00586.
 - RD-Agent(Q): NeurIPS 2025; critique in AutoScientist-Quant, arXiv 2608.28632.
 - Star counts: GitHub API, 2026-10-14.
