@@ -1,0 +1,38 @@
+[
+  {
+    "id": "r6-excess-return",
+    "quote": "A frozen Claude Sonnet 5.5, shown only a point-in-time table of sector-ETF price features, earns a higher cumulative return than equal weight over 63 live sessions.",
+    "source": "This pre-registration, §1 and §6",
+    "metric": "excess_cumulative_return",
+    "claimed": 0.0,
+    "ours": null,
+    "ci95": null,
+    "level": "L3",
+    "verdict": null,
+    "note": "Pre-registered 2026-11-02, not yet tested. Quantity: entrant cumulative return minus equal weight on the same nine US sector ETFs and sessions, points; direction only (claimed 0). The window is the 63 fills after the first verified ledger entry once LLM_PORTFOLIO_ENABLED is true; the paired stationary-bootstrap rule is pre-registration §6."
+  },
+  {
+    "id": "r6-excess-sharpe",
+    "quote": "A frozen Claude Sonnet 5.5, shown only a point-in-time table of sector-ETF price features, earns a higher annualised Sharpe ratio than equal weight over 63 live sessions.",
+    "source": "This pre-registration, §1 and §6",
+    "metric": "excess_sharpe",
+    "claimed": 0.0,
+    "ours": null,
+    "ci95": null,
+    "level": "L3",
+    "verdict": null,
+    "note": "Pre-registered 2026-11-02, not yet tested. Quantity: entrant annualised Sharpe (risk-free 0) minus equal weight's over the same sessions; direction only (claimed 0). The pre-registration estimates a 95% half-width of about 6 to 10, so this claim is expected to be inconclusive unless the gap is large."
+  },
+  {
+    "id": "r6-drawdown-advantage",
+    "quote": "A frozen Claude Sonnet 5.5, shown only a point-in-time table of sector-ETF price features, has a smaller maximum drawdown than equal weight over 63 live sessions.",
+    "source": "This pre-registration, §1 and §6",
+    "metric": "max_drawdown_gap",
+    "claimed": 0.0,
+    "ours": null,
+    "ci95": null,
+    "level": "L3",
+    "verdict": null,
+    "note": "Pre-registered 2026-11-02, not yet tested. Quantity: equal weight's maximum drawdown minus the entrant's, points; positive means the entrant's drawdown is smaller. The paired stationary-bootstrap rule is pre-registration §6."
+  }
+]
