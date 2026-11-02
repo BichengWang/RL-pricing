@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "submission": "tradingagents",
+  "task": "us-aapl",
+  "decision_date": "2026-10-30",
+  "weights": {
+    "AAPL": 1.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.681022,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "AAPL",
+    "trade_date": "2026-10-30",
+    "signal": "Overweight",
+    "weight": 1.0,
+    "decision_sha256": "92eb23ecdd00463f59970c7e1c4d2d266e7e81231c496ca6a462901e3d4b011c",
+    "decision_head": "**Rating**: Overweight\n\n**Executive Summary**: Add to AAPL in stages, aiming for about 1.25x a standard allocation. Start with a smaller first tranche of about 30-35% of a standard position, using a limit buy near the $333-336 support zone (50-day average and lower Bollinger Band) rather than chasing from the $344.63 close. Set the stop at a daily close below about $326-327 instead of $329.50, whi",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 132176,
+        "cached_input": 0,
+        "output": 24693,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 13525,
+        "cached_input": 0,
+        "output": 5782,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "598a9662240bc6c908e302a2be0f4675bd90743ca54bfe81c1f8fe92e44cc45c",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "41443785143",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-02T12:21:03+00:00"
+  },
+  "created_at": "2026-11-02T12:21:03+00:00"
+}

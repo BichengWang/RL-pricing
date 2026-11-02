@@ -1,0 +1,110 @@
+{
+  "schema": 1,
+  "submission": "tradingagents",
+  "task": "us-amzn",
+  "decision_date": "2026-10-30",
+  "weights": {
+    "AMZN": 0.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.644048,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "AMZN",
+    "trade_date": "2026-10-30",
+    "signal": "Underweight",
+    "weight": 0.0,
+    "decision_sha256": "3bb444e69be9027e99ea7d1454ac83a49b09ffbab2a92c07b716a0533fe34196",
+    "decision_head": "**Rating**: Underweight\n\n**Executive Summary**: Cut AMZN to about 60-75% of a standard allocation, which means trimming 25-40%. Sell the first half of the trim now (around $240). Sell the second half on a bounce toward the 200-day SMA or the old range floor ($243.40-245). If price hasn't reclaimed and held above $243.40 within 5-7 trading sessions, sell the rest of the trim at market whatever the ",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 132461,
+        "cached_input": 0,
+        "output": 25327,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 13944,
+        "cached_input": 0,
+        "output": 3504,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "cf6e3b96c3231ca611676f85e9be755e4578026c0a81364e8bd1d1bf2f1d8352",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "41443785143",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-02T12:29:10+00:00"
+  },
+  "created_at": "2026-11-02T12:29:10+00:00"
+}
