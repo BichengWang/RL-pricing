@@ -84,7 +84,8 @@ def check_causal(task, submission, *, data: MarketData | None = None, info: Info
     policy = runner.build_policy(submission, task)
     # A copy, so the training history shares no array with the later sessions.
     history = MarketData(data.dates[:start], data.tickers, **{f: getattr(data, f)[:start] for f in FIELDS})
-    policy.fit(history, as_day(task.validation_start), seed)
+    runner.fit_policy(history=history, policy=policy, validation_start=as_day(task.validation_start), seed=seed,
+                      info=info, crypto=task.source == "binance")
 
     crypto = task.source == "binance"
     cuts = sorted({int(i) for i in np.linspace(start, len(data) - 2, CUTS + 2)[1:-1]})

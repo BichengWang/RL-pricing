@@ -21,6 +21,24 @@ change in minor releases.
 
 ## Unreleased
 
+- `us-ndx80` joins the tasks as a re-evaluation (not ranked): the 80
+  Nasdaq-100 names of FinRL-DeepSeek that Yahoo still serves, 2019-2023, with
+  the unavoidable survivorship bias stated in the task description.
+- PPO and CVaR-PPO take an opt-in `llm_strength` parameter (default 0, no
+  change): with per-asset `llm_sentiment` and `llm_risk` items visible
+  strictly before the decision close, the scores join the observation, the
+  sentiment scales matching trades, and CVaR-PPO scales its tail-return
+  estimate by the holdings-weighted risk. `fit` reads the same point-in-time
+  view. Information items may carry `source_sha256` for source text that is
+  not retained, and `InfoView.items(..., start=)` lets a sequential policy
+  read only newly visible items.
+- Submissions may declare `tasks`, a list of task ids restricting the
+  submission to them (omitted means every task), so report-specific entrants
+  are not run or frozen on unrelated tasks.
+- Fourteen R5 L2 arms (`submissions/r5-*`), a hash-checked converter from
+  FinRL-DeepSeek's released news scores to M2 jsonl
+  (`reports/r5-finrl-deepseek/scores.py`) and a reproduce command
+  (`reports/r5-finrl-deepseek/reproduce.py`). No R5 result is committed.
 - Five offline and risk-sensitive RL entrants join the ranked tasks:
   behaviour cloning, IQL, CQL, a Decision Transformer
   (`rl.bench.policies.offline`, `iql`, `cql`, `decision_transformer`) and

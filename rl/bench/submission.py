@@ -25,7 +25,9 @@ ratios by it. Frozen live-track state is stored under
 ``submissions/<id>/frozen/<task>/``. ``ledger`` (optional) lists the task ids
 on which the submission commits a decision before every session open
 (:mod:`rl.bench.ledger`); entries are stored under
-``submissions/<id>/ledger/<task>/``.
+``submissions/<id>/ledger/<task>/``. ``tasks`` (optional) restricts the
+submission to those task ids; omitted or empty means every task. It keeps
+report-specific entrants out of unrelated runs and freezes.
 """
 
 from __future__ import annotations
@@ -63,6 +65,7 @@ class Submission:
     url: str = ""
     description: str = ""
     ledger: tuple[str, ...] = ()
+    tasks: tuple[str, ...] = ()
     retired: str | None = None
     directory: Path | None = None
     info_sources: tuple[dict, ...] = ()
@@ -76,6 +79,16 @@ class Submission:
             raise ValueError("Submission kind must be one of {}".format(KINDS))
         if ":" not in self.policy:
             raise ValueError("policy must be 'module:Class'")
+        object.__setattr__(self, "tasks", tuple(self.tasks))
+        if not all(isinstance(task, str) and task for task in self.tasks):
+            raise ValueError("tasks must be a list of task ids")
+        if len(set(self.tasks)) != len(self.tasks):
+            raise ValueError("task ids must be unique")
+        from rl.bench.tasks import TASKS
+
+        unknown = set(self.tasks) - set(TASKS)
+        if unknown:
+            raise ValueError("Unknown submission tasks {}".format(sorted(unknown)))
         if not isinstance(self.trials, int) or self.trials < 1:
             raise ValueError("trials must be a positive integer")
         json.dumps(self.params)  # parameters must round-trip through JSON
@@ -110,13 +123,17 @@ class Submission:
         today = today or dt.datetime.now(dt.timezone.utc).date()
         return self.retired is not None and today > dt.date.fromisoformat(self.retired)
 
+    def applies_to(self, task_id: str) -> bool:
+        """Whether this submission declares ``task_id`` (no ``tasks`` means every task)."""
+        return not self.tasks or task_id in self.tasks
+
     @classmethod
     def load(cls, directory) -> Submission:
         directory = Path(directory)
         spec = json.loads((directory / "submission.json").read_text())
         allowed = {
             "name", "kind", "policy", "params", "trials", "authors", "url", "description", "ledger",
-            "info_sources", "model_cutoffs", "contamination", "retired",
+            "info_sources", "model_cutoffs", "contamination", "tasks", "retired",
         }
         unknown = set(spec) - allowed
         if unknown:
@@ -168,7 +185,7 @@ class Submission:
         """
         spec = {"name": self.name, "kind": self.kind, "policy": self.policy, "params": self.params, "trials": self.trials}
         # Preserve fingerprints (and record bytes) for existing declarations.
-        for name in ("info_sources", "model_cutoffs", "contamination"):
+        for name in ("info_sources", "model_cutoffs", "contamination", "tasks"):
             if getattr(self, name):
                 spec[name] = getattr(self, name)
         digest = hashlib.sha256(json.dumps(spec, sort_keys=True, separators=(",", ":")).encode())

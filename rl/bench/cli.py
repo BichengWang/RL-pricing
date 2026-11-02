@@ -185,6 +185,8 @@ def _cmd_run_all(options) -> int:
     for task in tasks:
         data = None
         for submission in submissions:
+            if not submission.applies_to(task.id):
+                continue
             if options.stale and runner.historical_is_current(task, submission, options.out_root):
                 continue
             if data is None:
@@ -219,6 +221,8 @@ def _cmd_freeze(options) -> int:
     if options.task and options.submission:
         task, submission = get_task(options.task), _submission(options.submissions_root, options.submission)
         try:
+            if not submission.applies_to(task.id):
+                raise ValueError("{} is declared for {}".format(submission.id, ", ".join(submission.tasks)))
             if submission.is_retired() or (options.stale and not _should_freeze(task, submission, options)):
                 print("{} is retired or up to date on {}".format(submission.id, task.id))
                 return 0
@@ -243,6 +247,8 @@ def _cmd_freeze(options) -> int:
         data = None
         for submission in submissions:
             try:
+                if not submission.applies_to(task.id):
+                    continue
                 if submission.is_retired() or not _should_freeze(task, submission, options):
                     continue
                 if data is None:
@@ -269,6 +275,8 @@ def _cmd_live(options) -> int:
     loaded = {}
     for task, submission_id in _frozen_pairs(options.submissions_root, options.task, options.submission):
         if submission_id not in submissions or submissions[submission_id].is_retired() or not task.live:
+            continue
+        if not submissions[submission_id].applies_to(task.id):
             continue
         if task.id not in loaded:
             loaded[task.id] = load_task_data(task, refresh=options.refresh)
@@ -303,7 +311,7 @@ def _cmd_validate(options) -> int:
     found = discover(options.submissions_root)
     failures = []
     for submission in found.values():
-        for task in TASKS.values():
+        for task in (t for t in TASKS.values() if submission.applies_to(t.id)):
             try:
                 if submission.ledger:
                     ledger.declared_max_cost(submission)

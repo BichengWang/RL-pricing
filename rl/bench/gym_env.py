@@ -16,6 +16,7 @@ import numpy as np
 
 from rl.bench.engine import Account
 from rl.bench.features import LOOKBACK, N_FEATURES, feature_panel
+from rl.bench.llm import apply_sentiment
 from rl.bench.market import MarketData
 
 LOGIT_BOUND = 5.0  # actions are logits in [-LOGIT_BOUND, LOGIT_BOUND]
@@ -38,14 +39,20 @@ def actions_to_weights(action, listed) -> np.ndarray:
     return (exp / exp.sum())[:-1]
 
 
-def observation(features: np.ndarray, weights: np.ndarray) -> np.ndarray:
-    """Flattened features, current asset weights and the cash weight."""
+def observation(features: np.ndarray, weights: np.ndarray, extra: Optional[np.ndarray] = None) -> np.ndarray:
+    """Flattened features, current asset weights and the cash weight.
+
+    ``extra`` holds additional per-asset columns (the LLM scores), appended to
+    each asset's features before the flattening.
+    """
     weights = np.asarray(weights, dtype=float)
+    if extra is not None:
+        features = np.concatenate([np.asarray(features, dtype=float), np.asarray(extra, dtype=float)], axis=-1)
     return np.concatenate([np.ravel(features), weights, [1.0 - weights.sum()]]).astype(np.float32)
 
 
-def observation_size(n_assets: int) -> int:
-    return n_assets * N_FEATURES + n_assets + 1
+def observation_size(n_assets: int, extra_columns: int = 0) -> int:
+    return n_assets * (N_FEATURES + extra_columns) + n_assets + 1
 
 
 class PortfolioEnv(gym.Env):
@@ -66,6 +73,14 @@ class PortfolioEnv(gym.Env):
         First session an episode may trade on (the first decision is at the
         previous close). Default :data:`LOOKBACK` when ``data`` has at least
         ``2 * LOOKBACK`` sessions, so features are complete, otherwise 1.
+    extra :
+        Optional per-session, per-asset columns (LLM scores) of shape
+        ``(T, N, k)``, already restricted to what was visible at each
+        decision close. They are appended to each asset's observation.
+    sentiment_strength :
+        When positive, the first extra column (the sentiment score) scales
+        the trade it agrees or disagrees with, as
+        :func:`rl.bench.llm.apply_sentiment`; 0 leaves actions unchanged.
     """
 
     metadata = {"render_modes": []}
@@ -76,6 +91,8 @@ class PortfolioEnv(gym.Env):
         transaction_cost: float,
         episode_length: Optional[int] = 252,
         first_session: Optional[int] = None,
+        extra: Optional[np.ndarray] = None,
+        sentiment_strength: float = 0.0,
     ):
         super().__init__()
         n_sessions, n_assets = len(data), len(data.tickers)
@@ -93,12 +110,32 @@ class PortfolioEnv(gym.Env):
         self._random_start = episode_length is not None and self.episode_length < usable
         self._features = feature_panel(data)
         self._listed = np.isfinite(data.close)
+        if extra is not None:
+            extra = np.asarray(extra, dtype=float)
+            if extra.shape[:2] != (n_sessions, n_assets) or extra.ndim != 3 or extra.shape[2] < 1:
+                raise ValueError(
+                    "extra must have shape (sessions, assets, columns) = ({}, {}, k), got {}".format(
+                        n_sessions, n_assets, extra.shape
+                    )
+                )
+            if not np.isfinite(extra).all():
+                raise ValueError("extra columns must be finite")
+            if sentiment_strength < 0:
+                raise ValueError("sentiment_strength must be nonnegative")
+        elif sentiment_strength:
+            raise ValueError("sentiment_strength needs extra score columns")
+        self._extra = extra
+        self._sentiment_strength = float(sentiment_strength)
+        columns = 0 if extra is None else extra.shape[2]
         self.action_space = gym.spaces.Box(-LOGIT_BOUND, LOGIT_BOUND, (n_assets + 1,), dtype=np.float32)
-        self.observation_space = gym.spaces.Box(-np.inf, np.inf, (observation_size(n_assets),), dtype=np.float32)
+        self.observation_space = gym.spaces.Box(
+            -np.inf, np.inf, (observation_size(n_assets, columns),), dtype=np.float32
+        )
         self._account: Optional[Account] = None
 
     def _observe(self) -> np.ndarray:
-        return observation(self._features[self._decision], self._account.weights(self._decision))
+        extra = None if self._extra is None else self._extra[self._decision]
+        return observation(self._features[self._decision], self._account.weights(self._decision), extra)
 
     def reset(self, *, seed=None, options=None):
         super().reset(seed=seed)
@@ -115,6 +152,11 @@ class PortfolioEnv(gym.Env):
             raise RuntimeError("Call reset() before step()")
         fill = self._decision + 1
         target = actions_to_weights(action, self._listed[self._decision])
+        if self._sentiment_strength > 0:
+            target = apply_sentiment(
+                target, self._account.weights(self._decision),
+                self._extra[self._decision][:, 0], self._sentiment_strength,
+            )
         turnover, cost = self._account.trade(fill, target)
         equity = self._account.equity(fill)
         reward = float(np.log(max(equity, _MIN_EQUITY) / max(self._equity, _MIN_EQUITY)))

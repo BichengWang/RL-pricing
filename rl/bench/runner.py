@@ -75,6 +75,22 @@ def build_policy(submission: Submission, task: Task) -> Policy:
     return submission.policy_class()(**policy_params(submission, task))
 
 
+def fit_policy(policy: Policy, history: MarketData, validation_start, seed: int, info: InfoPanel | None = None,
+               *, crypto: bool = False) -> None:
+    """Fit ``policy``, giving policies that accept ``info`` only the fitted sessions' items.
+
+    The panel is cut at the close of ``history``'s last session, so a policy
+    cannot see an item published during the validation or test period through
+    its training data. Policies without an ``info`` parameter are fitted as before.
+    """
+    if "info" in inspect.signature(policy.fit).parameters:
+        if info is not None:
+            info = info.truncated(session_close(history.dates[-1], crypto=crypto))
+        policy.fit(history, validation_start, seed, info=info)
+    else:
+        policy.fit(history, validation_start, seed)
+
+
 def _seeds(policy: Policy, seeds, track: str) -> list[int]:
     if seeds is not None:
         seeds = [int(s) for s in seeds]
@@ -158,7 +174,10 @@ def _run(
     info: InfoPanel | None = None,
 ) -> Backtest:
     if seed is not None:
-        policy.fit(fit_history, validation_start, seed)
+        fit_policy(
+            policy, fit_history, validation_start, seed, info,
+            crypto=task.source == "binance",
+        )
     policy.reset()
     act = policy.act
     if info is not None:
@@ -253,6 +272,7 @@ def evaluate(
     out_root=LEADERBOARD_DIR,
 ) -> Path:
     """Historical track: fit before ``task.test_start``, trade the test window."""
+    _require_task(submission, task)
     _require_replayable(submission)
     data = _data_for(task, data, end=task.test_end).between(None, task.test_end)
     info = _load_info(task, submission, data)
@@ -327,6 +347,7 @@ def freeze(
     own publication and live record.
     """
     _require_live(task)
+    _require_task(submission, task)
     _require_replayable(submission)
     directory = submission.frozen_dir(task.id)
     marker = directory / FREEZE_FILE
@@ -349,10 +370,11 @@ def freeze(
     if staging.exists():
         shutil.rmtree(staging)
     staging.mkdir(parents=True)
+    info = _load_info(task, submission, data, refresh=refresh)
     for seed in seeds:
         log.info("Freezing %s on %s: seed %d", submission.id, task.id, seed)
         policy = build_policy(submission, task)
-        policy.fit(data, validation_start, seed)
+        fit_policy(policy, data, validation_start, seed, info, crypto=task.source == "binance")
         seed_dir = staging / "seed{}".format(seed)
         seed_dir.mkdir()
         policy.save(seed_dir)
@@ -411,6 +433,13 @@ def _finish_interrupted_freeze(directory: Path, staging: Path) -> bool:
     return True
 
 
+def _require_task(submission: Submission, task: Task) -> None:
+    if not submission.applies_to(task.id):
+        raise ValueError(
+            "{} is declared for {}".format(submission.id, ", ".join(submission.tasks))
+        )
+
+
 def _require_live(task: Task) -> None:
     if not task.live:
         raise ValueError("Task {} has no live track".format(task.id))
@@ -461,6 +490,7 @@ def update_live(
 ) -> Path | None:
     """Replay the frozen policy over every session after its publication."""
     _require_live(task)
+    _require_task(submission, task)
     directory = submission.frozen_dir(task.id)
     if not (directory / FREEZE_FILE).exists():
         raise FileNotFoundError("{} has no freeze for {}".format(submission.id, task.id))

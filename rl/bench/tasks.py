@@ -12,13 +12,17 @@ selects assets by later survival:
   delisted (BCCUSDT in November 2018, EOSUSDT in May 2025); the engine sells
   delisted holdings at their last close.
 
-One task deliberately breaks that rule:
+Two tasks deliberately break that rule:
 
 * ``paper-2021``: the 20 large-cap stocks, dates and test window of Wang &
   Zhang (2021). The universe was chosen in 2021 by market capitalisation, so
   it is survivorship-biased; the task exists to re-evaluate that paper's
   setup with multiple seeds and the benchmark's execution model, not to rank
   strategies.
+* ``us-ndx80``: the 80 names of Benhenda's FinRL-DeepSeek universe that
+  Yahoo still serves, 2019-2023. Membership is that of 2023-07-17, so the
+  universe is survivorship- and look-ahead-biased in favour of strategies
+  that hold it; it exists for the R5 re-test, not for ranking.
 
 Three more tasks are single-asset reproduction tasks, not ranked universes:
 
@@ -140,6 +144,33 @@ TASKS = {
             transaction_cost=0.001,
             periods_per_year=252,
             description="The 2021 paper's 20 large caps and 2019-2020 test; survivorship-biased by design.",
+            live=False,
+        ),
+        Task(
+            id="us-ndx80",
+            title="Nasdaq-100 80 (FinRL-DeepSeek re-evaluation)",
+            source="yahoo",
+            tickers=(
+                "AAPL", "ADBE", "ADI", "ADP", "ADSK", "AEP", "ALGN", "AMAT", "AMD", "AMGN",
+                "AMZN", "ASML", "AVGO", "AZN", "BIIB", "BKNG", "BKR", "CDNS", "CHTR", "CMCSA",
+                "COST", "CPRT", "CSCO", "CSGP", "CSX", "CTAS", "CTSH", "DLTR", "DXCM", "EBAY",
+                "ENPH", "EXC", "FANG", "FAST", "FTNT", "GILD", "GOOG", "GOOGL", "HON", "IDXX",
+                "ILMN", "INTC", "INTU", "ISRG", "KDP", "KLAC", "LRCX", "LULU", "MAR", "MCHP",
+                "MDLZ", "MELI", "META", "MNST", "MRVL", "MSFT", "MU", "NFLX", "NVDA", "NXPI",
+                "ODFL", "ON", "ORLY", "PANW", "PAYX", "PCAR", "PEP", "QCOM", "REGN", "ROST",
+                "SBUX", "SIRI", "SNPS", "TMUS", "TSLA", "TXN", "VRSK", "VRTX", "WDAY", "XEL",
+            ),
+            start="2013-01-01",
+            validation_start="2018-01-01",
+            test_start="2019-01-01",
+            test_end="2023-12-29",
+            transaction_cost=0.001,
+            periods_per_year=252,
+            description=(
+                "The 80 Nasdaq-100 names of Benhenda's FinRL-DeepSeek (arXiv 2502.07393) that Yahoo "
+                "still serves, 2019-2023; survivorship- and look-ahead-biased (membership on "
+                "2023-07-17), so it is shown as a re-evaluation, not a ranking."
+            ),
             live=False,
         ),
         Task(

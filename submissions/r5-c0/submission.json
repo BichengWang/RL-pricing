@@ -1,0 +1,24 @@
+{
+  "name": "R5 L2 C0 (CVaR-PPO)",
+  "kind": "rl",
+  "policy": "rl.bench.policies.cvar_ppo:CVaRPPOPolicy",
+  "params": {
+    "timesteps": 200000,
+    "episode_length": 252,
+    "net_arch": [
+      64,
+      64
+    ],
+    "cvar_alpha": 0.8,
+    "cvar_penalty": 1.0
+  },
+  "trials": 14,
+  "tasks": [
+    "us-ndx80"
+  ],
+  "authors": [
+    "RL-pricing"
+  ],
+  "url": "https://arxiv.org/abs/2502.07393",
+  "description": "Registered R5 L2 arm C0: the reference CVaR-PPO entrant on us-ndx80 with no LLM scores; the checkpoint with the best 2018 validation Sharpe is tested on 2019-2023. trials = 14 (every registered L2 arm); the task is a survivorship-biased re-evaluation, not a ranked universe."
+}
