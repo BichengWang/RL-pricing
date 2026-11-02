@@ -38,14 +38,14 @@ def _value(field):
     return float(field.value if hasattr(field, "value") else field)
 
 
-def update_scores(scores: np.ndarray, info: InfoView, tickers, start: int = 0) -> None:
-    """Apply items from position ``start`` on to a live per-asset score array.
+def update_scores(scores: np.ndarray, info: InfoView, tickers, start: int = 0, since=None) -> None:
+    """Apply items from position ``start`` on to a fresh per-asset score array.
 
-    ``info`` is already point-in-time; ``start`` lets a policy that acts once
-    per session read only the items published since its last decision.
+    ``since`` drops items published before it, which is how a policy keeps the
+    session's defaults instead of carrying an older score forward.
     """
     positions = {ticker: i for i, ticker in enumerate(tickers)}
-    for item in info.items(start=start):
+    for item in info.items(start=start, since=since):
         for ticker in item.tickers:
             column = positions.get(ticker)
             if column is None:
@@ -55,16 +55,20 @@ def update_scores(scores: np.ndarray, info: InfoView, tickers, start: int = 0) -
                     scores[column, k] = _value(item.fields[name])
 
 
-def score_panel(panel: InfoPanel, dates, tickers) -> np.ndarray:
+def score_panel(panel: InfoPanel, dates, tickers, *, crypto: bool = False) -> np.ndarray:
     """Per-session scores visible at each decision close, shape ``(T, N, 2)``.
 
-    ``dates`` are the sessions the caller will decide on; row ``t`` holds each
-    asset's most recent item published strictly before the close of ``dates[t]``.
+    Row ``t`` uses items published in ``(close(dates[t - 1]), close(dates[t]))``,
+    the window a sequential policy sees between two decisions. A ticker with
+    no score in that window takes the missing defaults; an older score is not
+    carried forward. The first row has no previous close and uses everything
+    before its own close.
     """
     dates = tuple(dates)
     tickers = tuple(tickers)
     positions = {ticker: column for column, ticker in enumerate(tickers)}
-    closes = np.array([session_close(day).timestamp() for day in dates], dtype=float)
+    closes = np.array([session_close(day, crypto=crypto).timestamp() for day in dates], dtype=float)
+    starts = np.concatenate(([-np.inf], closes[:-1]))
     series = {}
     for item in panel.items:
         moment = item.published_at.timestamp()
@@ -80,9 +84,11 @@ def score_panel(panel: InfoPanel, dates, tickers) -> np.ndarray:
     scores = np.empty((len(dates), len(tickers), 2), dtype=float)
     scores[..., 0], scores[..., 1] = MISSING_SCORES
     for (column, k), (times, values) in series.items():
-        index = np.searchsorted(np.array(times), closes, side="left") - 1
-        seen = index >= 0
-        scores[seen, column, k] = np.array(values)[index[seen]]
+        times, values = np.array(times), np.array(values)
+        latest = np.searchsorted(times, closes, side="left") - 1
+        first = np.searchsorted(times, starts, side="left")
+        fresh = latest >= first
+        scores[fresh, column, k] = values[latest[fresh]]
     return scores
 
 

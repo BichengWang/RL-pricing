@@ -30,8 +30,8 @@
   "model_cutoffs": [
     {
       "model": "deepseek-ai/DeepSeek-V3",
-      "training_cutoff": "2024-12-25",
-      "source_url": "https://huggingface.co/deepseek-ai/DeepSeek-V3"
+      "training_cutoff": "2024-07-31",
+      "source_url": "https://www.secrss.com/articles/80153"
     }
   ],
   "contamination": "possible",

@@ -67,6 +67,8 @@ def policy_params(submission: Submission, task: Task | None = None) -> dict:
         params.pop("max_cost_per_decision_usd", None)
     if task is not None and "transaction_cost" not in params and "transaction_cost" in parameters:
         params["transaction_cost"] = task.transaction_cost
+    if task is not None and "crypto" not in params and "crypto" in parameters:
+        params["crypto"] = task.source == "binance"
     return params
 
 
@@ -83,12 +85,14 @@ def fit_policy(policy: Policy, history: MarketData, validation_start, seed: int,
     cannot see an item published during the validation or test period through
     its training data. Policies without an ``info`` parameter are fitted as before.
     """
-    if "info" in inspect.signature(policy.fit).parameters:
-        if info is not None:
-            info = info.truncated(session_close(history.dates[-1], crypto=crypto))
-        policy.fit(history, validation_start, seed, info=info)
-    else:
-        policy.fit(history, validation_start, seed)
+    parameters = inspect.signature(policy.fit).parameters
+    kwargs = {}
+    if "info" in parameters:
+        kwargs["info"] = None if info is None else info.truncated(
+            session_close(history.dates[-1], crypto=crypto))
+    if "crypto" in parameters:
+        kwargs["crypto"] = crypto
+    policy.fit(history, validation_start, seed, **kwargs)
 
 
 def _seeds(policy: Policy, seeds, track: str) -> list[int]:

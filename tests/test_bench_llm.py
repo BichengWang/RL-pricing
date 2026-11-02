@@ -153,12 +153,29 @@ def test_scores_are_visible_only_strictly_before_the_decision_close():
     assert [item.id for item in view.items()] == ["before"]
 
 
-def test_missing_scores_and_unseen_tickers_take_the_registered_defaults():
+def test_missing_scores_are_per_session_and_not_carried_forward():
     panel = InfoPanel([make_item("one", "2018-03-12T14:00:00+00:00", sentiment=4.0, risk=None)])
     values = llm.score_panel(panel, ["2018-03-12", "2018-03-13"], ["AAA", "BBB"])
     assert values[0, 0].tolist() == [4.0, 3.0]
-    assert values[1, 0].tolist() == [4.0, 3.0]
+    assert values[1, 0].tolist() == [0.0, 3.0]  # no score in (Tuesday close, Wednesday close)
     assert values[:, 1].tolist() == [[0.0, 3.0], [0.0, 3.0]]
+
+
+def test_a_score_applies_only_to_the_session_the_alignment_assigns_it():
+    lagged = InfoPanel([make_item("day", "2018-03-12T23:59:59+00:00", sentiment=5.0, risk=1.0)])
+    values = llm.score_panel(lagged, ["2018-03-12", "2018-03-13", "2018-03-14"], ["AAA"])
+    assert values[:, 0].tolist() == [[0.0, 3.0], [5.0, 1.0], [0.0, 3.0]]
+    same_day = InfoPanel([make_item("day", "2018-03-12T00:00:00+00:00", sentiment=5.0, risk=1.0)])
+    values = llm.score_panel(same_day, ["2018-03-12", "2018-03-13", "2018-03-14"], ["AAA"])
+    assert values[:, 0].tolist() == [[5.0, 1.0], [0.0, 3.0], [0.0, 3.0]]
+
+
+def test_crypto_sessions_use_their_own_close():
+    panel = InfoPanel([make_item("day", "2023-05-01T23:59:59+00:00", sentiment=5.0, risk=1.0)])
+    us = llm.score_panel(panel, ["2023-05-01", "2023-05-02"], ["AAA"])
+    utc = llm.score_panel(panel, ["2023-05-01", "2023-05-02"], ["AAA"], crypto=True)
+    assert us[:, 0].tolist() == [[0.0, 3.0], [5.0, 1.0]]
+    assert utc[:, 0].tolist() == [[5.0, 1.0], [0.0, 3.0]]
 
 
 def test_the_latest_visible_item_wins_and_earlier_items_are_never_reread():
@@ -279,6 +296,30 @@ def test_fit_cannot_see_an_item_published_after_its_history(market, tmp_path):
     assert np.array_equal(np.load(actor_a)["w0"], np.load(actor_b)["w0"])
 
 
+def test_fit_policy_cuts_the_panel_at_the_fitted_close(market):
+    from rl.bench.policy import Policy
+
+    class RecordsInfo(Policy):
+        def __init__(self):
+            self.info = None
+            self.crypto = None
+
+        def fit(self, history, validation_start, seed, info=None, crypto=None):
+            self.info, self.crypto = info, crypto
+
+        def act(self, view):
+            return np.zeros(len(view.tickers))
+
+    history = market.between(None, "2017-01-01")
+    close = session_close(history.dates[-1], crypto=True)
+    panel = fixture_panel(market)
+    assert any(item.published_at >= close for item in panel.items)
+    policy = RecordsInfo()
+    runner.fit_policy(policy, history, np.datetime64("2016-06-01"), 0, panel, crypto=True)
+    assert policy.crypto is True
+    assert all(item.published_at < close for item in policy.info.items)
+
+
 def test_act_cannot_see_an_item_published_after_the_decision_close(market):
     submission = tiny(discover(REPO / "submissions")["r5-p10"])
     policy = fitted_actor(submission, market, fixture_panel(market))
@@ -379,24 +420,28 @@ def test_the_converter_joins_on_date_ticker_and_title(tmp_path, monkeypatch):
     joined = {(row[1], row[2]): (row[3], row[4]) for row in rows}
     assert joined[("AAPL", "Good news")] == (5.0, 1.0)
     assert joined[("MSFT", "Mixed")] == (4.0, 3.0)
-    items = list(scores._items("deepseek", rows, "lagged"))
+    items = list(scores._items("deepseek", scores.aligned_rows(rows, "lagged")))
     apple = next(item for item in items if item.tickers == ("AAPL",))
     assert apple.published_at == datetime(2023, 12, 16, 23, 59, 59, tzinfo=scores.UTC)
     assert apple.fields["llm_sentiment"].model == "deepseek-ai/DeepSeek-V3"
     assert apple.source_sha256 == hashlib.sha256(b"apple article").hexdigest()
     assert apple.text == "" and apple.text_sha256 == hashlib.sha256(b"").hexdigest()
-    same_day = list(scores._items("deepseek", rows, "same-day"))
+    same_day = list(scores._items("deepseek", scores.aligned_rows(rows, "same-day")))
     assert same_day[0].published_at == datetime(2023, 12, 16, 0, 0, tzinfo=scores.UTC)
 
 
 def test_a_tampered_score_file_is_rejected(tmp_path):
     path = tmp_path / "scores.csv"
     path.write_bytes(b"not the registered file")
+    wrong = dataclasses.replace(scores.SENTIMENT_DEEPSEEK, size=path.stat().st_size, sha256="0" * 64)
     with pytest.raises(ValueError, match="SHA-256"):
-        scores.verify(path, "0" * 64)
-    assert scores.verify(path, hashlib.sha256(path.read_bytes()).hexdigest()) == path
+        scores.verify(path, wrong)
+    correct = dataclasses.replace(wrong, sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+    assert scores.verify(path, correct) == path
+    with pytest.raises(ValueError, match="bytes"):
+        scores.verify(path, dataclasses.replace(correct, size=path.stat().st_size + 1))
     with pytest.raises(FileNotFoundError):
-        scores.verify(tmp_path / "missing.csv", "0" * 64)
+        scores.verify(tmp_path / "missing.csv", correct)
 
 
 def test_a_download_with_the_wrong_hash_is_not_kept(tmp_path, monkeypatch):
@@ -425,19 +470,79 @@ def test_a_download_with_the_wrong_hash_is_not_kept(tmp_path, monkeypatch):
     assert not (tmp_path / "cache" / (remote.name + ".part")).exists()
 
 
-def test_placebo_offsets_and_shift_are_deterministic():
+def test_placebo_keeps_weekend_rows_and_shifts_per_session():
     tickers = ("AAA", "BBB")
-    sessions = np.arange(np.datetime64("2020-01-01"), np.datetime64("2021-04-01"), dtype="datetime64[D]")
+    sessions = np.array([
+        day for day in np.arange(np.datetime64("2020-01-01"), np.datetime64("2021-04-01"), dtype="datetime64[D]")
+        if np.is_busday(day)
+    ])
     first = scores.placebo_offsets(len(sessions), tickers)
     assert first == scores.placebo_offsets(len(sessions), tickers)
     assert all(126 <= offset <= len(sessions) - 126 for offset in first.values())
-    rows = [("2020-06-01", "AAA", "t", 5.0, 1.0, "a"), ("2020-06-02", "BBB", "t", 2.0, 4.0, "b")]
+    # Saturday, Sunday and Monday publications; the two weekend rows map to Monday.
+    rows = [
+        (datetime(2020, 6, 6, 23, 59, 59, tzinfo=scores.UTC), "AAA", "sat", 5.0, 1.0, "a"),
+        (datetime(2020, 6, 7, 23, 59, 59, tzinfo=scores.UTC), "AAA", "sun", 4.0, 2.0, "b"),
+        (datetime(2020, 6, 8, 23, 59, 59, tzinfo=scores.UTC), "AAA", "mon", 3.0, 3.0, "c"),
+        (datetime(2020, 6, 6, 23, 59, 59, tzinfo=scores.UTC), "BBB", "sat", 2.0, 4.0, "d"),
+    ]
     counts = {}
     shifted = scores.placebo_rows(rows, sessions, tickers, counts)
-    by_ticker = {row[1]: row for row in shifted}
-    for original in rows:
-        start = int(np.searchsorted(sessions, np.datetime64(original[0])))
-        expected = sessions[(start + first[original[1]]) % len(sessions)]
-        assert np.datetime64(by_ticker[original[1]][0]) == expected
+    assert counts["placebo_deduped"] == 1 and counts.get("placebo_dropped_after", 0) == 0
+    by_key = {(row[1], row[2]): row for row in shifted}
+    assert ("AAA", "sat") not in by_key  # the later Sunday row wins Monday
+    expected_positions = {}
+    for row in (("sun", "2020-06-08"), ("mon", "2020-06-09")):
+        session_position = int(np.searchsorted(sessions, np.datetime64(row[1], "D")))
+        moved = (session_position + first["AAA"]) % len(sessions)
+        expected_positions[row[0]] = session_close(sessions[moved]) - timedelta(seconds=1)
+    assert by_key[("AAA", "sun")][0] == expected_positions["sun"]
+    assert by_key[("AAA", "mon")][0] == expected_positions["mon"]
+    bbb_position = int(np.searchsorted(sessions, np.datetime64("2020-06-08", "D")))
+    bbb_moved = (bbb_position + first["BBB"]) % len(sessions)
+    assert by_key[("BBB", "sat")][0] == session_close(sessions[bbb_moved]) - timedelta(seconds=1)
     with pytest.raises(ValueError, match="more than"):
         scores.placebo_offsets(200, tickers)
+
+
+def test_build_writes_to_the_given_output_and_forwards_refresh(tmp_path, monkeypatch):
+    sentiment, risk = fixture_model(tmp_path, monkeypatch)
+    calls = []
+
+    def download(remote, cache, refresh=False):
+        calls.append(refresh)
+        return sentiment if remote is scores.SENTIMENT_DEEPSEEK else risk
+
+    monkeypatch.setattr(scores, "download", download)
+    output = tmp_path / "out" / "deepseek-lagged.jsonl"
+    manifest = scores.build(
+        "deepseek-lagged", ("AAPL", "MSFT"), [], cache=tmp_path / "raw", output=output, refresh=True)
+    assert Path(manifest["path"]) == output and output.exists()
+    assert manifest["items"] == 2
+    assert calls and all(calls)
+
+
+def test_cvar_risk_factors_clip_actions_to_the_logit_bound():
+    from rl.bench.gym_env import LOGIT_BOUND
+    from rl.bench.policies.cvar_ppo import CVaRPPO
+
+    model = object.__new__(CVaRPPO)
+    model.risk_strength = 0.1
+    n_assets, width = 5, 13
+    observations = np.zeros((2, 1, n_assets * width + n_assets + 1))
+    per_asset = observations[..., : n_assets * width].reshape(2, 1, n_assets, width)
+    per_asset[..., 10] = 1.0  # listed
+    per_asset[..., 11] = 3.0  # sentiment
+    per_asset[..., 12] = 5.0  # risk
+    observations[..., -(n_assets + 1):-1] = 0.1
+    actions = np.full((2, 1, n_assets + 1), 50.0)
+    np.testing.assert_allclose(
+        model._risk_factors(observations, actions),
+        model._risk_factors(observations, np.full_like(actions, LOGIT_BOUND)),
+    )
+
+
+def test_the_runner_injects_the_session_close_mode():
+    submission = discover(REPO / "submissions")["r5-p0"]
+    assert runner.policy_params(submission, get_task("crypto-majors"))["crypto"] is True
+    assert runner.policy_params(submission, get_task("us-ndx80"))["crypto"] is False

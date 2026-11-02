@@ -43,7 +43,7 @@ from torch import nn
 from rl.bench.engine import Decision, simulate
 from rl.bench.features import LOOKBACK, latest_features
 from rl.bench.gym_env import PortfolioEnv, actions_to_weights, observation
-from rl.bench.info import InfoPanel
+from rl.bench.info import InfoPanel, session_close
 from rl.bench.llm import apply_sentiment, empty_scores, score_panel, update_scores
 from rl.bench.market import MarketData, MarketView
 from rl.bench.policy import Policy
@@ -210,7 +210,11 @@ class SB3Policy(Policy):
         Opt-in strength of the LLM score features (default 0: none). When
         positive, the two per-asset scores of :mod:`rl.bench.llm` are appended
         to the observation through the point-in-time rule, and the sentiment
-        score scales the trades it agrees or disagrees with.
+        score scales the trades it agrees or disagrees with. A session
+        without a fresh score takes the missing defaults (0 and 3).
+    crypto :
+        Whether the task's sessions close at midnight UTC (Binance) instead
+        of the New York close. The runner injects it from the task.
     """
 
     stochastic = True
@@ -227,6 +231,7 @@ class SB3Policy(Policy):
         algo_kwargs: Optional[dict] = None,
         transaction_cost: float = 0.001,
         llm_strength: float = 0.0,
+        crypto: bool = False,
     ):
         algo = str(algo).lower()
         if algo not in ALGORITHMS:
@@ -236,6 +241,7 @@ class SB3Policy(Policy):
         if isinstance(llm_strength, bool) or not isinstance(llm_strength, (int, float)) or llm_strength < 0:
             raise ValueError("llm_strength must be a nonnegative number")
         self.llm_strength = float(llm_strength)
+        self.crypto = bool(crypto)
         self.algo = algo
         self.timesteps = int(timesteps)
         self.episode_length = episode_length
@@ -263,7 +269,7 @@ class SB3Policy(Policy):
         if self.llm_strength > 0:
             if scores is None:
                 scores = empty_scores(len(view.tickers))
-                update_scores(scores, view.info, view.tickers)
+                update_scores(scores, view.info, view.tickers, since=self._previous_close(view))
             features = np.concatenate([features, np.asarray(scores, dtype=float)], axis=-1)
         obs = observation(features, view.weights)
         if obs.shape != (input_size,):
@@ -298,16 +304,19 @@ class SB3Policy(Policy):
         return float(returns.mean() / spread) if spread > 1e-12 else 0.0
 
     def fit(
-        self, history: MarketData, validation_start: np.datetime64, seed: int, info: Optional[InfoPanel] = None
+        self, history: MarketData, validation_start: np.datetime64, seed: int, info: Optional[InfoPanel] = None,
+        crypto: Optional[bool] = None,
     ) -> None:
         split = history.index_of(validation_start)
         if split < 2:
             raise ValueError("Need at least two sessions before validation_start to train")
+        if crypto is not None:
+            self.crypto = bool(crypto)
         scores = None
         if self.llm_strength > 0:
             if info is None:
                 raise ValueError("llm_strength needs the submission's declared information source")
-            scores = score_panel(info, history.dates, history.tickers)
+            scores = score_panel(info, history.dates, history.tickers, crypto=self.crypto)
         env = PortfolioEnv(
             history.rows(0, split), self.transaction_cost, self.episode_length,
             extra=None if scores is None else scores[:split], sentiment_strength=self.llm_strength,
@@ -352,24 +361,23 @@ class SB3Policy(Policy):
         self.actor = Actor.from_model(self.algo, model)
 
     def reset(self) -> None:
-        self._scores = None
         self._info_seen = 0
         self._last_date = None
 
+    def _previous_close(self, view: MarketView):
+        """The previous session's close, or ``None`` when the view has one session."""
+        dates = view.history.dates
+        return session_close(dates[-2], crypto=self.crypto) if len(dates) >= 2 else None
+
     def _scores_at(self, view: MarketView) -> np.ndarray:
-        """Scores visible at ``view.date``, reading only items published since the last act."""
-        if (
-            self._scores is None
-            or len(self._scores) != len(view.tickers)
-            or len(view.info) < self._info_seen
-            or (self._last_date is not None and view.date <= self._last_date)
-        ):
-            self._scores = empty_scores(len(view.tickers))
+        """The current session's scores; an older item is not carried forward."""
+        if len(view.info) < self._info_seen or (self._last_date is not None and view.date <= self._last_date):
             self._info_seen = 0
-        update_scores(self._scores, view.info, view.tickers, start=self._info_seen)
+        scores = empty_scores(len(view.tickers))
+        update_scores(scores, view.info, view.tickers, start=self._info_seen, since=self._previous_close(view))
         self._info_seen = len(view.info)
         self._last_date = view.date
-        return self._scores
+        return scores
 
     def act(self, view: MarketView) -> Decision:
         if self.actor is None:

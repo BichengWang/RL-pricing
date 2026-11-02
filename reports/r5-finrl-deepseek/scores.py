@@ -11,9 +11,12 @@ fields, the producing model id, and the article's text only as a SHA-256.
 
 Two alignments are registered: ``lagged`` publishes a day's score at 23:59:59
 UTC of that day (visible from the next session) and ``same-day`` keeps the
-file's stamp (visible at that day's close). ``placebo`` circularly shifts each
-ticker's score series within the task's sessions by an offset drawn once per
-ticker from ``[126, n - 126]`` with ``numpy.default_rng(0)``.
+file's stamp (visible at that day's close). ``placebo`` maps each row to the
+session at which that alignment first shows it, reduces the rows to one per
+(ticker, session), and circularly shifts each ticker's per-session series
+within the task's sessions by an offset drawn once per ticker from
+``[126, n - 126]`` with ``numpy.default_rng(0)``; weekend news is therefore
+kept, as it is in the real arms.
 
 Downloads and the converted files are cached under ``datasets/``, which is
 gitignored: no score data and no converted file is committed. Data are not
@@ -30,10 +33,12 @@ import os
 import sys
 import urllib.request
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import numpy as np
+
+from rl.bench.info import session_close
 
 REPO = Path(__file__).resolve().parents[2]
 DEFAULT_CACHE = REPO / "datasets" / "r5-finrl-deepseek"
@@ -102,13 +107,16 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def verify(path: Path, expected: str) -> Path:
-    """``path`` if its SHA-256 is ``expected``; raise on a mismatch or a wrong size."""
+def verify(path: Path, remote: Remote) -> Path:
+    """``path`` if its size and SHA-256 are ``remote``'s; raise otherwise."""
     if not path.is_file():
         raise FileNotFoundError(path)
+    size = path.stat().st_size
+    if size != remote.size:
+        raise ValueError("{} has {} bytes, expected {}".format(path, size, remote.size))
     actual = sha256_file(path)
-    if actual != expected:
-        raise ValueError("{} has SHA-256 {}, expected {}".format(path, actual, expected))
+    if actual != remote.sha256:
+        raise ValueError("{} has SHA-256 {}, expected {}".format(path, actual, remote.sha256))
     return path
 
 
@@ -123,7 +131,7 @@ def download(remote: Remote, cache: Path, *, refresh: bool = False) -> Path:
     cache.mkdir(parents=True, exist_ok=True)
     path = cache / remote.name
     if path.exists() and not refresh:
-        return verify(path, remote.sha256)
+        return verify(path, remote)
     partial = path.with_name(path.name + ".part")
     digest = hashlib.sha256()
     size = 0
@@ -194,8 +202,8 @@ def joined_rows(model_key: str, cache: Path, tickers, *, refresh: bool = False):
     """
     _, sentiment_file, risk_file = MODELS[model_key]
     tickers = set(tickers)
-    sentiment_path = download(sentiment_file, cache)
-    risk_path = download(risk_file, cache)
+    sentiment_path = download(sentiment_file, cache, refresh=refresh)
+    risk_path = download(risk_file, cache, refresh=refresh)
     counts = {
         "sentiment_rows": 0, "risk_rows": 0, "joined": 0,
         "dropped_sentiment": 0, "dropped_risk": 0, "dropped_ambiguous": 0,
@@ -241,23 +249,28 @@ def joined_rows(model_key: str, cache: Path, tickers, *, refresh: bool = False):
     return joined, counts
 
 
-def _items(model_key: str, rows, alignment: str):
+def aligned_rows(rows, alignment: str):
+    """Rows with their publication instant under ``alignment`` first."""
+    return [(_published(row[0], alignment), *row[1:]) for row in rows]
+
+
+def _items(model_key: str, rows):
     from rl.bench.info import InfoItem
 
     model, sentiment_file, risk_file = MODELS[model_key]
     source = "fnspid-{}".format(model_key)
     empty = hashlib.sha256(b"").hexdigest()
-    for day, ticker, title, sentiment, risk, article in rows:
+    for published_at, ticker, title, sentiment, risk, article in rows:
         fields = {}
         if sentiment is not None:
             fields["llm_sentiment"] = {"value": sentiment, "model": model}
         if risk is not None:
             fields["llm_risk"] = {"value": risk, "model": model}
         yield InfoItem(
-            id="{}-{}-{}".format(model_key, day[:10], ticker),
+            id="{}-{}-{}".format(model_key, published_at.date().isoformat(), ticker),
             source=source,
             tickers=(ticker,),
-            published_at=_published(day, alignment),
+            published_at=published_at,
             title=title,
             text="",
             text_sha256=empty,
@@ -278,35 +291,51 @@ def placebo_offsets(n_sessions: int, tickers) -> dict[str, int]:
 
 
 def placebo_rows(rows, sessions, tickers, counts: dict):
-    """Re-date each ticker's score series by its circular offset within ``sessions``."""
-    positions = {np.datetime64(day, "D"): i for i, day in enumerate(sessions)}
+    """Shift each ticker's per-session score series by its circular offset.
+
+    ``rows`` carry their publication instant. A row belongs to the first
+    session whose close is after that instant (the session at which the real
+    arm sees it), so weekend news is kept and lands on the next session. If a
+    ticker has several rows for one session, the latest publication wins.
+    The shifted value is published one second before its new session's close,
+    so the same per-session window sees it.
+    """
+    sessions = [np.datetime64(day, "D") for day in sessions]
+    closes = np.array([session_close(day).timestamp() for day in sessions])
     offsets = placebo_offsets(len(sessions), tickers)
-    shifted, dropped = [], 0
+    latest = {}
     for row in rows:
-        day = np.datetime64(row[0][:10], "D")
-        position = positions.get(day)
-        if position is None:
-            dropped += 1
+        position = int(np.searchsorted(closes, row[0].timestamp(), side="right"))
+        if position >= len(sessions):
+            counts["placebo_dropped_after"] = counts.get("placebo_dropped_after", 0) + 1
             continue
-        offset = offsets[row[1]]
-        moved = np.datetime64(sessions[(position + offset) % len(sessions)], "D")
-        shifted.append((str(moved), *row[1:]))
-    counts["placebo_dropped_off_grid"] = dropped
+        key = (row[1], position)
+        if key in latest:
+            counts["placebo_deduped"] = counts.get("placebo_deduped", 0) + 1
+            if latest[key][0] > row[0]:
+                continue
+        latest[key] = row
+    shifted = []
+    for (ticker, position), row in latest.items():
+        moved = (position + offsets[ticker]) % len(sessions)
+        published = session_close(sessions[moved]) - timedelta(seconds=1)
+        shifted.append((published, ticker, *row[2:]))
     shifted.sort(key=lambda row: (row[0], row[1]))
     return shifted
 
 
-def build(variant: str, tickers, sessions, cache=DEFAULT_CACHE, *, refresh: bool = False) -> dict:
-    """Write ``<cache>/<variant>.jsonl`` and return a manifest of hashes and counts."""
+def build(variant: str, tickers, sessions, cache=DEFAULT_CACHE, *, output=None, refresh: bool = False) -> dict:
+    """Write the jsonl to ``output`` (default ``<cache>/<variant>.jsonl``) and return its manifest."""
     if variant not in VARIANTS:
         raise ValueError("Unknown score variant {!r}; choose from {}".format(variant, sorted(VARIANTS)))
     model_key, alignment, placebo = VARIANTS[variant]
     tickers = tuple(tickers)
     rows, counts = joined_rows(model_key, Path(cache), tickers, refresh=refresh)
+    rows = aligned_rows(rows, alignment)
     if placebo:
         rows = placebo_rows(rows, sessions, tickers, counts)
-    items = sorted(_items(model_key, rows, alignment), key=lambda item: (item.published_at, item.id))
-    output = Path(cache) / (variant + ".jsonl")
+    items = sorted(_items(model_key, rows), key=lambda item: (item.published_at, item.id))
+    output = Path(cache) / (variant + ".jsonl") if output is None else Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
     partial = output.with_name(output.name + ".part")
     with open(partial, "w", encoding="utf-8") as handle:

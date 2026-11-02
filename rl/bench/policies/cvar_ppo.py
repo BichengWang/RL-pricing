@@ -26,6 +26,7 @@ import numpy as np
 from stable_baselines3 import PPO
 
 from rl.bench.features import N_FEATURES
+from rl.bench.gym_env import LOGIT_BOUND
 from rl.bench.llm import apply_sentiment, risk_factors
 from rl.bench.policies.sb3 import SB3Policy
 
@@ -85,7 +86,9 @@ class CVaRPPO(PPO):
         risk = per_asset[..., N_FEATURES + 1]
         current = np.asarray(observations[..., -(n_assets + 1):-1], dtype=float)
         keep = np.concatenate([listed, np.ones(listed.shape[:-1] + (1,), dtype=bool)], axis=-1)
-        logits = np.where(keep, np.asarray(actions, dtype=float), -np.inf)
+        # SB3 clips sampled actions to the action space before env.step but stores the raw ones.
+        clipped = np.clip(np.asarray(actions, dtype=float), -LOGIT_BOUND, LOGIT_BOUND)
+        logits = np.where(keep, clipped, -np.inf)
         exp = np.exp(logits - logits.max(axis=-1, keepdims=True))
         target = (exp / exp.sum(axis=-1, keepdims=True))[..., :-1]
         target = apply_sentiment(target, current, sentiment, self.risk_strength)
