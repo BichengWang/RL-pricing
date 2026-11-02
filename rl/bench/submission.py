@@ -239,6 +239,8 @@ class Submission:
                 raise ValueError("Submission {} has no directory to load {} from".format(self.id, module_name))
             return _digest({"submissions/{}/{}".format(self.id, module_name): (self.directory / module_name).read_bytes()})
         spec = importlib.util.find_spec(module_name)
+        if spec is None or not (spec.origin or "").endswith(".py"):
+            raise ModuleNotFoundError("Policy module {} has no Python source".format(module_name))
         return _digest({_module_label(module_name, spec): Path(spec.origin).read_bytes()})
 
 

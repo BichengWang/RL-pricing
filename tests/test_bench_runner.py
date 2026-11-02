@@ -508,6 +508,8 @@ def test_a_changed_submission_starts_a_new_cohort_beside_the_old_one(tmp_path, d
     assert sorted(r.get("cohort", 1) for s in summary["sections"] for r in s["rows"] if r["id"] == "fixed") == [1, 2]
     text = leaderboard.render_markdown(summary)
     assert "[Fixed](../submissions/fixed/) (cohort 1)" in text and "[Fixed](../submissions/fixed/) (cohort 2)" in text
+    report = monthly.write_monthly_report(out, "2019-12", submissions_root=directory.parent).read_text()
+    assert "Fixed (cohort 1)" in report and "Fixed (cohort 2)" in report
 
 
 def test_freeze_stale_refreezes_only_changed_submissions_and_skips_retired(tmp_path, monkeypatch):

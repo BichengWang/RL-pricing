@@ -194,6 +194,7 @@ jobs:
       - name: Score frozen policies on new sessions
         run: rl-pricing bench live --refresh
       - name: Score ledger decisions
+        if: ${{ !cancelled() }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # --refresh: ledger-only tasks (us-aapl, us-googl, us-amzn) are not
@@ -201,12 +202,15 @@ jobs:
         # before the month's last close.
         run: rl-pricing bench ledger score --refresh
       - name: Monthly report
+        if: ${{ !cancelled() }}  # a ledger score failure must not discard the rest of the month
         run: rl-pricing bench monthly
       - name: Render leaderboard and verdicts
+        if: ${{ !cancelled() }}  # a ledger score failure must not discard the rest of the month
         run: |
           rl-pricing bench leaderboard
           rl-pricing bench reports
       - name: Commit results
+        if: ${{ !cancelled() }}  # a ledger score failure must not discard the rest of the month
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

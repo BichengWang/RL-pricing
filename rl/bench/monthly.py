@@ -107,8 +107,8 @@ def _entry(record: dict, as_of: str) -> dict | None:
         "_equity": equity,
         "_benchmark": benchmark,
     }
-    if record.get("cohort", 1) > 1:
-        entry["cohort"] = record["cohort"]
+    if record.get("cohort", 1) > 1 or record.get("superseded"):
+        entry["cohort"] = record.get("cohort", 1)
     if record.get("code_changed"):
         entry["code_changed"] = True
     if record.get("policy_versions", 1) > 1:
@@ -117,7 +117,7 @@ def _entry(record: dict, as_of: str) -> dict | None:
 
 
 def _key(entry: dict) -> str:
-    cohort = "/{}".format(entry["cohort"]) if entry.get("cohort") else ""
+    cohort = "/{}".format(entry["cohort"]) if entry.get("cohort", 1) > 1 else ""
     return "{}/{}/{}{}".format(entry["track"], entry["task"], entry["submission"], cohort)
 
 
@@ -368,6 +368,14 @@ def write_monthly_report(
     as_of = _month_end(month)
     retired = {s.id for s in discover(submissions_root).values() if s.is_retired()}
     records = [record for record in _load(root) if record["submission"] not in retired]
+    latest: dict[tuple, int] = {}
+    for record in records:
+        key = (record["track"], record["task"], record["submission"])
+        latest[key] = max(latest.get(key, 1), record.get("cohort", 1))
+    records = [
+        {**r, "superseded": True} if r.get("cohort", 1) < latest[(r["track"], r["task"], r["submission"])] else r
+        for r in records
+    ]
     entries = [e for e in (_entry(record, as_of) for record in records) if e is not None]
     entries.sort(key=_order)
 

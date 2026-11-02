@@ -72,7 +72,9 @@ Scoring (:func:`score_ledger`)
     failure so a flaky API cannot silently lower a score); the default caches
     finished runs and their jobs on disk, which cannot change. A run's jobs
     that cannot be read, or a clone without full history, raise
-    :class:`VerificationUnavailable`: nothing is scored or rewritten.
+    :class:`VerificationUnavailable`: that pair is not scored and its record
+    is not rewritten (``score_all`` reports it as a failure and goes on, and the
+    ``live`` job still publishes the rest).
 
 Crypto note: Binance sessions open at 00:00 UTC, so the weekday morning job
 decides after the open of the day's session and its entries cannot verify.
@@ -519,11 +521,13 @@ def _commit_problem(path: Path, head_sha: str | None) -> str | None:
         return "entry differs from the one commit {} added".format(commit[:12])
     if not head_sha:
         return "run has no head_sha"
-    ancestor = _git(path.parent, "merge-base", "--is-ancestor", head_sha, commit).returncode
-    if ancestor == 1:
-        return "commit {} does not descend from the run's head {}".format(commit[:12], head_sha[:12])
-    if ancestor != 0:
+    if _git(path.parent, "cat-file", "-e", "{}^{{commit}}".format(head_sha)).returncode != 0:
         return "the run's head {} is not in the repository history".format(head_sha[:12])
+    ancestor = _git(path.parent, "merge-base", "--is-ancestor", head_sha, commit)
+    if ancestor.returncode == 1:
+        return "commit {} does not descend from the run's head {}".format(commit[:12], head_sha[:12])
+    if ancestor.returncode != 0:
+        raise VerificationUnavailable("git merge-base failed: {}".format(ancestor.stderr.strip()))
     return None
 
 

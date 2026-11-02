@@ -218,13 +218,18 @@ def _cmd_freeze(options) -> int:
 
     if options.task and options.submission:
         task, submission = get_task(options.task), _submission(options.submissions_root, options.submission)
-        if submission.is_retired() or (options.stale and not _should_freeze(task, submission, options)):
-            print("{} is retired or up to date on {}".format(submission.id, task.id))
-            return 0
-        path = runner.freeze(
-            task, submission, seeds=_seeds(options.seeds), force=options.force or options.stale,
-            refresh=options.refresh,
-        )
+        try:
+            if submission.is_retired() or (options.stale and not _should_freeze(task, submission, options)):
+                print("{} is retired or up to date on {}".format(submission.id, task.id))
+                return 0
+            path = runner.freeze(
+                task, submission, seeds=_seeds(options.seeds), force=options.force or options.stale,
+                refresh=options.refresh,
+            )
+        except Exception:
+            log.exception("%s failed to freeze on %s", submission.id, task.id)
+            print("Failed: {}/{}".format(task.id, submission.id), file=sys.stderr)
+            return 1
         print("Froze {}".format(path))
         return 0
     tasks = [get_task(options.task)] if options.task else [t for t in TASKS.values() if t.live]
