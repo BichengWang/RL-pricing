@@ -92,9 +92,12 @@ def test_valid_tool_output_becomes_weights_and_records_provenance():
     assert weights == pytest.approx(np.full(len(TICKERS), 1 / len(TICKERS)))
     assert llm.last_cost_usd == pytest.approx((2000 * 2.0 + 500 * 10.0) / 1e6)
     sent = llm._client.calls[0]
-    assert sent["model"] == lp.PINNED_MODEL and sent["temperature"] == 0.0
-    assert sent["max_tokens"] == lp.MAX_OUTPUT_TOKENS
-    assert sent["tool_choice"] == {"type": "tool", "name": lp._TOOL_NAME}
+    assert sent["model"] == lp.PINNED_MODEL
+    assert "temperature" not in sent
+    assert sent["thinking"] == {"type": "between_tools"}
+    assert sent["max_tokens"] == lp.MAX_OUTPUT_TOKENS == 8192
+    assert sent["tool_choice"] == {"type": "auto"}
+    assert sent["tools"][0]["strict"] is True
     assert set(sent["tools"][0]["input_schema"]["properties"]) == {*TICKERS, "cash", "rationale"}
     provenance = llm.ledger_inputs
     assert provenance["prompt_sha256"] == lp.PROMPT_SHA256
@@ -182,7 +185,7 @@ def test_information_items_after_the_decision_close_cannot_reach_the_prompt():
     assert with_both.ledger_inputs["input_sha256"] == with_before.ledger_inputs["input_sha256"]
 
 
-def make_submission(root, **params):
+def make_submission(root, info_sources=None, **params):
     directory = root / "llm-portfolio"
     directory.mkdir(parents=True)
     spec = {
@@ -196,6 +199,8 @@ def make_submission(root, **params):
             "source_url": "https://platform.claude.com/docs/en/about-claude/models/overview",
         }],
     }
+    if info_sources:
+        spec["info_sources"] = info_sources
     (directory / "submission.json").write_text(json.dumps(spec))
     return Submission.load(directory)
 
@@ -244,6 +249,99 @@ def test_ledger_records_an_invalid_twice_response_as_a_hold_with_the_reason(tmp_
     assert "no JSON object" in entry["inputs"]["error"]
 
 
+def test_prompt_budget_truncates_information_items():
+    history = panel()
+    day = str(history.dates[-1])
+    close = session_close(day)
+    items = [
+        InfoItem(
+            id="item-{}".format(n), source="test", tickers=("XLK",),
+            published_at=close - dt.timedelta(minutes=n + 1), title="long item",
+            text="x" * 5000, text_sha256=hashlib.sha256(("x" * 5000).encode()).hexdigest(),
+        )
+        for n in range(100)
+    ]
+    llm = policy(valid_payload())
+    llm.act(view(history, info=InfoPanel(items).at_session(day)))
+
+    prompt = llm._client.calls[0]["messages"][0]["content"]
+    assert len(prompt) <= lp.MAX_INPUT_CHARS
+    assert llm.ledger_inputs["input_chars"] == len(prompt)
+    assert "more items omitted" in prompt
+
+
+def test_ledger_loads_only_information_published_before_the_decision_close(tmp_path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-only")
+    monkeypatch.setenv("RL_PRICING_DATA", str(tmp_path / "data"))
+    sub = make_submission(
+        tmp_path, monthly_budget_usd=15.0,
+        info_sources=[{"source": "jsonl", "path": "items.jsonl"}],
+    )
+    history = panel()
+    day = str(history.dates[-1])
+    close = session_close(day)
+
+    def item(name, published):
+        text = name
+        return InfoItem(
+            id=name, source="test", tickers=("XLK",), published_at=published, title=name,
+            text=text, text_sha256=hashlib.sha256(text.encode()).hexdigest(),
+        )
+
+    before, after = item("before", close - dt.timedelta(hours=1)), item("after", close + dt.timedelta(hours=1))
+    (sub.directory / "items.jsonl").write_text(
+        json.dumps(before.to_dict()) + "\n" + json.dumps(after.to_dict()) + "\n"
+    )
+    llm = policy(valid_payload())
+    monkeypatch.setattr(runner, "build_policy", lambda *_: llm)
+
+    path = ledger.record_decision(get_task("us-sectors"), sub, data=history, now=NOW, run=RUN)
+    entry = json.loads(path.read_text())
+    direct = policy(valid_payload())
+    direct.act(view(history, weights=np.zeros(len(TICKERS)), info=InfoPanel([before]).at_session(day)))
+
+    assert entry["inputs"]["input_sha256"] == direct.ledger_inputs["input_sha256"]
+    assert "[XLK] after" not in direct._client.calls[0]["messages"][0]["content"]
+
+
+def test_a_pre_call_stale_hold_costs_nothing(tmp_path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-only")
+    sub = make_submission(tmp_path, monthly_budget_usd=15.0, max_age_days=0)
+    llm = LLMPortfolioPolicy(client=Client([(valid_payload(), (1000, 100))]), max_age_days=0)
+    monkeypatch.setattr(runner, "build_policy", lambda *_: llm)
+
+    path = ledger.record_decision(get_task("us-sectors"), sub, data=panel(), now=NOW, run=RUN)
+
+    entry = json.loads(path.read_text())
+    assert entry["hold"] is True and entry["reason"].startswith("error: RuntimeError")
+    assert entry["cost_usd"] == 0.0
+    assert entry["inputs"]["cost_basis"] == "no_call"
+    assert entry["reserved_cost_usd"] == lp.LLMPortfolioPolicy.max_cost_per_decision_usd
+
+
+def test_ledger_entry_is_unaffected_by_rows_after_the_decision_close(tmp_path, monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-only")
+    sub = make_submission(tmp_path, monthly_budget_usd=15.0)
+    full = panel()
+    cutoff = 250
+    history = full.rows(0, cutoff + 1)
+    llm = policy(valid_payload())
+    monkeypatch.setattr(runner, "build_policy", lambda *_: llm)
+
+    path = ledger.record_decision(get_task("us-sectors"), sub, data=history, now=NOW, run=RUN)
+    entry = json.loads(path.read_text())
+
+    arrays = {name: getattr(full, name).copy() for name in ("open", "high", "low", "close", "volume")}
+    for name in ("open", "high", "low", "close"):
+        arrays[name][cutoff + 1 :] = 1e9
+    poisoned = MarketData(dates=full.dates.copy(), tickers=full.tickers, **arrays)
+    direct = policy(valid_payload())
+    direct.act(view(poisoned.rows(0, cutoff + 1), weights=np.zeros(len(TICKERS))))
+
+    assert entry["data_sha256"] == history.sha256()
+    assert entry["inputs"]["input_sha256"] == direct.ledger_inputs["input_sha256"]
+
+
 def test_ledger_record_command_writes_a_us_sectors_entry_with_the_fake_client(tmp_path, monkeypatch, capsys):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-only")
     sub = make_submission(tmp_path, monthly_budget_usd=15.0)
@@ -262,7 +360,7 @@ def test_ledger_record_command_writes_a_us_sectors_entry_with_the_fake_client(tm
 
 def test_per_entrant_monthly_budget_is_hard_and_applies_without_the_environment_cap(tmp_path, monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-only")
-    sub = make_submission(tmp_path, monthly_budget_usd=0.175)
+    sub = make_submission(tmp_path, monthly_budget_usd=0.255)
     llm = policy(valid_payload(), usage=(2000, 500))  # $0.009
     monkeypatch.setattr(runner, "build_policy", lambda *_: llm)
     data = panel()
@@ -270,7 +368,7 @@ def test_per_entrant_monthly_budget_is_hard_and_applies_without_the_environment_
     ledger.record_decision(
         get_task("us-sectors"), sub, data=data.rows(0, len(data) - 1), now=NOW, run=RUN
     )
-    # $0.009 spent + the $0.17 reservation does not fit the $0.175 cap: the second call is refused.
+    # $0.009 spent + the $0.25 reservation does not fit the $0.255 cap: the second call is refused.
     with pytest.raises(ValueError, match="budget cap"):
         ledger.record_decision(get_task("us-sectors"), sub, data=data, now=NOW, run=RUN)
     assert len(llm._client.calls) == 1

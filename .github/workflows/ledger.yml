@@ -43,11 +43,19 @@ jobs:
           restore-keys: bench-data-
       - name: Install dependencies
         # TradingAgents is pinned in rl/bench/policies/tradingagents.py (not on PyPI;
-        # kept out of package metadata so rl-pricing stays publishable).
+        # kept out of package metadata so rl-pricing stays publishable). The LLM
+        # portfolio SDK is installed only when that entrant is switched on, so the
+        # R3 install path is unchanged while it is off.
+        env:
+          LLM_PORTFOLIO_ENABLED: ${{ vars.LLM_PORTFOLIO_ENABLED }}
         run: |
           python -m pip install --upgrade pip
           pip install torch --index-url https://download.pytorch.org/whl/cpu
-          pip install -e ".[agents]"
+          if [ "${LLM_PORTFOLIO_ENABLED}" = "true" ]; then
+            pip install -e ".[agents]"
+          else
+            pip install -e .
+          fi
           pip install "$(python -c 'from rl.bench.policies.tradingagents import INSTALL_REQUIREMENT; print(INSTALL_REQUIREMENT)')"
       - name: Record decisions
         env:
@@ -65,6 +73,10 @@ jobs:
           SEC_EDGAR_USER_AGENT: ${{ vars.SEC_EDGAR_USER_AGENT }}
         run: |
           if [ "${LLM_PORTFOLIO_ENABLED}" = "true" ]; then
+            if ! ls reports/r6-llm-portfolio-live/evidence/recall_probe_20*.json >/dev/null 2>&1; then
+              echo "::error::LLM_PORTFOLIO_ENABLED=true requires a committed recall probe output"
+              exit 1
+            fi
             rl-pricing bench ledger record --refresh
           else
             rl-pricing bench ledger record --refresh --exclude llm-portfolio

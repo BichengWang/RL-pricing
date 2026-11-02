@@ -54,11 +54,14 @@ MODEL_CUTOFF = "2026-06-30"
 PRICES_USD_PER_MTOK = {"input": 2.00, "output": 10.00}
 #: One retry is allowed, so the cap covers two attempts.
 MAX_INPUT_TOKENS = 20_000
-MAX_OUTPUT_TOKENS = 4_096
+#: Two characters per token is a conservative bound for the rendered prompt.
+MAX_INPUT_CHARS = 2 * MAX_INPUT_TOKENS
+MAX_OUTPUT_TOKENS = 8_192
 MAX_ATTEMPTS = 2
-TEMPERATURE = 0.0
+#: The model rejects non-default sampling parameters; this is its lowest thinking setting.
+THINKING = {"type": "between_tools"}
 _TOOL_NAME = "submit_target_weights"
-_INFO_LIMIT = 40
+_INFO_MAX_CHARS = 15_000
 _INFO_TEXT_LIMIT = 500
 
 SYSTEM_PROMPT = """\
@@ -110,6 +113,7 @@ def _tool(tickers: tuple[str, ...]) -> dict:
     return {
         "name": _TOOL_NAME,
         "description": "Submit long-only target weights, cash and a short rationale.",
+        "strict": True,
         "input_schema": {
             "type": "object",
             "properties": properties,
@@ -279,18 +283,22 @@ def input_table(view: MarketView) -> str:
     return "\n".join(lines)
 
 
-def info_lines(view: MarketView) -> str:
-    """The visible information items, compactly, with a bound on their number and length."""
+def info_lines(view: MarketView, budget: int = _INFO_MAX_CHARS) -> str:
+    """The visible information items, compactly, within a character budget."""
     items = view.info.items()
-    lines = [
-        "- {} {} [{}] {}: {}".format(
+    lines, used = [], 0
+    for item in items:
+        line = "- {} {} [{}] {}: {}".format(
             item.published_at.isoformat(), item.source, ",".join(item.tickers), item.title,
             item.text[:_INFO_TEXT_LIMIT],
         )
-        for item in items[:_INFO_LIMIT]
-    ]
-    if len(items) > _INFO_LIMIT:
-        lines.append("- ({} more items omitted)".format(len(items) - _INFO_LIMIT))
+        if used + len(line) + 1 > budget:
+            break
+        lines.append(line)
+        used += len(line) + 1
+    omitted = len(items) - len(lines)
+    if omitted:
+        lines.append("- ({} more items omitted to fit the input budget)".format(omitted))
     return "\n".join(lines) if lines else "(none)"
 
 
@@ -344,9 +352,8 @@ class LLMPortfolioPolicy(Policy):
         self.monthly_budget_usd = monthly_budget_usd
         self.max_tokens = MAX_OUTPUT_TOKENS
         self.max_age_days = max_age_days
-        self.last_cost_usd = 0.0
+        self.last_cost_usd: float | None = 0.0
         self.ledger_inputs: dict[str, Any] = {}
-        self._injected = client is not None
         self._client = client if client is not None else self._build_client()
 
     def _build_client(self):
@@ -366,18 +373,32 @@ class LLMPortfolioPolicy(Policy):
         return client
 
     def reset(self) -> None:
-        self.last_cost_usd = 0.0
+        self.last_cost_usd = None  # no provider call yet
         self.ledger_inputs = {}
 
     def _prompt(self, view: MarketView) -> tuple[str, str]:
         table = input_table(view)
         cash = 1.0 - float(np.nansum(view.weights))
+        info = info_lines(view)
         user = USER_TEMPLATE.format(
-            date=str(view.date), table=table, cash="{:.2%}".format(max(0.0, cash)), info=info_lines(view)
+            date=str(view.date), table=table, cash="{:.2%}".format(max(0.0, cash)), info=info
         )
+        if len(user) > MAX_INPUT_CHARS:
+            excess = len(user) - MAX_INPUT_CHARS
+            info = info[: max(0, len(info) - excess - 64)] + "\n- (truncated to the input budget)"
+            user = USER_TEMPLATE.format(
+                date=str(view.date), table=table, cash="{:.2%}".format(max(0.0, cash)), info=info
+            )
+        if len(user) > MAX_INPUT_CHARS:
+            raise ValueError(
+                "the rendered prompt is {} characters, above the {}-character input budget".format(
+                    len(user), MAX_INPUT_CHARS
+                )
+            )
         return user, _sha256(user)
 
     def act(self, view: MarketView) -> Decision:
+        self.last_cost_usd = None  # no provider call yet; the ledger bills nothing for this hold
         if self.max_age_days is not None:
             age = (_date.today() - _date.fromisoformat(str(view.date))).days
             if age > self.max_age_days:
@@ -406,6 +427,8 @@ class LLMPortfolioPolicy(Policy):
                 "prompt_version": PROMPT_VERSION,
                 "prompt_sha256": PROMPT_SHA256,
                 "input_sha256": input_sha256,
+                "input_chars": len(user),
+                "input_budget_chars": MAX_INPUT_CHARS,
                 "decision_date": str(view.date),
                 "attempts": attempts,
                 "response_text": "\n".join(response_texts),
@@ -421,11 +444,11 @@ class LLMPortfolioPolicy(Policy):
                 response = self._client.messages.create(
                     model=self.model,
                     max_tokens=self.max_tokens,
-                    temperature=TEMPERATURE,
+                    thinking=THINKING,
                     system=SYSTEM_PROMPT,
                     messages=[{"role": "user", "content": user}],
                     tools=[_tool(tickers)],
-                    tool_choice={"type": "tool", "name": _TOOL_NAME},
+                    tool_choice={"type": "auto"},
                 )
                 usage = _usage(response)
                 for name in usage_total:

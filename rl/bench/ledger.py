@@ -23,8 +23,10 @@ Recording (:func:`record_decision`)
       because fitted state is not stored in an entry and could not be audited.
       A policy that needs fitting should use the frozen live track instead.
     * Optional policy attributes read after ``act``: ``last_cost_usd`` (spend of
-      the call, counted against the budget) and ``ledger_inputs`` (JSON-able
-      provenance: model ids, agent commit, raw decision...).
+      the call, counted against the budget; ``0`` with no usage is billed the
+      declared worst case, while ``None`` means no provider call was made and
+      costs nothing) and ``ledger_inputs`` (JSON-able provenance: model ids,
+      agent commit, raw decision...).
     * An LLM submission requires its provider's key (``OPENAI_API_KEY`` or
       ``ANTHROPIC_API_KEY``, from ``params.llm_provider``), every name in the
       policy class's ``ledger_env`` (TradingAgents declares ``FRED_API_KEY`` and
@@ -401,10 +403,17 @@ def record_decision(
     except Exception as error:  # a failing policy holds; it never stops the ledger
         log.exception("%s on %s: policy failed on %s", submission.id, task.id, decision_date)
         entry["reason"] = "error: {}: {}".format(type(error).__name__, error)
-    cost = _finite(getattr(policy, "last_cost_usd", 0.0))
-    entry["cost_usd"] = cost if cost > 0 else reservation  # no reported usage is billed at the worst case
+    cost = getattr(policy, "last_cost_usd", 0.0)
+    if cost is None:  # no provider call was made (a pre-call guard), so nothing is spent
+        entry["cost_usd"] = 0.0
+        cost_basis = "no_call"
+    else:
+        cost = _finite(cost)
+        entry["cost_usd"] = cost if cost > 0 else reservation  # no reported usage is billed at the worst case
+        cost_basis = "usage" if cost > 0 else "reservation"
     inputs = getattr(policy, "ledger_inputs", None)
     entry["inputs"] = _jsonable(inputs) if isinstance(inputs, dict) else {}
+    entry["inputs"].setdefault("cost_basis", cost_basis)
     entry["inputs"].setdefault("policy", submission.policy)
     entry["inputs"].setdefault("params", submission.params)
     entry["decision_sha256"] = decision_sha256(entry)
