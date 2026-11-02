@@ -69,8 +69,8 @@ class DecisionTransformerPolicy(BCPolicy):
                          transaction_cost=transaction_cost, **kwargs)
         if not 1 <= context <= MAX_CONTEXT:
             raise ValueError("context must be in [1, {}]".format(MAX_CONTEXT))
-        if layers < 1 or hidden % heads or not 0 < return_scale < float("inf"):
-            raise ValueError("Positive layers, hidden divisible by heads and finite return_scale required")
+        if layers < 1 or heads < 1 or hidden % heads or not 0 < return_scale < float("inf"):
+            raise ValueError("Positive layers and heads, hidden divisible by heads and finite return_scale required")
         self.context, self.layers, self.heads = context, layers, heads
         self.return_scale = return_scale
         self.targets = self.rate = None

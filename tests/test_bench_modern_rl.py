@@ -132,6 +132,9 @@ def test_decision_transformer_is_causal_and_context_is_bounded():
     assert not torch.allclose(out[:, 3:], base[:, 3:], atol=1e-3)
     with pytest.raises(ValueError, match="context"):
         DecisionTransformerPolicy(context=21)
+    for bad in (dict(heads=0), dict(heads=3), dict(layers=0)):
+        with pytest.raises(ValueError, match="Positive layers and heads"):
+            DecisionTransformerPolicy(**bad)
 
 
 def test_cvar_penalty_hits_the_worst_estimated_returns_in_proportion_to_the_weight():
