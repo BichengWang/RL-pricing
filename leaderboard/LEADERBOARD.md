@@ -94,6 +94,140 @@ Fixed public split: fit before the test window, then trade it.
 | – | [SAC](../submissions/sac/) | rl | 0.66 ± 0.26 | 15.1% | -30.2% | 122.8× | 0.95 | -10.8% (t=-2.2) | -0.43 (p=0.998) | 0.83 | 5 |
 | – | [Cash](../submissions/cash/) | baseline | – | 0.0% | 0.0% | 0.0× | 0.00 | 0.0% | – | – | 1 |
 
+## Live track
+
+Policies frozen at the date shown and scored on the sessions after it; they cannot have been tuned on the results.
+
+### Crypto majors (frozen 2026-10-13) — `crypto-majors`
+
+2026-10-15 to 2026-11-01 (18 sessions) · fee 0.1% per side · BTCUSDT, ETHUSDT, BNBUSDT, EOSUSDT, BCCUSDT, NEOUSDT, ADAUSDT, LTCUSDT, XRPUSDT, ONTUSDT
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [Minimum variance](../submissions/minimum-variance/) | baseline | -1.88 | -52.3% | -7.2% | 20.3× | 0.88 | 92.4% (t=2.2) | +2.78 (p=0.179) | 0.32 | 1 |
+| 2 | [Momentum (top 3)](../submissions/momentum/) | baseline | -2.63 | -58.8% | -7.6% | 20.3× | 0.77 | 57.0% (t=1.4) | +2.03 (p=0.188) | 0.25 | 1 |
+| 3 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | -3.67 ± 0.85 | -43.2% | -5.4% | 306.9× | 0.09 | -39.7% (t=-0.6) | +0.77 (p=0.424) | 0.21 | 3 |
+| 4 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | -3.69 | -66.1% | -7.3% | 15.2× | 0.71 | 25.4% (t=1.6) | +0.97 (p=0.173) | 0.17 | 1 |
+| 5 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | -4.10 | -80.1% | -9.9% | 20.3× | 0.96 | 20.5% (t=1.8) | +0.56 (p=0.157) | 0.14 | 1 |
+| 6 | [SAC](../submissions/sac/) | rl | -4.33 ± 0.90 | -81.2% | -10.0% | 214.8× | 0.90 | 1.7% (t=-0.0) | +0.14 (p=0.372) | 0.11 | 3 |
+| 7 | **1/N buy and hold** ◆ | baseline | -4.66 | -85.1% | -10.9% | 20.3× | 1.00 | 0.0% | – | 0.11 | – |
+| 8 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | -4.66 | -85.1% | -10.9% | 20.3× | 1.00 | 0.0% | +0.00 (p=1.000) | 0.11 | 1 |
+| 9 | [A2C](../submissions/a2c/) | rl | -4.68 ± 0.10 | -81.4% | -9.7% | 37.1× | 0.88 | -0.7% (t=-0.2) | -0.02 (p=0.647) | 0.11 | 3 |
+| 10 | [TD3](../submissions/td3/) | rl | -4.83 ± 0.72 | -82.6% | -10.2% | 174.8× | 0.89 | -11.1% (t=-0.3) | -0.26 (p=0.680) | 0.08 | 3 |
+| 11 | [PPO](../submissions/ppo/) | rl | -4.84 ± 0.18 | -80.8% | -9.3% | 69.3× | 0.84 | -5.9% (t=-0.8) | -0.18 (p=0.804) | 0.10 | 3 |
+| 12 | [DDPG](../submissions/ddpg/) | rl | -5.87 ± 1.83 | -80.9% | -9.2% | 175.8× | 0.69 | -34.4% (t=-1.0) | -1.10 (p=0.911) | 0.05 | 3 |
+| 13 | [Cash](../submissions/cash/) | baseline | – | 0.0% | 0.0% | 0.0× | 0.00 | 0.0% | – | – | 1 |
+
+### Crypto majors (frozen 2026-10-14) — `crypto-majors`
+
+2026-10-17 to 2026-11-01 (16 sessions) · fee 0.1% per side · BTCUSDT, ETHUSDT, BNBUSDT, EOSUSDT, BCCUSDT, NEOUSDT, ADAUSDT, LTCUSDT, XRPUSDT, ONTUSDT
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **1/N buy and hold** ◆ | benchmark | -4.50 | -86.0% | -10.9% | – | – | – | – | – | – |
+| 2 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | -4.72 ± 0.59 | -79.2% | -8.8% | 81.0× | 0.78 | -6.4% (t=0.2) | -0.18 (p=0.625) | 0.00 | 3 |
+| 3 | [SAC (tuned)](../submissions/sac-tuned/) | rl | -4.96 ± 1.12 | -85.2% | -10.4% | 243.8× | 0.87 | -24.3% (t=-0.3) | -0.58 (p=0.819) | 0.00 | 3 |
+
+### US multi-asset allocation (frozen 2026-10-13) — `us-multi-asset`
+
+2026-10-15 to 2026-10-30 (12 sessions) · fee 0.05% per side · SPY, QQQ, IWM, EFA, EEM, TLT, IEF, LQD, GLD, VNQ
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [Minimum variance](../submissions/minimum-variance/) | baseline | 3.71 | 25.9% | -0.6% | 21.0× | -0.28 | 19.8% (t=0.9) | +5.12 (p=0.145) | 0.81 | 1 |
+| 2 | [DDPG](../submissions/ddpg/) | rl | 1.56 ± 5.94 | 1.2% | -1.5% | 199.6× | 0.84 | 7.0% (t=0.6) | +0.99 (p=0.246) | 0.46 | 3 |
+| 3 | [TD3](../submissions/td3/) | rl | 1.39 ± 2.15 | 9.6% | -0.9% | 134.4× | 0.73 | 17.9% (t=1.3) | +2.72 (p=0.022) | 0.61 | 3 |
+| 4 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | 0.79 | 4.6% | -0.7% | 21.0× | 0.58 | 11.8% (t=1.2) | +2.20 (p=0.130) | 0.56 | 1 |
+| 5 | [Momentum (top 3)](../submissions/momentum/) | baseline | -1.36 | -26.5% | -3.1% | 21.0× | 2.16 | -2.0% (t=-0.1) | +0.05 (p=0.489) | 0.38 | 1 |
+| 6 | **1/N buy and hold** ◆ | baseline | -1.41 | -12.0% | -1.3% | 21.0× | 1.00 | 0.0% | – | 0.38 | – |
+| 7 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | -1.41 | -12.0% | -1.3% | 21.0× | 1.00 | 0.0% | +0.00 (p=1.000) | 0.38 | 1 |
+| 8 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | -1.58 ± 0.21 | -19.8% | -2.0% | 66.8× | 1.43 | -3.6% (t=-0.4) | -0.20 (p=0.587) | 0.36 | 3 |
+| 9 | [SAC](../submissions/sac/) | rl | -1.66 ± 0.14 | -13.5% | -1.3% | 47.1× | 0.97 | -2.2% (t=-1.0) | -0.26 (p=0.868) | 0.36 | 3 |
+| 10 | [A2C](../submissions/a2c/) | rl | -1.86 ± 0.37 | -15.3% | -1.3% | 30.7× | 0.98 | -4.1% (t=-1.7) | -0.47 (p=0.939) | 0.34 | 3 |
+| 11 | [PPO](../submissions/ppo/) | rl | -1.99 ± 0.46 | -15.1% | -1.2% | 41.0× | 0.92 | -4.8% (t=-3.0) | -0.59 (p=0.992) | 0.33 | 3 |
+| 12 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | -2.46 | -16.1% | -1.2% | 8.4× | 0.71 | -8.5% (t=-0.9) | -1.05 (p=0.738) | 0.29 | 1 |
+| 13 | [Cash](../submissions/cash/) | baseline | – | 0.0% | 0.0% | 0.0× | 0.00 | 0.0% | – | – | 1 |
+
+### US multi-asset allocation (frozen 2026-10-13) — `us-multi-asset`
+
+2026-10-19 to 2026-10-30 (10 sessions) · fee 0.05% per side · SPY, QQQ, IWM, EFA, EEM, TLT, IEF, LQD, GLD, VNQ
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | **1/N buy and hold** ◆ | benchmark | -1.91 | -16.1% | -1.3% | – | – | – | – | – | – |
+| 2 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | -2.07 ± 0.29 | -16.3% | -1.2% | 44.1× | 0.93 | -1.5% (t=-0.3) | -0.17 (p=0.650) | 0.03 | 3 |
+| 3 | [SAC (tuned)](../submissions/sac-tuned/) | rl | -2.10 ± 0.09 | -16.2% | -1.2% | 35.1× | 0.92 | -1.6% (t=-1.8) | -0.19 (p=0.924) | 0.03 | 3 |
+
+### US sector rotation (frozen 2026-10-13) — `us-sectors`
+
+2026-10-15 to 2026-10-30 (12 sessions) · fee 0.05% per side · XLB, XLE, XLF, XLI, XLK, XLP, XLU, XLV, XLY
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [DDPG](../submissions/ddpg/) | rl | 6.62 ± 4.81 | 86.9% | -0.9% | 178.3× | 0.80 | 23.4% (t=1.2) | +0.82 (p=0.431) | 0.93 | 3 |
+| 2 | [PPO](../submissions/ppo/) | rl | 6.58 ± 0.38 | 52.6% | -0.6% | 41.3× | 0.88 | 0.9% (t=0.3) | +0.13 (p=0.366) | 0.91 | 3 |
+| 3 | [A2C](../submissions/a2c/) | rl | 6.50 ± 0.30 | 53.5% | -0.6% | 26.6× | 0.90 | 0.5% (t=-0.1) | +0.07 (p=0.353) | 0.91 | 3 |
+| 4 | **1/N buy and hold** ◆ | baseline | 6.46 | 59.5% | -0.6% | 21.0× | 1.00 | 0.0% | – | 0.90 | – |
+| 5 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | 6.46 | 59.5% | -0.6% | 21.0× | 1.00 | 0.0% | +0.00 (p=1.000) | 0.90 | 1 |
+| 6 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | 6.19 | 66.5% | -0.8% | 21.0× | 1.12 | -1.1% (t=-0.1) | -0.26 (p=0.599) | 0.89 | 1 |
+| 7 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | 5.32 | 22.8% | -0.2% | 11.7× | 0.48 | -1.8% (t=-0.3) | -1.14 (p=0.646) | 0.88 | 1 |
+| 8 | [SAC](../submissions/sac/) | rl | 4.89 ± 1.02 | 58.4% | -0.8% | 92.9× | 0.72 | 9.7% (t=0.3) | +0.58 (p=0.370) | 0.93 | 3 |
+| 9 | [Minimum variance](../submissions/minimum-variance/) | baseline | 4.78 | 47.7% | -0.5% | 21.0× | 0.96 | -5.8% (t=-0.3) | -1.68 (p=0.703) | 0.85 | 1 |
+| 10 | [TD3](../submissions/td3/) | rl | 3.98 ± 1.63 | 39.3% | -0.8% | 101.4× | 0.61 | 4.5% (t=-0.1) | -0.05 (p=0.463) | 0.93 | 3 |
+| 11 | [Momentum (top 3)](../submissions/momentum/) | baseline | 3.08 | 32.7% | -0.9% | 21.0× | 0.40 | 10.1% (t=0.3) | -3.38 (p=0.782) | 0.73 | 1 |
+| 12 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | 2.49 ± 4.48 | 25.9% | -1.1% | 86.5× | 0.66 | -10.8% (t=-0.1) | -4.20 (p=0.857) | 0.68 | 3 |
+| 13 | [Cash](../submissions/cash/) | baseline | – | 0.0% | 0.0% | 0.0× | 0.00 | 0.0% | – | – | 1 |
+
+### US sector rotation (frozen 2026-10-13) — `us-sectors`
+
+2026-10-19 to 2026-10-30 (10 sessions) · fee 0.05% per side · XLB, XLE, XLF, XLI, XLK, XLP, XLU, XLV, XLY
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | 5.97 ± 0.22 | 51.2% | -0.5% | 47.9× | 0.84 | 1.8% (t=0.9) | +0.26 (p=0.151) | 0.40 | 3 |
+| 2 | [SAC (tuned)](../submissions/sac-tuned/) | rl | 5.94 ± 0.35 | 52.7% | -0.5% | 35.1× | 0.87 | 1.5% (t=0.6) | +0.21 (p=0.181) | 0.40 | 3 |
+| 3 | **1/N buy and hold** ◆ | benchmark | 5.74 | 59.6% | -0.6% | – | – | – | – | – | – |
+
+## Ledger track: decisions committed before each open
+
+Each decision is committed to the repository by a scheduled workflow before the session it trades opens; entries whose workflow run cannot be verified, and sessions without an entry, count as holds.
+
+### AAPL (TradingAgents paper window) (decisions from 2026-10-23) — `us-aapl`
+
+2026-10-26 to 2026-10-30 (5 sessions) · fee 0.05% per side · AAPL
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [Ledger canary (1/N)](../submissions/ledger-canary/) | baseline | 0.50 | 8.2% | -1.2% | 50.4× | 1.00 | 0.0% | +0.00 (p=1.000) | 0.53 | 1 |
+| 2 | **1/N buy and hold** ◆ | benchmark | 0.50 | 8.2% | -1.2% | – | – | – | – | – | – |
+
+### AAPL (TradingAgents paper window) (decisions from 2026-10-28) — `us-aapl`
+
+2026-10-29 to 2026-10-30 (2 sessions) · fee 0.05% per side · AAPL
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [TradingAgents](../submissions/tradingagents/) | llm | -7.92 | -72.4% | -1.2% | 125.9× | 1.00 | 0.0% | +0.00 (p=1.000) | 0.31 | 1 |
+| 2 | **1/N buy and hold** ◆ | benchmark | -7.92 | -72.4% | -1.2% | – | – | – | – | – | – |
+
+### AMZN (TradingAgents paper window) (decisions from 2026-10-28) — `us-amzn`
+
+2026-10-29 to 2026-10-30 (2 sessions) · fee 0.05% per side · AMZN
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [TradingAgents](../submissions/tradingagents/) | llm | -374.63 | -96.9% | -2.7% | 125.9× | 1.00 | 0.0% | +0.00 (p=1.000) | 0.00 | 1 |
+| 2 | **1/N buy and hold** ◆ | benchmark | -374.63 | -96.9% | -2.7% | – | – | – | – | – | – |
+
+### GOOGL (TradingAgents paper window) (decisions from 2026-10-28) — `us-googl`
+
+2026-10-29 to 2026-10-30 (2 sessions) · fee 0.05% per side · GOOGL
+
+| # | Strategy | Kind | Sharpe | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | [TradingAgents](../submissions/tradingagents/) | llm | -98.77 | -95.9% | -2.5% | 125.9× | 1.00 | 0.0% | +0.00 (p=1.000) | 0.00 | 1 |
+| 2 | **1/N buy and hold** ◆ | benchmark | -98.77 | -95.9% | -2.5% | – | – | – | – | – | – |
+
 ◆ marks the 1/N buy-and-hold benchmark (equal weights at the start of the period, never rebalanced); every ΔSharpe is measured against it over the same sessions.
 
 **Metrics.** Computed from daily simple returns with a zero risk-free rate. *Sharpe*: mean/std × √(periods per year); with several seeds, mean ± standard deviation of per-seed Sharpe ratios. *CAGR*, *Max DD* (peak-to-trough, including the starting value) and *Beta*/*Alpha* (OLS of daily returns on the benchmark's; alpha annualised, *t* is Newey-West) are means across seeds. *Turnover/yr*: annualised one-way traded fraction of equity. *ΔSharpe*: annualised Sharpe of the seed-averaged returns minus the benchmark's, with a one-sided paired stationary-bootstrap p-value (H1: better than 1/N). *DSR*: deflated Sharpe ratio of the seed-averaged returns, i.e. the probability the true Sharpe is positive after accounting for the submission's `trials` and for the dispersion of Sharpe ratios across this table (Bailey & López de Prado, 2014).

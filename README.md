@@ -180,6 +180,35 @@ how many you tried.
 | historical | `paper-2021` (re-evaluation) | – | **1/N buy and hold** ◆ | 1.11 | 29.9% | -29.4% | – | 0.94 |
 | historical | `paper-2021` (re-evaluation) | – | 1/N monthly rebalance | 1.04 | 26.7% | -29.5% | -0.07 (p=0.777) | 0.93 |
 | historical | `paper-2021` (re-evaluation) | – | A2C | 1.03 ± 0.01 | 25.1% | -28.2% | -0.08 (p=0.825) | 0.92 |
+| live | `crypto-majors` | 1 | Minimum variance | -1.88 | -52.3% | -7.2% | +2.78 (p=0.179) | 0.32 |
+| live | `crypto-majors` | 2 | Momentum (top 3) | -2.63 | -58.8% | -7.6% | +2.03 (p=0.188) | 0.25 |
+| live | `crypto-majors` | 3 | LSTM forecast | -3.67 ± 0.85 | -43.2% | -5.4% | +0.77 (p=0.424) | 0.21 |
+| live | `crypto-majors` | 7 | **1/N buy and hold** ◆ | -4.66 | -85.1% | -10.9% | – | 0.11 |
+| live | `crypto-majors` | 1 | **1/N buy and hold** ◆ | -4.50 | -86.0% | -10.9% | – | – |
+| live | `crypto-majors` | 2 | PPO (tuned) | -4.72 ± 0.59 | -79.2% | -8.8% | -0.18 (p=0.625) | 0.00 |
+| live | `crypto-majors` | 3 | SAC (tuned) | -4.96 ± 1.12 | -85.2% | -10.4% | -0.58 (p=0.819) | 0.00 |
+| live | `us-multi-asset` | 1 | Minimum variance | 3.71 | 25.9% | -0.6% | +5.12 (p=0.145) | 0.81 |
+| live | `us-multi-asset` | 2 | DDPG | 1.56 ± 5.94 | 1.2% | -1.5% | +0.99 (p=0.246) | 0.46 |
+| live | `us-multi-asset` | 3 | TD3 | 1.39 ± 2.15 | 9.6% | -0.9% | +2.72 (p=0.022) | 0.61 |
+| live | `us-multi-asset` | 6 | **1/N buy and hold** ◆ | -1.41 | -12.0% | -1.3% | – | 0.38 |
+| live | `us-multi-asset` | 1 | **1/N buy and hold** ◆ | -1.91 | -16.1% | -1.3% | – | – |
+| live | `us-multi-asset` | 2 | PPO (tuned) | -2.07 ± 0.29 | -16.3% | -1.2% | -0.17 (p=0.650) | 0.03 |
+| live | `us-multi-asset` | 3 | SAC (tuned) | -2.10 ± 0.09 | -16.2% | -1.2% | -0.19 (p=0.924) | 0.03 |
+| live | `us-sectors` | 1 | DDPG | 6.62 ± 4.81 | 86.9% | -0.9% | +0.82 (p=0.431) | 0.93 |
+| live | `us-sectors` | 2 | PPO | 6.58 ± 0.38 | 52.6% | -0.6% | +0.13 (p=0.366) | 0.91 |
+| live | `us-sectors` | 3 | A2C | 6.50 ± 0.30 | 53.5% | -0.6% | +0.07 (p=0.353) | 0.91 |
+| live | `us-sectors` | 4 | **1/N buy and hold** ◆ | 6.46 | 59.5% | -0.6% | – | 0.90 |
+| live | `us-sectors` | 1 | PPO (tuned) | 5.97 ± 0.22 | 51.2% | -0.5% | +0.26 (p=0.151) | 0.40 |
+| live | `us-sectors` | 2 | SAC (tuned) | 5.94 ± 0.35 | 52.7% | -0.5% | +0.21 (p=0.181) | 0.40 |
+| live | `us-sectors` | 3 | **1/N buy and hold** ◆ | 5.74 | 59.6% | -0.6% | – | – |
+| ledger | `us-aapl` | 1 | Ledger canary (1/N) | 0.50 | 8.2% | -1.2% | +0.00 (p=1.000) | 0.53 |
+| ledger | `us-aapl` | 2 | **1/N buy and hold** ◆ | 0.50 | 8.2% | -1.2% | – | – |
+| ledger | `us-aapl` | 1 | TradingAgents | -7.92 | -72.4% | -1.2% | +0.00 (p=1.000) | 0.31 |
+| ledger | `us-aapl` | 2 | **1/N buy and hold** ◆ | -7.92 | -72.4% | -1.2% | – | – |
+| ledger | `us-amzn` | 1 | TradingAgents | -374.63 | -96.9% | -2.7% | +0.00 (p=1.000) | 0.00 |
+| ledger | `us-amzn` | 2 | **1/N buy and hold** ◆ | -374.63 | -96.9% | -2.7% | – | – |
+| ledger | `us-googl` | 1 | TradingAgents | -98.77 | -95.9% | -2.5% | +0.00 (p=1.000) | 0.00 |
+| ledger | `us-googl` | 2 | **1/N buy and hold** ◆ | -98.77 | -95.9% | -2.5% | – | – |
 
 Full tables: [leaderboard/LEADERBOARD.md](leaderboard/LEADERBOARD.md).
 <!-- leaderboard:end -->
