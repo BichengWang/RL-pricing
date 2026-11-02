@@ -55,13 +55,13 @@ first run starts after 13:00 UTC). From 11-02 the open is 14:30 UTC.
 | P0.7 | ✅ done | README limitation corrected on 10-25 (P0.20) |
 | P0.8 | ◐ dry run passed | P0.17. First CI run 11-02 06:00 UTC |
 | P0.9 | ◐ | README lab-first. Launch kit (outside the repository) now cites `2026-10.md` and the applied metadata command |
-| P0.10 | ⏳ | Moved to 11-02 (decision 11-01). Medium story `medium.com/p/5185d13cde70` scheduled for 08:00 PT, LinkedIn and X at 08:30 PT; text in the owner's private publisher repository |
+| P0.10 | ◐ posts live | 11-01 PT: [Medium](https://medium.com/@bichengwang17/i-re-ran-my-own-rl-trading-paper-75-times-the-55-return-never-came-back-81b449ec45a5), [LinkedIn](https://www.linkedin.com/feed/update/urn:li:activity:7522905014755971072/), [X thread](https://x.com/BichengW81192/status/2117143600597450774). Show HN, Reddit and the R1/R2 author emails remain |
 | P0.11 | ✅ done | #98: `':(glob)submissions/*/ledger/**'`, staged only when `git status` shows entries. Dispatch run 40218696858 committed `a1e399f` |
 | P0.12 | ✅ done | #98: cron `17 4,7,10 * * 1-5`, checkout `ref: main`. Start times of 3 sessions above; first runs all before 12:00 UTC |
 | P0.13 | ✅ done | #98: an `llm` participant needs the three credentials and `LEDGER_MONTHLY_BUDGET_USD`; the graph and pin check run at construction. Run 40218696858: "LLM ledger preflight requires OPENAI_API_KEY, FRED_API_KEY, SEC_EDGAR_USER_AGENT, LEDGER_MONTHLY_BUDGET_USD", no TradingAgents entry, canary committed |
 | P0.14 | ✅ gate met | Entries 10-23, 10-26, 10-27; runs 40218696858, 40483444401 and 40672930905 all started before their fill's open. Fills 10-26 and 10-27 priced; 10-28 waits for Yahoo's close (`NaN` at 01:05 UTC 10-29) |
 | P0.15 | ✅ done | Addendum 2026-10-29. Recall probe: both Claude models gave no price for any of the 15 stock-sessions. Dry run, decision 10-28: Hold, Hold, Overweight; $1.97 for three stocks, 648 s. Earlier, with the placeholder OpenAI key in `~/my-code/TradingAgents/.env`, the dry run showed that a rejected key wrote `error:` holds that later runs couldn't replace. Construction now retrieves both pinned models from the provider (#105), so a bad key writes nothing |
-| P0.16 | ◐ sent late | 11-01 23:19 UTC, by email to `xyzh@stanford.edu` naming the report folder (`reply.md`). The 10-28 draft was never sent. The email promised no announcement before 11-08; the launch on 11-02 breaks that, so she needs a note from the owner |
+| P0.16 | ◐ sent late | 11-01 23:19 UTC, by email to `xyzh@stanford.edu` naming the report folder (`reply.md`). The 10-28 draft was never sent. The email promised no announcement before 11-08; the launch about seven hours later breaks that, so she needs a note from the owner |
 | P0.17 | ✅ done | All five `live` steps ran in a scratch clone on 10-25; `2026-10.md` rendered (45 strategy-task pairs, 3 tasks). Nothing needed fixing. Local canary entries without a run identity scored as holds, as `ledger.py` documents. Rerun 10-29 with R3's entries: `ledger score` read the cached data, so us-aapl ended at 10-27 while the live tasks reached 10-28 (canary: 2 sessions instead of 3). The job's `ledger score` now passes `--refresh`; otherwise the 11-02 report could miss the 10-30 fill |
 | P0.18 | ✅ done | `rl-pricing` 0.5.0 on PyPI (release `v0.5.0`, 10-23). On 10-25 a clean Python 3.13 venv ran `pip install rl-pricing` and `rl-pricing bench tasks`. 1.0.0 on 10-27: metadata in `pyproject.toml`, semantic versioning from [`CHANGELOG.md`](../CHANGELOG.md), import package still `rl` (decision 10-27) |
 | P0.19 | ✅ done | #97: hashes of the authors' repository at `5dbb44df` (184 files) and Yahoo `^DJI`/DIA; L1 probe (Python 3.7, TF 1.15.4, Stable-Baselines 2.10.1) trained A2C for 5 steps, run 40219347746. **L1 go**, decided 10-25. Sharadar files wait for P0.6 |
@@ -92,10 +92,9 @@ Owner checklist, in order (updated 2026-11-01):
 1. P0.1: set the social preview image by hand (launch kit § Repository
    metadata).
 2. P0.6: ask Sharadar for written confirmation; was due 10-31.
-3. 11-01: send Xinyi Zhang a note that the announcement moved to 11-02 and
-   her reply will still be printed in full. 11-02: posts go out; paste the
-   October report's numbers into the launch kit for Show HN. 11-03: R1 and R2
-   author emails.
+3. 11-02: send Xinyi Zhang a note that the announcement went out on 11-01
+   and her reply will still be printed in full; paste the October report's
+   numbers into the launch kit for Show HN. 11-03: R1 and R2 author emails.
 
 | Date | Step |
 | --- | --- |
@@ -103,8 +102,8 @@ Owner checklist, in order (updated 2026-11-01):
 | 10-26 Mon – 10-28 Wed | Canary fills 10-26, 10-27, 10-28; first-run start times listed (P0.12) |
 | 10-29 Thu | Addendum on `main`, secrets set; first TradingAgents fill (R3: 63 sessions) |
 | 10-30 Fri | Canary at 5 fills, P0.4 closed |
-| 11-02 Mon | CI writes `leaderboard/reports/2026-10.md` |
-| 11-02 Mon | Launch: Medium 08:00 PT, LinkedIn and X 08:30 PT, then Show HN |
+| 11-01 Sun, 22:18–22:40 PT | Launch: LinkedIn post, Medium article, X thread |
+| 11-02 Mon | CI writes `leaderboard/reports/2026-10.md`; Show HN |
 | 11-03 Tue | R1 and R2 author emails; Reddit posts begin |
 
 ## Exit criteria
