@@ -1,0 +1,16 @@
+{
+  "name": "CVaR-PPO",
+  "kind": "rl",
+  "policy": "rl.bench.policies.cvar_ppo:CVaRPPOPolicy",
+  "params": {
+    "timesteps": 200000,
+    "episode_length": 252,
+    "net_arch": [64, 64],
+    "cvar_alpha": 0.8,
+    "cvar_penalty": 1.0
+  },
+  "trials": 5,
+  "authors": ["RL-pricing"],
+  "url": "https://arxiv.org/abs/2502.07393",
+  "description": "PPO (Stable-Baselines3) with the CPPO tail-risk penalty of FinRL-DeepSeek: steps whose estimated episode return falls below the (1 - 0.8) quantile of the rollout lose advantage in proportion to the shortfall, weight 1. Same environment, features and checkpoint selection as the PPO entrant. trials = 5: a 50000-step trial of alpha 0.9, weight 1 plus a declared grid of 4 at 200000 steps (alpha 0.9, 0.8, 0.95 with weight 1; alpha 0.9 with weight 5), compared by mean validation Sharpe over the three ranked tasks and 2 seeds."
+}

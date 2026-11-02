@@ -1,0 +1,14 @@
+{
+  "name": "Behaviour cloning",
+  "kind": "rl",
+  "policy": "rl.bench.policies.offline:BCPolicy",
+  "params": {
+    "steps": 2000,
+    "eval_every": 250,
+    "episodes_per_behaviour": 4
+  },
+  "trials": 5,
+  "authors": ["RL-pricing"],
+  "url": "",
+  "description": "Offline imitation: an MLP with a masked softmax head regresses the target weights logged from the training sessions only, by five built-in strategies (1/N rebalanced, momentum, minimum variance, inverse volatility, trend following) and a Dirichlet-noised copy of each, 4 episodes of 128 sessions each, rewards and fills from the benchmark engine. The checkpoint with the best validation net Sharpe is kept. trials = 5: the default configuration plus a declared grid of 4 (2/4/8 episodes per behaviour, 1000-4000 steps, hidden 64/128), compared by mean validation Sharpe over the three ranked tasks and 2 seeds."
+}
