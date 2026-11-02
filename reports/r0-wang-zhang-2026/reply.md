@@ -17,8 +17,10 @@ because the mail tool used rewrote every link into a redirect. It pointed to:
 - `reports/r0-wang-zhang-2026/report.md` (the draft, with its Reproduce section),
 - `reports/r0-wang-zhang-2026/evidence/` (per-run results, `analyze.py`, `summary.json`).
 
-Earliest publication date: **2026-11-08**, seven days after the notice. The
-email says the report will not be announced before then.
+Seven days after the notice is 2026-11-08, and the email said the report would
+not be announced before then. On 2026-11-01 the owner moved the announcement
+to **2026-11-02**, one day after the notice: a deviation from the seven-day
+rule for this report, disclosed in the launch article.
 
 ## Reply
 

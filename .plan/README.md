@@ -10,7 +10,7 @@ Bicheng Wang. This directory is the source of truth for direction; change
 | [`decisions.md`](decisions.md) | Every direction decision, its date, reason and what would reopen it |
 | [`lab-protocol.md`](lab-protocol.md) | How a reproduction is run, judged and published |
 | [`targets.md`](targets.md) | Which published claims we re-test, scored, with sources |
-| [`phase-0-foundations.md`](phase-0-foundations.md) | 2026-10-15 → 2026-11-08: lab scaffolding, live ledger, launch |
+| [`phase-0-foundations.md`](phase-0-foundations.md) | 2026-10-15 → 2026-11-05: lab scaffolding, live ledger, launch |
 | [`phase-1-first-reports.md`](phase-1-first-reports.md) | 2026-11-06 → 2026-12-31: FinRL ensemble, TradingAgents replication |
 | [`phase-2-live-verdicts.md`](phase-2-live-verdicts.md) | 2027-01-01 → 2027-03-31: TradingAgents live verdict, fourth report, site |
 | [`phase-3-authority.md`](phase-3-authority.md) | 2027-04-01 → 2027-06-30: lab paper, paid audit pilot, community nominations |
@@ -132,7 +132,7 @@ gantt
   R3 first fill, target                  :milestone, 2026-10-23, 0d
   R3 start deadline                      :milestone, 2026-10-30, 0d
   First monthly live report              :milestone, 2026-11-02, 0d
-  Launch                                 :milestone, 2026-11-08, 0d
+  Launch                                 :milestone, 2026-11-02, 0d
   section Phase 1
   R1 FinRL ensemble                      :p1a, 2026-11-06, 25d
   R1 published                           :milestone, 2026-12-01, 0d
