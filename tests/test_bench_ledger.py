@@ -16,7 +16,7 @@ import pytest
 from rl.bench import cli, ledger, leaderboard, monthly, runner
 from rl.bench.data import DATA_ENV, load_task_data
 from rl.bench.engine import simulate
-from rl.bench.market import FIELDS
+from rl.bench.market import FIELDS, MarketData
 from rl.bench.policies import tradingagents as ta
 from rl.bench.policy import Policy
 from rl.bench.submission import Submission
@@ -60,6 +60,16 @@ class Boom(Policy):
 class Oversized(Policy):
     def act(self, view):
         return np.full(len(view.tickers), 0.5)
+
+
+class SectorWeights(Policy):
+    """A weights vector over the nine sector ETFs: three equal sleeves, the rest in cash."""
+
+    def act(self, view):
+        CALLS.append(str(view.date))
+        weights = np.zeros(len(view.tickers))
+        weights[[0, 4, 8]] = 1.0 / 3.0
+        return weights
 
 
 class Idle(Policy):
@@ -396,6 +406,63 @@ def test_budget_comes_from_the_environment(tmp_path, data, monkeypatch):
     monkeypatch.setenv(ledger.BUDGET_ENV, "lots")
     with pytest.raises(ValueError, match=ledger.BUDGET_ENV):
         record(costly, data, [BASE + 3])
+
+
+def nine_sector_panel(data):
+    task = get_task("us-sectors")
+    width = len(task.tickers)
+    arrays = {}
+    for name in FIELDS:
+        array = getattr(data, name)
+        repeats = -(-width // array.shape[1])
+        arrays[name] = np.tile(array, (1, repeats))[:, :width]
+    return MarketData(dates=data.dates.copy(), tickers=task.tickers, **arrays)
+
+
+def test_a_weights_vector_on_us_sectors_records_and_scores(tmp_path, data):
+    task = get_task("us-sectors")
+    panel = nine_sector_panel(data)
+    sub = make_submission(
+        tmp_path / "s", "sectors", "test_bench_ledger:SectorWeights", ledger_tasks=(task.id,)
+    )
+    indices = range(BASE, BASE + 3)
+    paths = record(sub, panel, indices, task=task)
+
+    assert all(load(path)["schema"] == 2 for path in paths)
+    entry = load(paths[0])
+    assert entry["task"] == "us-sectors" and entry["hold"] is False
+    assert set(entry["weights"]) == set(task.tickers)
+    assert sum(entry["weights"].values()) == pytest.approx(1.0)
+
+    push_entries(tmp_path)
+    path = ledger.score_ledger(
+        task, sub, data=panel.rows(0, BASE + 4), out_root=tmp_path / "board",
+        github=honest_github(panel, indices), repository=REPO,
+    )
+    scored = load(path)
+    assert scored["task"] == "us-sectors" and scored["data"]["tickers"] == list(task.tickers)
+    targets = {
+        str(panel.dates[i]): np.array([1 / 3, 0, 0, 0, 1 / 3, 0, 0, 0, 1 / 3])
+        for i in indices
+    }
+    reference = simulate(
+        panel.rows(0, BASE + 4), lambda view: targets.get(str(view.date)),
+        start=BASE + 1, transaction_cost=task.transaction_cost,
+    )
+    assert scored["runs"][0]["equity"] == runner._round(reference.equity)
+    assert scored["runs"][0]["turnover"] == runner._round(reference.turnover)
+
+
+def test_record_all_can_hold_an_entrant_until_its_switch_is_on(tmp_path, data):
+    root = tmp_path / "submissions"
+    kept = make_submission(root, "aaa-kept")
+    held = make_submission(root, "zzz-held")
+    written, failures = ledger.record_all(
+        root, data={"synthetic": data}, now=NOW, exclude=("zzz-held",)
+    )
+    assert not failures
+    assert [path.parents[2].name for path in written] == [kept.id]
+    assert not (held.directory / "ledger").exists()
 
 
 def test_a_decision_without_reported_usage_is_billed_its_reservation(tmp_path, data):

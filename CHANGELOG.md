@@ -39,6 +39,37 @@ change in minor releases.
   FinRL-DeepSeek's released news scores to M2 jsonl
   (`reports/r5-finrl-deepseek/scores.py`) and a reproduce command
   (`reports/r5-finrl-deepseek/reproduce.py`). No R5 result is committed.
+- New ledger entrant `llm-portfolio`: `LLMPortfolioPolicy` in
+  `rl.bench.policies.llm_portfolio` asks the pinned Claude Sonnet 5.5
+  (`claude-sonnet-5-5`) for long-only target weights on the nine
+  `us-sectors` ETFs, through a fixed prompt and strict tool schema. The model
+  rejects non-default sampling parameters and forced tool use, so the request
+  sends no temperature, uses `tool_choice: "auto"`, pins
+  `thinking: "between_tools"` and bounds the rendered prompt to a 20,000-token
+  character budget. Each entry records the model id, prompt and rendered-input
+  SHA-256s, the full response, token usage and cost; the declared worst case is
+  $0.25 per decision. The official `anthropic` SDK is the new `agents` extra,
+  installed only when `LLM_PORTFOLIO_ENABLED` is `true`; the workflow excludes
+  the entrant otherwise and refuses to start it without a committed recall
+  probe.
+- The ledger's LLM preflight requires the names in the policy class's
+  `ledger_env` instead of always requiring `FRED_API_KEY` and
+  `SEC_EDGAR_USER_AGENT`; `TradingAgentsPolicy` keeps both, a price-only policy
+  needs only its provider key.
+- `submission.json` may set `monthly_budget_usd`, a per-entrant monthly cap.
+  The ledger enforces the smaller of it and `LEDGER_MONTHLY_BUDGET_USD` before
+  calling the policy.
+- Ledger policies receive `MarketView.info` when the task or submission
+  declares information sources, filtered to items published strictly before
+  the decision close. A policy that sets `last_cost_usd = None` reports that no
+  provider call was made (a pre-call hold); the ledger then records zero cost
+  instead of the declared reservation. `ledger record` gained
+  `--exclude <id>` (repeatable) so the workflow can hold an entrant until its
+  switch is on.
+- Ledger recording and scoring are covered on a multi-asset task: a weights
+  vector over the nine `us-sectors` ETFs is recorded as a schema 2 entry and
+  scored through the same engine and commit verification as single-asset
+  entries.
 - Five offline and risk-sensitive RL entrants join the ranked tasks:
   behaviour cloning, IQL, CQL, a Decision Transformer
   (`rl.bench.policies.offline`, `iql`, `cql`, `decision_transformer`) and
