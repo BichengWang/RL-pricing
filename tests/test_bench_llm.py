@@ -4,6 +4,7 @@ import dataclasses
 import hashlib
 import importlib.util
 import json
+import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -27,6 +28,7 @@ NEW_YORK = ZoneInfo("America/New_York")
 SCORES = REPO / "reports/r5-finrl-deepseek/scores.py"
 SPEC = importlib.util.spec_from_file_location("r5_scores", SCORES)
 scores = importlib.util.module_from_spec(SPEC)
+sys.modules[SPEC.name] = scores  # dataclasses resolve the defining module through sys.modules
 SPEC.loader.exec_module(scores)
 
 ARM_IDS = tuple("r5-" + arm for arm in (
