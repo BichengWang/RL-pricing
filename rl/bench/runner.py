@@ -11,7 +11,8 @@ Two tracks share one execution model (:func:`rl.bench.engine.simulate`):
   that publication, so it cannot have been tuned or cherry-picked on them.
 
 Every record also carries the equal-weight buy-and-hold benchmark simulated
-identically. Records are the schema-1 JSON documents the leaderboard reads.
+identically. Records are JSON documents the leaderboard reads: schema 2 adds
+``protocol_version`` and the ``code`` identity; schema 1 records stay readable.
 """
 
 from __future__ import annotations
@@ -29,6 +30,7 @@ from pathlib import Path
 
 import numpy as np
 
+from rl import __version__
 from rl.bench.engine import Backtest, simulate
 from rl.bench.info import InfoPanel, historical_contamination, load_task_info, session_close
 from rl.bench.market import MarketData, MarketView, as_day
@@ -39,26 +41,38 @@ from rl.bench.tasks import Task
 
 log = logging.getLogger(__name__)
 
-SCHEMA = 1
+SCHEMA = 2
+PROTOCOL_VERSION = "2"
+READABLE_SCHEMAS = (1, 2)
 LEADERBOARD_DIR = Path("leaderboard")
 STOCHASTIC_SEEDS = {"historical": 5, "live": 3}
 BENCHMARK_NAME = "1/N buy and hold"
 FREEZE_FILE = "freeze.json"
+COHORTS_DIR = "cohorts"
 PUBLICATIONS_FILE = "publications.json"
 _PACKAGES = ("rl-pricing", "numpy", "pandas", "torch", "gymnasium", "stable-baselines3")
 
 
-def build_policy(submission: Submission, task: Task) -> Policy:
-    """Construct the policy, passing the task's fee to policies that take one.
+def policy_params(submission: Submission, task: Task | None = None) -> dict:
+    """Constructor arguments of the submission's policy.
 
-    RL and forecasting policies train against the execution model and need
-    ``transaction_cost``; a submission may still pin its own value.
+    ``max_cost_per_decision_usd`` is a ledger declaration and is passed on only
+    to a policy that accepts it. RL and forecasting policies train against the
+    execution model and need ``transaction_cost``; a submission may still pin
+    its own value.
     """
-    cls = submission.policy_class()
+    parameters = inspect.signature(submission.policy_class()).parameters
     params = dict(submission.params)
-    if "transaction_cost" not in params and "transaction_cost" in inspect.signature(cls).parameters:
+    if "max_cost_per_decision_usd" not in parameters:
+        params.pop("max_cost_per_decision_usd", None)
+    if task is not None and "transaction_cost" not in params and "transaction_cost" in parameters:
         params["transaction_cost"] = task.transaction_cost
-    return cls(**params)
+    return params
+
+
+def build_policy(submission: Submission, task: Task) -> Policy:
+    """Construct the policy, passing the task's fee to policies that take one."""
+    return submission.policy_class()(**policy_params(submission, task))
 
 
 def _seeds(policy: Policy, seeds, track: str) -> list[int]:
@@ -104,6 +118,11 @@ def _versions() -> dict:
         except importlib.metadata.PackageNotFoundError:
             found[name] = None
     return found
+
+
+def code_identity(submission: Submission) -> dict:
+    """Package version, git commit and policy source hash that produced a result."""
+    return {"package_version": __version__, "git_commit": _commit(), "code_sha256": submission.code_sha256()}
 
 
 def _utc(now: dt.datetime | None) -> str:
@@ -178,6 +197,8 @@ def _record(
 ) -> dict:
     return {
         "schema": SCHEMA,
+        "protocol_version": PROTOCOL_VERSION,
+        "code": code_identity(submission),
         "task": task.id,
         "track": track,
         "submission": submission.id,
@@ -271,6 +292,24 @@ def historical_is_current(task: Task, submission: Submission, out_root=LEADERBOA
     return record.get("submission_sha256") == submission.fingerprint()
 
 
+def freeze_is_current(task: Task, submission: Submission, out_root=LEADERBOARD_DIR) -> bool:
+    """Whether the stored freeze was made from this submission as it is now.
+
+    Edits to the shared ``rl.bench`` code do not make a freeze stale: replay
+    reports them as ``code_changed``. A schema-1 freeze stores no fingerprint,
+    so its historical record stands in for it.
+    """
+    marker = submission.frozen_dir(task.id) / FREEZE_FILE
+    if not marker.exists():
+        return False
+    frozen = verify_freeze(marker.parent)
+    if frozen["policy"] != submission.policy or frozen["params"] != submission.params:
+        return False
+    if "submission_sha256" in frozen:
+        return frozen["submission_sha256"] == submission.fingerprint()
+    return not _historical_path(out_root, task, submission).exists() or historical_is_current(task, submission, out_root)
+
+
 def freeze(
     task: Task,
     submission: Submission,
@@ -281,13 +320,23 @@ def freeze(
     force: bool = False,
     refresh: bool = False,
 ) -> Path:
-    """Live track: fit on all available sessions and store the frozen policy."""
+    """Live track: fit on all available sessions and store the frozen policy.
+
+    Replacing an existing freeze (``force``) starts the next cohort: the
+    earlier cohorts move to ``frozen/<task>/cohorts/<n>/`` and keep their
+    own publication and live record.
+    """
     _require_live(task)
     _require_replayable(submission)
     directory = submission.frozen_dir(task.id)
     marker = directory / FREEZE_FILE
+    # Beside frozen/, so a crash cannot leave a stray freeze.json for publish(); a failed fit leaves the old freeze alone.
+    staging = submission.directory / ".freeze-{}.tmp".format(task.id)
+    if _finish_interrupted_freeze(directory, staging):
+        return marker
     if marker.exists() and not force:
         raise FileExistsError("{} is already frozen for {}; pass force=True to replace".format(submission.id, task.id))
+    previous = json.loads(marker.read_text()) if marker.exists() else None  # replaced even if its artifacts are damaged
     data = _data_for(task, data, refresh=refresh)
     if len(data) < 2:
         raise ValueError("Not enough data to freeze {}".format(task.id))
@@ -295,17 +344,24 @@ def freeze(
     validation_start = data.dates[data.index_of(fitted_through - task.validation_length)]
 
     seeds = _seeds(build_policy(submission, task), seeds, "live")
-    if directory.exists():
-        shutil.rmtree(directory)
-    directory.mkdir(parents=True)
+    if (staging / COHORTS_DIR).exists():
+        raise FileExistsError("{} holds archived cohorts without a complete freeze; restore them first".format(staging))
+    if staging.exists():
+        shutil.rmtree(staging)
+    staging.mkdir(parents=True)
     for seed in seeds:
         log.info("Freezing %s on %s: seed %d", submission.id, task.id, seed)
         policy = build_policy(submission, task)
         policy.fit(data, validation_start, seed)
-        seed_dir = directory / "seed{}".format(seed)
+        seed_dir = staging / "seed{}".format(seed)
         seed_dir.mkdir()
         policy.save(seed_dir)
     freeze_record = {
+        "schema": SCHEMA,
+        "protocol_version": PROTOCOL_VERSION,
+        "code": code_identity(submission),
+        "cohort": previous.get("cohort", 1) + 1 if previous else 1,
+        "submission_sha256": submission.fingerprint(),
         "task": task.id,
         "submission": submission.id,
         "policy": submission.policy,
@@ -316,10 +372,43 @@ def freeze(
         "seeds": seeds,
         "data_sha256": data.sha256(),
         "commit": _commit(),
-        "artifacts": _artifact_hashes(directory),
+        "artifacts": _artifact_hashes(staging),
     }
-    _write_json(marker, freeze_record, indent=2, sort_keys=False)
+    _write_json(staging / FREEZE_FILE, freeze_record, indent=2, sort_keys=False)
+    if previous:
+        # Old files go into cohorts/<n>/ inside the live directory, freeze.json last, so that every step can be
+        # repeated after a crash and no state holds the only copy of a cohort in the staging directory.
+        archived = directory / COHORTS_DIR / str(previous.get("cohort", 1))
+        archived.mkdir(parents=True, exist_ok=True)
+        for item in sorted(directory.iterdir(), key=lambda path: path.name == FREEZE_FILE):
+            if item.name != COHORTS_DIR:
+                shutil.move(str(item), archived / item.name)
+        shutil.move(str(directory / COHORTS_DIR), staging / COHORTS_DIR)
+    if directory.exists():
+        shutil.rmtree(directory)
+    directory.parent.mkdir(parents=True, exist_ok=True)
+    staging.rename(directory)
     return marker
+
+
+def _finish_interrupted_freeze(directory: Path, staging: Path) -> bool:
+    """Complete a re-freeze that stopped after archiving the old cohorts; ``True`` if it did.
+
+    Then ``directory`` has no ``freeze.json`` but holds (or already handed to
+    the finished ``staging`` directory) the earlier cohorts. Nothing is deleted
+    except the empty shell of ``directory``.
+    """
+    if (directory / FREEZE_FILE).exists() or not (staging / FREEZE_FILE).exists():
+        return False
+    if not ((directory / COHORTS_DIR).exists() or (staging / COHORTS_DIR).exists()):
+        return False
+    if (directory / COHORTS_DIR).exists():
+        shutil.move(str(directory / COHORTS_DIR), staging / COHORTS_DIR)
+    if directory.exists():
+        shutil.rmtree(directory)
+    staging.rename(directory)
+    log.warning("Completed an interrupted re-freeze of %s", directory)
+    return True
 
 
 def _require_live(task: Task) -> None:
@@ -343,13 +432,15 @@ def _artifact_hashes(directory: Path) -> dict[str, str]:
     return {
         path.relative_to(directory).as_posix(): _sha256_file(path)
         for path in sorted(directory.rglob("*"))
-        if path.is_file() and path.name != FREEZE_FILE
+        if path.is_file() and path.name != FREEZE_FILE and path.relative_to(directory).parts[0] != COHORTS_DIR
     }
 
 
 def verify_freeze(directory: Path) -> dict:
     """Load ``freeze.json`` and check that the stored artifacts are unchanged."""
     freeze_record = json.loads((directory / FREEZE_FILE).read_text())
+    if freeze_record.get("schema", 1) not in READABLE_SCHEMAS:
+        raise ValueError("{} has unsupported schema {!r}".format(directory / FREEZE_FILE, freeze_record["schema"]))
     expected = freeze_record["artifacts"]
     actual = _artifact_hashes(directory)
     problems = sorted(
@@ -390,7 +481,8 @@ def update_live(
             "%s: history through %s differs from the data fitted on (revised prices?)",
             task.id, fitted_through,
         )
-    published = _publication(Path(out_root), submission.id, task.id, directory / FREEZE_FILE)
+    cohort = frozen.get("cohort", 1)
+    published = _publication(Path(out_root), submission.id, task.id, directory / FREEZE_FILE, cohort)
     if published is None:
         log.info("%s on %s: frozen but not yet published", submission.id, task.id)
         return None
@@ -418,15 +510,33 @@ def update_live(
     record = _record(task, submission, "live", data, fit, runs, benchmark)
     if info is not None:
         record["info_sha256"] = info.sha256()
-    return _store(Path(out_root) / "live" / task.id / "{}.json".format(submission.id), record)
+    record["cohort"] = cohort
+    frozen_code = (frozen.get("code") or {}).get("code_sha256")
+    if frozen_code is None:
+        record["code_identity"] = "unrecorded"  # frozen before schema 2: nothing to compare
+    else:
+        record["frozen_code"] = frozen["code"]
+        record["code_changed"] = record["code"]["code_sha256"] != frozen_code
+    return _store(live_path(out_root, task, submission, cohort), record)
 
 
-def _publication(out_root: Path, submission_id: str, task_id: str, marker: Path) -> str | None:
+def live_path(out_root, task: Task, submission: Submission, cohort: int = 1) -> Path:
+    name = submission.id if cohort == 1 else "{}.cohort-{}".format(submission.id, cohort)
+    return Path(out_root) / "live" / task.id / (name + ".json")
+
+
+def _publication_key(submission_id: str, task_id: str, cohort: int) -> str:
+    """``submission/task`` for cohort 1 (the keys already published), ``submission/task/<n>`` after."""
+    key = "{}/{}".format(submission_id, task_id)
+    return key if cohort == 1 else "{}/{}".format(key, cohort)
+
+
+def _publication(out_root: Path, submission_id: str, task_id: str, marker: Path, cohort: int = 1) -> str | None:
     """When this exact freeze was published, or ``None`` if it has not been."""
     path = out_root / PUBLICATIONS_FILE
     if not path.exists():
         return None
-    entry = json.loads(path.read_text()).get("{}/{}".format(submission_id, task_id))
+    entry = json.loads(path.read_text()).get(_publication_key(submission_id, task_id, cohort))
     if entry is None or entry["freeze_sha256"] != _sha256_file(marker):
         return None
     return entry["published_at"]
@@ -444,8 +554,8 @@ def publish(submissions_root, *, out_root=LEADERBOARD_DIR, now: dt.datetime | No
     publications = json.loads(path.read_text()) if path.exists() else {}
     stamped = []
     for marker in sorted(Path(submissions_root).glob("*/frozen/*/{}".format(FREEZE_FILE))):
-        verify_freeze(marker.parent)
-        key = "{}/{}".format(marker.parent.parent.parent.name, marker.parent.name)
+        frozen = verify_freeze(marker.parent)
+        key = _publication_key(marker.parent.parent.parent.name, marker.parent.name, frozen.get("cohort", 1))
         digest = _sha256_file(marker)
         if publications.get(key, {}).get("freeze_sha256") == digest:
             continue

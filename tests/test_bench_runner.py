@@ -3,19 +3,21 @@
 import dataclasses
 import datetime as dt
 import json
+import shutil
+from pathlib import Path
 
 import numpy as np
 import pytest
 
 from rl import cli
-from rl.bench import leaderboard, runner
+from rl.bench import leaderboard, monthly, runner
 from rl.bench.data import load_task_data
 from rl.bench.engine import simulate
 from rl.bench.market import as_day
 from rl.bench.policies.baselines import EqualWeightBuyHold
 from rl.bench.policy import Policy
 from rl.bench.submission import Submission
-from rl.bench.tasks import get_task
+from rl.bench.tasks import TASKS, get_task
 
 TASK = get_task("synthetic")
 LIVE = dataclasses.replace(TASK, id="synthetic-live", live=True)
@@ -84,7 +86,8 @@ def test_evaluate_matches_direct_simulation_and_injects_fee(tilt, data, tmp_path
 
     assert path == tmp_path / "board" / "historical" / "synthetic" / "tilt.json"
     record = json.loads(path.read_text())
-    assert record["schema"] == 1 and record["track"] == "historical"
+    assert record["schema"] == 2 and record["track"] == "historical" and record["protocol_version"] == "2"
+    assert record["code"] == runner.code_identity(tilt) and len(record["code"]["code_sha256"]) == 64
     assert [run["seed"] for run in record["runs"]] == [0, 1, 2, 3, 4]
     assert record["data"]["sha256"] == data.sha256()
     assert set(BUILT_WITH) == {TASK.transaction_cost}
@@ -204,7 +207,7 @@ def test_live_scoring_waits_for_publication_and_starts_after_it(tilt, data, tmp_
     assert publish(tilt, tmp_path, "2019-02-01") == []
     runner.freeze(LIVE, tilt, data=early, force=True, seeds=[7])
     assert runner.update_live(LIVE, tilt, data=data, out_root=tmp_path / "board") is None
-    assert publish(tilt, tmp_path, "2019-03-01") == ["tilt/synthetic-live"]
+    assert publish(tilt, tmp_path, "2019-03-01") == ["tilt/synthetic-live/2"]  # cohort 2 has its own key
     record = json.loads(runner.update_live(LIVE, tilt, data=data, out_root=tmp_path / "board").read_text())
     assert record["dates"][1] == "2019-03-04"
 
@@ -377,3 +380,271 @@ def test_run_all_stale_recomputes_only_records_whose_submission_changed(tmp_path
     # Without --stale every record is recomputed.
     assert cli.main(argv[:4] + argv[5:]) == 0
     assert capsys.readouterr().out.count("Wrote") == 2
+
+
+# --- code identity, cohorts, retirement --------------------------------------------
+
+POLICY = (
+    "import numpy as np\n"
+    "from rl.bench.policy import Policy\n\n"
+    "class Fixed(Policy):\n"
+    "    def act(self, view):\n"
+    "        return np.full(len(view.tickers), 0.5 / len(view.tickers))\n"
+)
+EDITED = POLICY.replace("0.5 /", "0.25 /")  # a different size: no stale bytecode can hide the edit
+
+
+def shipped(tmp_path, source=POLICY, **extra):
+    directory = tmp_path / "submissions" / "fixed"
+    directory.mkdir(parents=True)
+    (directory / "policy.py").write_text(source)
+    spec = {"name": "Fixed", "kind": "other", "policy": "policy.py:Fixed", **extra}
+    (directory / "submission.json").write_text(json.dumps(spec))
+    return directory
+
+
+def downgrade(path, *drop):
+    """Rewrite a schema 2 record or freeze as schema 1 wrote it."""
+    document = json.loads(path.read_text())
+    for key in ("protocol_version", "code", *drop):
+        document.pop(key, None)
+    document["schema"] = 1
+    path.write_text(json.dumps(document, indent=2) + "\n")
+
+
+def test_code_sources_follow_rl_bench_imports_and_nothing_else(tmp_path):
+    local = Submission.load(shipped(tmp_path))
+    assert {"rl/bench/__init__.py", "rl/bench/policy.py", "submissions/fixed/policy.py"} <= set(local.code_sources())
+    builtin = Submission(id="b", name="B", kind="baseline", policy="rl.bench.policies.baselines:EqualWeightBuyHold")
+    sources = builtin.code_sources()
+    assert {"rl/bench/policies/baselines.py", "rl/bench/policies/__init__.py", "rl/bench/policy.py"} <= set(sources)
+    assert not any(name.endswith(("leaderboard.py", "ledger.py", "runner.py")) for name in sources)
+    assert builtin.code_sha256() == builtin.code_sha256() != local.code_sha256()
+
+
+def test_live_replay_on_edited_code_is_marked_and_never_silent(tmp_path, data):
+    directory = shipped(tmp_path)
+    sub = Submission.load(directory)
+    out = tmp_path / "board"
+    marker = runner.freeze(LIVE, sub, data=data.between(None, "2019-01-01"))
+    frozen = json.loads(marker.read_text())
+    assert frozen["schema"] == 2 and frozen["cohort"] == 1 and frozen["code"] == runner.code_identity(sub)
+    publish(sub, tmp_path, frozen["fitted_through"])
+
+    same = json.loads(runner.update_live(LIVE, sub, data=data, out_root=out).read_text())
+    assert same["code_changed"] is False and same["frozen_code"] == frozen["code"] and same["cohort"] == 1
+
+    (directory / "policy.py").write_text(EDITED)
+    edited = json.loads(runner.update_live(LIVE, Submission.load(directory), data=data, out_root=out).read_text())
+    assert edited["code_changed"] is True
+    assert edited["frozen_code"]["code_sha256"] == frozen["code"]["code_sha256"] != edited["code"]["code_sha256"]
+
+    summary = leaderboard.build(out)
+    [row] = [r for s in summary["sections"] for r in s["rows"] if r["id"] == "fixed"]
+    assert row["code_changed"] is True
+    assert "[Fixed](../submissions/fixed/) (code changed)" in leaderboard.render_markdown(summary)
+    assert "(code changed)" in monthly._label(monthly._entry(edited, "2019-12-31"))
+
+
+def test_schema_1_freeze_and_records_replay_and_render_as_before(tmp_path, data):
+    sub = Submission.load(shipped(tmp_path))
+    out = tmp_path / "board"
+    marker = runner.freeze(LIVE, sub, data=data.between(None, "2019-01-01"))
+    downgrade(marker, "cohort", "submission_sha256")
+    publish(sub, tmp_path, "2019-01-01")
+    path = runner.update_live(LIVE, sub, data=data, out_root=out)
+    record = json.loads(path.read_text())
+    assert record["code_identity"] == "unrecorded" and "code_changed" not in record
+    assert runner.freeze_is_current(LIVE, sub, out)  # no fingerprint stored: its historical record decides
+
+    runner.evaluate(LIVE, sub, data=data, out_root=out)
+    assert runner.freeze_is_current(LIVE, sub, out)
+    (sub.directory / "policy.py").write_text(EDITED)
+    assert not runner.freeze_is_current(LIVE, Submission.load(sub.directory), out)
+    (sub.directory / "policy.py").write_text(POLICY)
+
+    before = leaderboard.render_markdown(leaderboard.build(out))
+    entry_before = monthly._public(monthly._entry(record, "2019-12-31"))
+    for stored in out.glob("*/*/*.json"):
+        downgrade(stored, "cohort", "frozen_code", "code_identity", "code_changed", "submission_sha256")
+        assert json.loads(stored.read_text())["schema"] == 1
+    assert leaderboard.render_markdown(leaderboard.build(out)) == before
+    assert monthly._public(monthly._entry(json.loads(path.read_text()), "2019-12-31")) == entry_before
+
+
+def test_a_changed_submission_starts_a_new_cohort_beside_the_old_one(tmp_path, data):
+    directory = shipped(tmp_path)
+    sub = Submission.load(directory)
+    out = tmp_path / "board"
+    marker = runner.freeze(LIVE, sub, data=data.between(None, "2019-01-01"))
+    first = marker.read_bytes()
+    assert runner.freeze_is_current(LIVE, sub, out)
+    assert publish(sub, tmp_path, "2019-01-15") == ["fixed/synthetic-live"]
+    old_record = runner.update_live(LIVE, sub, data=data, out_root=out)
+    assert old_record.name == "fixed.json"
+    old_bytes = old_record.read_bytes()
+
+    (directory / "policy.py").write_text(EDITED)
+    changed = Submission.load(directory)
+    assert not runner.freeze_is_current(LIVE, changed, out)  # a changed definition, not merely changed code
+    later = data.between(None, "2019-02-01")
+    runner.freeze(LIVE, changed, data=later, force=True)
+    second = json.loads(marker.read_text())
+    assert second["cohort"] == 2 and second["fitted_through"] == str(later.dates[-1])
+    assert runner.freeze_is_current(LIVE, changed, out)
+    archived = marker.parent / "cohorts" / "1"
+    assert (archived / "freeze.json").read_bytes() == first and runner.verify_freeze(archived)["cohort"] == 1
+    assert not list(directory.glob(".freeze-*"))
+
+    assert runner.update_live(LIVE, changed, data=data, out_root=out) is None  # cohort 2 is not yet published
+    assert publish(sub, tmp_path, "2019-03-01") == ["fixed/synthetic-live/2"]
+    new_record = runner.update_live(LIVE, changed, data=data, out_root=out)
+    assert new_record.name == "fixed.cohort-2.json" and json.loads(new_record.read_text())["cohort"] == 2
+    assert old_record.read_bytes() == old_bytes  # the first cohort's record is untouched
+    publications = json.loads((out / runner.PUBLICATIONS_FILE).read_text())
+    assert sorted(publications) == ["fixed/synthetic-live", "fixed/synthetic-live/2"]
+
+    summary = leaderboard.build(out)
+    assert sorted(r.get("cohort", 1) for s in summary["sections"] for r in s["rows"] if r["id"] == "fixed") == [1, 2]
+    text = leaderboard.render_markdown(summary)
+    assert "[Fixed](../submissions/fixed/) (cohort 1)" in text and "[Fixed](../submissions/fixed/) (cohort 2)" in text
+    report = monthly.write_monthly_report(out, "2019-12", submissions_root=directory.parent).read_text()
+    assert "Fixed (cohort 1)" in report and "Fixed (cohort 2)" in report
+
+
+def test_freeze_stale_refreezes_only_changed_submissions_and_skips_retired(tmp_path, monkeypatch):
+    monkeypatch.setitem(TASKS, LIVE.id, LIVE)
+    directory = shipped(tmp_path)
+    gone = directory.parent / "gone"
+    gone.mkdir()
+    (gone / "submission.json").write_text(json.dumps({
+        "name": "Gone", "kind": "other", "policy": "test_bench_runner:Concentrated", "retired": "2019-01-01",
+    }))
+    argv = ["bench", "freeze", "--stale", "--task", LIVE.id, "--submissions-root", str(directory.parent),
+            "--out-root", str(tmp_path / "board")]
+    marker = directory / "frozen" / LIVE.id / "freeze.json"
+    assert cli.main(argv) == 0
+    first = marker.read_bytes()
+    assert json.loads(first)["cohort"] == 1 and not (gone / "frozen").exists()
+    assert cli.main(argv) == 0
+    assert marker.read_bytes() == first
+    (directory / "policy.py").write_text(EDITED)
+    assert cli.main(argv) == 0
+    assert json.loads(marker.read_text())["cohort"] == 2
+    assert (marker.parent / "cohorts" / "1" / "freeze.json").read_bytes() == first
+
+
+@pytest.mark.parametrize("bad", ["2019-13-01", "tomorrow", "2019-1-1", 20190101])
+def test_retired_must_be_a_date(tmp_path, bad):
+    with pytest.raises(ValueError, match="retired"):
+        Submission.load(shipped(tmp_path, retired=bad))
+
+
+def test_a_submission_is_retired_the_day_after_its_date():
+    sub = Submission(id="a", name="A", kind="other", policy="m:C", retired="2019-01-01")
+    assert not sub.is_retired(dt.date(2019, 1, 1)) and sub.is_retired(dt.date(2019, 1, 2))
+    assert not Submission(id="b", name="B", kind="other", policy="m:C").is_retired()
+
+
+def test_retired_submissions_leave_the_ranking_but_keep_their_records(board, tmp_path):
+    root = board.parent / "submissions"
+    spec = json.loads((root / "tilt" / "submission.json").read_text())
+    (root / "tilt" / "submission.json").write_text(json.dumps({**spec, "retired": "2019-01-01"}))
+    record_path = board / "historical" / "synthetic" / "tilt.json"
+    kept = record_path.read_bytes()
+
+    summary = leaderboard.write_leaderboard(board, readme=None, submissions_root=root)
+    [section] = summary["sections"]
+    assert sorted(r["id"] for r in section["rows"] if r["id"]) == ["buyhold", "conc"]
+    assert [r["rank"] for r in section["rows"]] == [1, 2, 3]
+    [retired] = summary["retired"]
+    assert (retired["id"], retired["track"], retired["task"], retired["retired"]) == (
+        "tilt", "historical", "synthetic", "2019-01-01",
+    )
+    text = (board / "LEADERBOARD.md").read_text()
+    assert "## Retired" in text and "[Tilt](../submissions/tilt/)" in text.split("## Retired")[1]
+    assert "[Tilt]" not in text.split("## Retired")[0]
+    assert record_path.read_bytes() == kept
+
+    out = board.parent / "again"
+    argv = ["--submissions-root", str(root), "--out-root", str(out)]
+    assert cli.main(["bench", "run-all", "--task", "synthetic", *argv]) == 0
+    assert sorted(p.stem for p in (out / "historical" / "synthetic").glob("*.json")) == ["buyhold", "conc"]
+
+
+@pytest.mark.parametrize("crash", ["archiving the second file", "moving the archive to the new freeze", "the final rename"])
+def test_an_interrupted_refreeze_never_loses_an_archived_cohort(tilt, data, tmp_path, monkeypatch, crash):
+    early, marker = freeze_early(tilt, data)
+    first = marker.read_bytes()
+    publish(tilt, tmp_path, "2019-01-15")
+    changed = Submission(**{**tilt.__dict__, "params": {"invested": 0.5}})
+    later = data.between(None, "2019-02-01")
+
+    real_move, real_rename, calls = shutil.move, Path.rename, []
+
+    def move(source, destination, *args):
+        calls.append(source)
+        if len(calls) == (2 if crash.startswith("archiving") else 5):
+            raise OSError("job cancelled")
+        return real_move(source, destination, *args)
+
+    def rename(self, target):
+        if self.name.startswith(".freeze-"):
+            raise OSError("job cancelled")
+        return real_rename(self, target)
+
+    with monkeypatch.context() as patched:
+        patched.setattr(shutil, "move", move)
+        patched.setattr(Path, "rename", rename)
+        with pytest.raises(OSError, match="cancelled"):
+            runner.freeze(LIVE, changed, data=later, force=True, seeds=[0, 1, 2])
+
+    again = runner.freeze(LIVE, changed, data=later, force=True, seeds=[0, 1, 2])  # the next CI run
+    assert again == marker and json.loads(marker.read_text())["cohort"] == 2
+    archived = marker.parent / "cohorts" / "1"
+    assert (archived / "freeze.json").read_bytes() == first
+    assert runner.verify_freeze(archived)["cohort"] == 1  # every artifact of the old cohort is there
+    assert not list(tilt.directory.glob(".freeze-*"))
+    assert publish(tilt, tmp_path, "2019-03-01") == ["tilt/synthetic-live/2"]
+    assert sorted(json.loads((tmp_path / "board" / runner.PUBLICATIONS_FILE).read_text())) == [
+        "tilt/synthetic-live", "tilt/synthetic-live/2",
+    ]
+
+
+def test_a_staging_directory_holding_cohorts_is_never_wiped(tilt, data):
+    early, marker = freeze_early(tilt, data)
+    staging = tilt.directory / ".freeze-{}.tmp".format(LIVE.id)
+    (staging / "cohorts" / "1").mkdir(parents=True)
+    with pytest.raises(FileExistsError, match="archived cohorts"):
+        runner.freeze(LIVE, tilt, data=early, force=True)
+    assert (staging / "cohorts" / "1").is_dir() and marker.exists()
+
+
+def test_every_record_writer_keeps_the_code_that_scored_it(tmp_path, data):
+    sub = Submission.load(shipped(tmp_path))
+    out = tmp_path / "board"
+    marker = runner.freeze(LIVE, sub, data=data.between(None, "2019-01-01"))
+    publish(sub, tmp_path, "2019-01-01")
+    records = [
+        runner.evaluate(LIVE, sub, data=data, out_root=out),
+        runner.update_live(LIVE, sub, data=data, out_root=out),
+    ]
+    for path in records:
+        record = json.loads(path.read_text())
+        assert record["schema"] == 2 and record["code"] == runner.code_identity(sub), path
+    assert json.loads(marker.read_text())["code"] == runner.code_identity(sub)
+
+
+def test_monthly_report_leaves_out_retired_submissions(tmp_path, data):
+    directory = shipped(tmp_path)
+    sub = Submission.load(directory)
+    out = tmp_path / "board"
+    runner.freeze(LIVE, sub, data=data.between(None, "2019-01-01"))
+    publish(sub, tmp_path, "2019-01-01")
+    runner.update_live(LIVE, sub, data=data, out_root=out)
+    root = directory.parent
+    assert "Fixed" in monthly.write_monthly_report(out, "2019-12", submissions_root=root).read_text()
+    spec = json.loads((directory / "submission.json").read_text())
+    (directory / "submission.json").write_text(json.dumps({**spec, "retired": "2019-06-01"}))
+    text = monthly.write_monthly_report(out, "2019-12", submissions_root=root).read_text()
+    assert "Fixed" not in text and "No sessions scored yet" in text

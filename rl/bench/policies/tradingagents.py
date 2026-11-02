@@ -245,6 +245,9 @@ class TradingAgentsPolicy(Policy):
     #: not seedable, which is why the ledger runs it once per session.
     stochastic: ClassVar[bool] = False
 
+    # $0.694 was the largest decision in the R3 dry run (2026-10-29), rounded up.
+    max_cost_per_decision_usd = 0.70
+
     def __init__(
         self,
         llm_provider: str = "openai",
@@ -374,7 +377,7 @@ class TradingAgentsPolicy(Policy):
         weight = self.rating_weights[rating]
         usage = self.usage.snapshot()
         if not usage and not self._injected:
-            log.warning("No token usage was reported for %s on %s; cost_usd is 0", ticker, day)
+            log.warning("No token usage was reported for %s on %s; the ledger bills max_cost_per_decision_usd", ticker, day)
         self.ledger_inputs = {
             "agent": "TauricResearch/TradingAgents",
             "agent_version": self._agent_version if not self._injected else "injected",

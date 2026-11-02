@@ -193,6 +193,7 @@ def test_add_cli_registers_monthly(board, capsys):
     parser = ArgumentParser()
     common = ArgumentParser(add_help=False)
     common.add_argument("--out-root")
+    common.add_argument("--submissions-root", default="submissions")
     monthly.add_cli(parser.add_subparsers(dest="command"), common)
     options = parser.parse_args(["monthly", "--out-root", str(board), "--month", "2019-03"])
     assert options.handler(options) == 0
