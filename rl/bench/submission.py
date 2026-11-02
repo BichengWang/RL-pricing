@@ -32,8 +32,11 @@ import importlib.util
 import json
 import re
 from dataclasses import dataclass, field
+from datetime import date
 from pathlib import Path
+from urllib.parse import urlparse
 
+from rl.bench.info import validate_sources
 from rl.bench.policy import Policy
 
 KINDS = ("baseline", "rl", "forecast", "llm", "other")
@@ -54,6 +57,9 @@ class Submission:
     description: str = ""
     ledger: tuple[str, ...] = ()
     directory: Path | None = None
+    info_sources: tuple[dict, ...] = ()
+    model_cutoffs: tuple[dict, ...] = ()
+    contamination: str | None = None
 
     def __post_init__(self):
         if not _ID.match(self.id):
@@ -69,12 +75,34 @@ class Submission:
             raise ValueError("ledger must be a list of task ids")
         if len(set(self.ledger)) != len(self.ledger):
             raise ValueError("ledger task ids must be unique")
+        object.__setattr__(self, "info_sources", validate_sources(self.info_sources))
+        if self.contamination not in (None, "possible"):
+            raise ValueError('contamination must be "possible" or omitted')
+        if not isinstance(self.model_cutoffs, (list, tuple)):
+            raise ValueError("model_cutoffs must be a list")
+        models = set()
+        for entry in self.model_cutoffs:
+            if not isinstance(entry, dict) or set(entry) != {"model", "training_cutoff", "source_url"}:
+                raise ValueError("model_cutoffs need model, training_cutoff and source_url")
+            if not isinstance(entry["model"], str) or not entry["model"].strip() or entry["model"] in models:
+                raise ValueError("model_cutoffs need unique nonempty model ids")
+            models.add(entry["model"])
+            cutoff = entry["training_cutoff"]
+            if not isinstance(cutoff, str) or date.fromisoformat(cutoff).isoformat() != cutoff:
+                raise ValueError("training_cutoff must be YYYY-MM-DD")
+            url = urlparse(entry["source_url"])
+            if url.scheme not in ("https", "http") or not url.netloc:
+                raise ValueError("model cutoff source_url must be an HTTP(S) URL")
+        object.__setattr__(self, "model_cutoffs", tuple(dict(entry) for entry in self.model_cutoffs))
 
     @classmethod
     def load(cls, directory) -> Submission:
         directory = Path(directory)
         spec = json.loads((directory / "submission.json").read_text())
-        allowed = {"name", "kind", "policy", "params", "trials", "authors", "url", "description", "ledger"}
+        allowed = {
+            "name", "kind", "policy", "params", "trials", "authors", "url", "description", "ledger",
+            "info_sources", "model_cutoffs", "contamination",
+        }
         unknown = set(spec) - allowed
         if unknown:
             raise ValueError("Unknown submission fields {} in {}".format(sorted(unknown), directory))
@@ -124,6 +152,10 @@ class Submission:
         ``url`` keeps a record current; any other change makes it stale.
         """
         spec = {"name": self.name, "kind": self.kind, "policy": self.policy, "params": self.params, "trials": self.trials}
+        # Preserve fingerprints (and record bytes) for existing declarations.
+        for name in ("info_sources", "model_cutoffs", "contamination"):
+            if getattr(self, name):
+                spec[name] = getattr(self, name)
         digest = hashlib.sha256(json.dumps(spec, sort_keys=True, separators=(",", ":")).encode())
         if self.directory is None:
             return digest.hexdigest()

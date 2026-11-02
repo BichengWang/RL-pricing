@@ -57,7 +57,20 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e ".[test]"
       - name: Validate submissions
-        run: rl-pricing bench validate
+        env:
+          SEC_EDGAR_USER_AGENT: ${{ vars.SEC_EDGAR_USER_AGENT }}
+        run: |
+          rl-pricing bench validate
+          # Lookahead check for each non-LLM submission this pull request adds or changes.
+          # Built-in policies are covered by the pytest suite.
+          git diff --name-only --diff-filter=d "origin/${GITHUB_BASE_REF}...HEAD" -- 'submissions/*/*' |
+            cut -d/ -f2 | sort -u |
+            while read -r id; do
+              if [ -f "submissions/$id/submission.json" ] && [ "$(jq -r .kind "submissions/$id/submission.json")" != llm ]; then
+                echo "$id"
+              fi
+            done |
+            xargs -r -P 4 -I{} rl-pricing bench check-causal --task synthetic --submission {}
       - name: Run baselines on the synthetic task
         run: rl-pricing bench run-all --task synthetic --kind baseline --out-root "$RUNNER_TEMP/board"
       - name: Render leaderboard

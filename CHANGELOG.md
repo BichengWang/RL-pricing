@@ -46,6 +46,20 @@ change in minor releases.
 - `claims.json` accepts `"verdict": null` for a pre-registered claim that has
   not been tested; `rl-pricing bench reports` validates it and leaves it out of
   the verdict tables until a verdict is set.
+- `MarketView.info` gives a policy dated items (filings, news, precomputed
+  scores) published strictly before the decision session's close; it is empty
+  unless a task or submission declares `info_sources`: `sec-edgar` (8-K, 10-Q,
+  10-K by EDGAR acceptance time; needs `SEC_EDGAR_USER_AGENT`) or `jsonl`.
+  Records that read information store `info_sha256`.
+- `model_cutoffs` and `contamination` submission fields. `kind: llm`
+  submissions and any submission with model-produced item fields must declare
+  `model_cutoffs`; a historical test window starting before a declared cutoff
+  is refused unless the record is labelled `contamination: "possible"`, which
+  the leaderboard shows.
+- `rl-pricing bench check-causal --task <t> --submission <id>` runs the policy
+  on truncated windows and on poisoned future prices and items and fails if an
+  earlier decision changes. CI runs it on every non-LLM submission a pull
+  request adds or changes.
 
 ## 1.0.0 (2026-10-27)
 

@@ -8,7 +8,7 @@ step says so in its first paragraph.
 | Level | Question | Setup |
 | --- | --- | --- |
 | L1 replication | Do the authors' own code and setup produce their numbers? | Authors' code at a pinned commit, their data window, their metric definitions. Deviations (missing data, dead APIs) are listed. |
-| L2 robustness | Does the effect survive an honest protocol? | This repository's engine: signal at the close, fill at the next open, proportional fees, at least 5 seeds, declared trials, survivorship-free or explicitly labeled universe, seed-averaged metrics against 1/N and the paper's own baseline. |
+| L2 robustness | Does the effect survive an honest protocol? | This repository's engine: signal at the close, fill at the next open, proportional fees, at least 5 seeds, declared trials, survivorship-free or explicitly labeled universe, seed-averaged metrics against 1/N and the paper's own baseline. A policy sees a dated item (filing, news) at the decision for session *t* only if it was published strictly before that session's close (16:00 New York; 00:00 UTC for crypto); filings use EDGAR's acceptance time. `rl-pricing bench check-causal` tests this for every policy. |
 | L3 generalization | Does it hold outside the original window? | Later or earlier windows, other universes, and for anything that can be run daily, the live decision ledger. |
 
 A claim can hold at L1 and fail at L2. The verdict table shows the level each
@@ -54,8 +54,11 @@ Wording stays neutral: "the claim does not hold under X". We don't say
 ## LLM agents and contamination
 
 - A historical test of an LLM agent counts only if the model's documented
-  training cutoff is before the test window. Otherwise it is reported as
-  "possibly contaminated" and cannot earn ✅.
+  training cutoff is before the test window. Submissions declare it in
+  `model_cutoffs` (also required for any model-produced news score); the
+  runner refuses a window that starts earlier unless the submission is
+  labelled `contamination: "possible"`, and the leaderboard shows the label.
+  Such a result is "possibly contaminated" and cannot earn ✅.
 - Every LLM report includes a recall probe: can the model name the test
   period's prices or events without tools? The method follows ai-hedge-fund
   issue #720.

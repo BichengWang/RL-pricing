@@ -303,10 +303,12 @@ Set `trials` honestly to the number of configurations you tried.
 
 Then:
 
-1. `rl-pricing bench validate` and `rl-pricing bench run --task <task> --submission <id>` locally.
+1. `rl-pricing bench validate`, `rl-pricing bench check-causal --task synthetic --submission <id>` (lookahead
+   check, also run by CI on each non-LLM submission a pull request changes) and
+   `rl-pricing bench run --task <task> --submission <id>` locally.
 2. Open a pull request with `submissions/<id>/` only: CI writes every record
    under `leaderboard/` and rejects pull requests that edit them. It checks
-   that the submission builds and the baselines reproduce.
+   that the submission builds, has no lookahead and the baselines reproduce.
 3. On merge, CI computes your historical records on every task with a live
    track and freezes the policy on today's data (or publishes your committed
    freeze from `rl-pricing bench freeze`); the monthly job scores it live

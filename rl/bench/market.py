@@ -9,10 +9,12 @@ missing. Arrays are read-only so a policy cannot alter the data it is given.
 from __future__ import annotations
 
 import hashlib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
+
+from rl.bench.info import InfoView
 
 FIELDS = ("open", "high", "low", "close", "volume")
 
@@ -152,11 +154,14 @@ class MarketView:
 
     ``history`` ends at the decision session. ``weights`` are the current
     asset weights of the account at that close after price drift, as
-    fractions of equity; the remainder is cash.
+    fractions of equity; the remainder is cash. ``info`` holds the dated items
+    (filings, news) published strictly before this session's close; it is
+    empty unless the task or submission declares ``info_sources``.
     """
 
     history: MarketData
     weights: np.ndarray
+    info: InfoView = field(default_factory=InfoView)
 
     @property
     def date(self) -> np.datetime64:
