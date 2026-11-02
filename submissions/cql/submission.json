@@ -1,0 +1,14 @@
+{
+  "name": "CQL",
+  "kind": "rl",
+  "policy": "rl.bench.policies.cql:CQLPolicy",
+  "params": {
+    "steps": 4000,
+    "eval_every": 500,
+    "episodes_per_behaviour": 8
+  },
+  "trials": 5,
+  "authors": ["RL-pricing"],
+  "url": "https://arxiv.org/abs/2006.04779",
+  "description": "Conservative Q-learning, CQL(H) (Kumar et al. 2020, CORL commit eeeeef2) offline on the training sessions only, logged from the five built-in strategies and their Dirichlet-noised copies, with a Dirichlet actor over the listed assets and cash. Conservative weight 1, gamma 0.99. The checkpoint with the best validation net Sharpe is kept. trials = 5: the default configuration plus a declared grid of 4 (2/4/8 episodes per behaviour, 1000-4000 steps, conservative weight 1/5), compared by mean validation Sharpe over the three ranked tasks and 2 seeds."
+}

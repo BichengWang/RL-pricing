@@ -21,6 +21,14 @@ change in minor releases.
 
 ## Unreleased
 
+- Five offline and risk-sensitive RL entrants join the ranked tasks:
+  behaviour cloning, IQL, CQL, a Decision Transformer
+  (`rl.bench.policies.offline`, `iql`, `cql`, `decision_transformer`) and
+  CVaR-PPO (`rl.bench.policies.cvar_ppo`, PPO from Stable-Baselines3 with the
+  CPPO tail-risk penalty). The offline ones train on engine-logged
+  trajectories of the built-in strategies from the training sessions only;
+  every one keeps its best validation-Sharpe checkpoint and replays exactly
+  from its saved weights.
 - Historical records store `submission_sha256`, a hash of the submission's
   `name`, `kind`, `policy`, `params`, `trials` and shipped files.
   `rl-pricing bench run-all --stale` recomputes only the records whose

@@ -240,6 +240,9 @@ class SB3Policy(Policy):
         self.best_step: Optional[int] = None
         self.best_sharpe: Optional[float] = None
 
+    def _algorithm(self):
+        return ALGORITHMS[self.algo]
+
     def _decide(self, act, input_size: int, view: MarketView) -> np.ndarray:
         features = latest_features(view.history.window(LOOKBACK))
         obs = observation(features, view.weights)
@@ -283,7 +286,7 @@ class SB3Policy(Policy):
             )
         with _single_thread():
             set_random_seed(int(seed))
-            model = ALGORITHMS[self.algo](
+            model = self._algorithm()(
                 "MlpPolicy",
                 env,
                 learning_rate=self.learning_rate,

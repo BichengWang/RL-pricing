@@ -1,0 +1,15 @@
+{
+  "name": "Decision Transformer",
+  "kind": "rl",
+  "policy": "rl.bench.policies.decision_transformer:DecisionTransformerPolicy",
+  "params": {
+    "steps": 4000,
+    "eval_every": 500,
+    "episodes_per_behaviour": 8,
+    "context": 10
+  },
+  "trials": 5,
+  "authors": ["RL-pricing"],
+  "url": "https://arxiv.org/abs/2106.01345",
+  "description": "Decision Transformer (Chen et al. 2021): a two-layer causal transformer over (return-to-go, observation, weights) tokens, context 10 sessions, trained on the training sessions only from the five built-in strategies and their Dirichlet-noised copies. The target return rate (a quantile of the logged episodes' mean reward) and the checkpoint are picked on validation net Sharpe. trials = 5: the default configuration plus a declared grid of 4 (2/4/8 episodes per behaviour, 1000-4000 steps, context 10/20), compared by mean validation Sharpe over the three ranked tasks and 2 seeds."
+}

@@ -1,0 +1,14 @@
+{
+  "name": "IQL",
+  "kind": "rl",
+  "policy": "rl.bench.policies.iql:IQLPolicy",
+  "params": {
+    "steps": 1000,
+    "eval_every": 125,
+    "episodes_per_behaviour": 2
+  },
+  "trials": 5,
+  "authors": ["RL-pricing"],
+  "url": "https://arxiv.org/abs/2110.06169",
+  "description": "Implicit Q-learning (Kostrikov et al. 2021, CORL commit eeeeef2) offline on the training sessions only, logged from the five built-in strategies and their Dirichlet-noised copies, with a Dirichlet actor over the listed assets and cash. Expectile 0.7, beta 3, gamma 0.99. The checkpoint with the best validation net Sharpe is kept. trials = 5: the default configuration plus a declared grid of 4 (2/4/8 episodes per behaviour, 1000-4000 steps, beta 3/10), compared by mean validation Sharpe over the three ranked tasks and 2 seeds."
+}
