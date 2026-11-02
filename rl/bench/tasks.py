@@ -46,6 +46,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from rl.bench.market import as_day
+from rl.bench.info import validate_sources
 
 
 @dataclass(frozen=True)
@@ -64,8 +65,10 @@ class Task:
     #: Whether the task has a live forward-test track (frozen submissions
     #: scored on sessions after their freeze date).
     live: bool = True
+    info_sources: tuple[dict, ...] = ()
 
     def __post_init__(self):
+        object.__setattr__(self, "info_sources", validate_sources(self.info_sources))
         if self.source not in ("yahoo", "binance", "synthetic"):
             raise ValueError("Unknown data source {!r}".format(self.source))
         days = [as_day(d) for d in (self.start, self.validation_start, self.test_start, self.test_end)]

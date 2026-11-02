@@ -38,6 +38,11 @@ def build_parser() -> ArgumentParser:
     run.add_argument("--submission", required=True)
     run.add_argument("--seeds", type=int, help="number of seeds (default: 5 if stochastic, else 1)")
 
+    causal = commands.add_parser("check-causal", parents=[common], help="check truncation and future poisoning")
+    causal.add_argument("--task", required=True, choices=sorted(TASKS))
+    causal.add_argument("--submission", required=True)
+    causal.add_argument("--seed", type=int, default=0, help="fixed fit and decision seed")
+
     run_all = commands.add_parser(
         "run-all",
         parents=[common],
@@ -147,6 +152,21 @@ def _cmd_run(options) -> int:
     submission = _submission(options.submissions_root, options.submission)
     path = runner.evaluate(get_task(options.task), submission, seeds=_seeds(options.seeds), out_root=options.out_root)
     print("Wrote {}".format(path))
+    return 0
+
+
+def _cmd_check_causal(options) -> int:
+    from rl.bench.causal import check_causal
+
+    submission = _submission(options.submissions_root, options.submission)
+    try:
+        cuts = check_causal(get_task(options.task), submission, seed=options.seed)
+    except ValueError as error:
+        print(error, file=sys.stderr)
+        return 1
+    print("{}: truncation and future poisoning passed at {} (seed {})".format(
+        submission.id, ", ".join(cuts), options.seed
+    ))
     return 0
 
 
@@ -282,6 +302,7 @@ _COMMANDS = {
     "tasks": _cmd_tasks,
     "data": _cmd_data,
     "run": _cmd_run,
+    "check-causal": _cmd_check_causal,
     "run-all": _cmd_run_all,
     "freeze": _cmd_freeze,
     "live": _cmd_live,

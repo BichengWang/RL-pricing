@@ -30,7 +30,8 @@ from pathlib import Path
 import numpy as np
 
 from rl.bench.engine import Backtest, simulate
-from rl.bench.market import MarketData, as_day
+from rl.bench.info import InfoPanel, historical_contamination, load_task_info
+from rl.bench.market import MarketData, MarketView, as_day
 from rl.bench.policies.baselines import EqualWeightBuyHold
 from rl.bench.policy import Policy
 from rl.bench.submission import Submission
@@ -133,11 +134,20 @@ def _data_for(task: Task, data: MarketData | None, end=None, refresh: bool = Fal
     return load_task_data(task, end=end, refresh=refresh)
 
 
-def _run(task: Task, policy: Policy, data: MarketData, start: int, seed, fit_history, validation_start) -> Backtest:
+def _run(
+    task: Task, policy: Policy, data: MarketData, start: int, seed, fit_history, validation_start,
+    info: InfoPanel | None = None,
+) -> Backtest:
     if seed is not None:
         policy.fit(fit_history, validation_start, seed)
     policy.reset()
-    return simulate(data, policy.act, start=start, transaction_cost=task.transaction_cost)
+    act = policy.act
+    if info is not None:
+        def act(view):
+            return policy.act(MarketView(
+                view.history, view.weights, info.at_session(view.date, crypto=task.source == "binance")
+            ))
+    return simulate(data, act, start=start, transaction_cost=task.transaction_cost)
 
 
 def _benchmark(task: Task, data: MarketData, history: MarketData, start: int, validation_start) -> Backtest:
@@ -211,6 +221,8 @@ def evaluate(
 ) -> Path:
     """Historical track: fit before ``task.test_start``, trade the test window."""
     _require_replayable(submission)
+    info = load_task_info(task, submission) if task.info_sources or submission.info_sources else None
+    contamination = historical_contamination(submission, task, info or InfoPanel())
     data = _data_for(task, data, end=task.test_end).between(None, task.test_end)
     start = data.index_of(task.test_start)
     history = data.rows(0, start)
@@ -221,12 +233,16 @@ def evaluate(
     for seed in seeds:
         log.info("%s on %s: seed %d", submission.id, task.id, seed)
         runs.append(
-            (seed, _run(task, build_policy(submission, task), data, start, seed, history, validation_start))
+            (seed, _run(task, build_policy(submission, task), data, start, seed, history, validation_start, info))
         )
     benchmark = _benchmark(task, data, history, start, validation_start)
     fit = {"history_end": str(history.dates[-1]), "validation_start": str(validation_start)}
     record = _record(task, submission, "historical", data, fit, runs, benchmark)
     record["submission_sha256"] = submission.fingerprint()
+    if info is not None:
+        record["info_sha256"] = info.sha256()
+    if contamination:
+        record["contamination"] = contamination
     return _store(_historical_path(out_root, task, submission), record)
 
 
@@ -372,11 +388,12 @@ def update_live(
         log.info("%s on %s: no sessions after its publication on %s yet", submission.id, task.id, published)
         return None
     history = data.rows(0, start)
+    info = load_task_info(task, submission, refresh=refresh) if task.info_sources or submission.info_sources else None
     runs = []
     for seed in frozen["seeds"]:
         policy = build_policy(submission, task)
         policy.load(directory / "seed{}".format(seed))
-        runs.append((seed, _run(task, policy, data, start, None, history, None)))
+        runs.append((seed, _run(task, policy, data, start, None, history, None, info)))
     validation_start = as_day(frozen["validation_start"])
     benchmark = _benchmark(task, data, history, start, validation_start)
     fit = {
@@ -387,6 +404,8 @@ def update_live(
         "frozen_data_sha256": frozen["data_sha256"],
     }
     record = _record(task, submission, "live", data, fit, runs, benchmark)
+    if info is not None:
+        record["info_sha256"] = info.sha256()
     return _store(Path(out_root) / "live" / task.id / "{}.json".format(submission.id), record)
 
 

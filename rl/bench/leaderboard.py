@@ -118,6 +118,8 @@ def _analyze_record(record: dict) -> dict:
         "benchmark": False,
         "created": record["created"],
     }
+    if record.get("contamination"):
+        row["contamination"] = record["contamination"]
     keys = per_seed[0].keys()
     stats = {key: _mean_sd([m[key] for m in per_seed]) for key in keys}
     row["sharpe"], row["sharpe_sd"] = stats["sharpe"]
@@ -240,6 +242,8 @@ def _row_cells(row: dict, link_prefix: str | None, ranked: bool = True) -> list[
         name = "**{}** ◆".format(name)
     elif row["id"] and link_prefix is not None:
         name = "[{}]({}/{}/)".format(name, link_prefix, row["id"])
+    if row.get("contamination") == "possible":
+        name += " (contamination: possible)"
     sharpe = _fmt(row["sharpe"], "{:.2f}")
     if row["sharpe"] is not None and math.isfinite(row["sharpe"]) and row.get("seeds", 1) > 1:
         sharpe += " ± {:.2f}".format(row["sharpe_sd"])
