@@ -45,9 +45,9 @@ Recording (:func:`record_decision`)
       monthly cap (the smaller of ``LEDGER_MONTHLY_BUDGET_USD`` and the
       submission's ``monthly_budget_usd``, when set), or the month is already
       at it, nothing is written, so no model is called and the command reports
-      failure. A
-      decision that reports no cost is billed its declared worst case, never
-      zero. Baselines cost nothing and ignore the cap. A policy whose ``act``
+      failure. A decision that reports zero usage is billed its declared worst
+      case; a policy that sets ``last_cost_usd = None`` made no provider call
+      and costs nothing. Baselines cost nothing and ignore the cap. A policy whose ``act``
       raises (or returns weights the engine rejects) yields a hold with reason
       ``"error: ..."``. A policy that cannot even be constructed is an
       infrastructure failure: nothing is written, so the job fails visibly
