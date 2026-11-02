@@ -43,6 +43,8 @@ from torch import nn
 from rl.bench.engine import Decision, simulate
 from rl.bench.features import LOOKBACK, latest_features
 from rl.bench.gym_env import PortfolioEnv, actions_to_weights, observation
+from rl.bench.info import InfoPanel, session_close
+from rl.bench.llm import apply_sentiment, empty_scores, score_panel, update_scores
 from rl.bench.market import MarketData, MarketView
 from rl.bench.policy import Policy
 
@@ -204,6 +206,15 @@ class SB3Policy(Policy):
     transaction_cost :
         Fee rate used for training and validation. The runner must pass the
         task's cost, otherwise the agent trains under the wrong fees.
+    llm_strength :
+        Opt-in strength of the LLM score features (default 0: none). When
+        positive, the two per-asset scores of :mod:`rl.bench.llm` are appended
+        to the observation through the point-in-time rule, and the sentiment
+        score scales the trades it agrees or disagrees with. A session
+        without a fresh score takes the missing defaults (0 and 3).
+    crypto :
+        Whether the task's sessions close at midnight UTC (Binance) instead
+        of the New York close. The runner injects it from the task.
     """
 
     stochastic = True
@@ -219,12 +230,18 @@ class SB3Policy(Policy):
         eval_every: Optional[int] = None,
         algo_kwargs: Optional[dict] = None,
         transaction_cost: float = 0.001,
+        llm_strength: float = 0.0,
+        crypto: bool = False,
     ):
         algo = str(algo).lower()
         if algo not in ALGORITHMS:
             raise ValueError("algo must be one of {}, got {!r}".format(sorted(ALGORITHMS), algo))
         if timesteps < 1:
             raise ValueError("timesteps must be positive")
+        if isinstance(llm_strength, bool) or not isinstance(llm_strength, (int, float)) or llm_strength < 0:
+            raise ValueError("llm_strength must be a nonnegative number")
+        self.llm_strength = float(llm_strength)
+        self.crypto = bool(crypto)
         self.algo = algo
         self.timesteps = int(timesteps)
         self.episode_length = episode_length
@@ -237,14 +254,23 @@ class SB3Policy(Policy):
         self.model = None
         self.actor: Optional[Actor] = None
         self._validation = None
+        self._validation_scores = None
+        self._scores = None
+        self._info_seen = 0
+        self._last_date = None
         self.best_step: Optional[int] = None
         self.best_sharpe: Optional[float] = None
 
     def _algorithm(self):
         return ALGORITHMS[self.algo]
 
-    def _decide(self, act, input_size: int, view: MarketView) -> np.ndarray:
+    def _decide(self, act, input_size: int, view: MarketView, scores=None) -> np.ndarray:
         features = latest_features(view.history.window(LOOKBACK))
+        if self.llm_strength > 0:
+            if scores is None:
+                scores = empty_scores(len(view.tickers))
+                update_scores(scores, view.info, view.tickers, since=self._previous_close(view))
+            features = np.concatenate([features, np.asarray(scores, dtype=float)], axis=-1)
         obs = observation(features, view.weights)
         if obs.shape != (input_size,):
             raise ValueError(
@@ -252,30 +278,53 @@ class SB3Policy(Policy):
                     input_size, obs.shape
                 )
             )
-        return actions_to_weights(act(obs), view.listed)
+        weights = actions_to_weights(act(obs), view.listed)
+        if self.llm_strength > 0:
+            weights = apply_sentiment(weights, view.weights, np.asarray(scores, dtype=float)[:, 0], self.llm_strength)
+        return weights
 
-    def _model_decide(self, model, view: MarketView) -> np.ndarray:
+    def _model_decide(self, model, view: MarketView, scores=None) -> np.ndarray:
         return self._decide(
-            lambda obs: model.predict(obs, deterministic=True)[0], model.observation_space.shape[0], view
+            lambda obs: model.predict(obs, deterministic=True)[0], model.observation_space.shape[0], view, scores
         )
 
     def _validation_sharpe(self, model) -> float:
         """Per-session Sharpe ratio of the deterministic policy on the validation sessions."""
         history, start = self._validation
-        result = simulate(
-            history, lambda view: self._model_decide(model, view), start, self.transaction_cost
-        )
+
+        def act(view):
+            scores = None
+            if self._validation_scores is not None:
+                scores = self._validation_scores[history.index_of(view.date)]
+            return self._model_decide(model, view, scores)
+
+        result = simulate(history, act, start, self.transaction_cost)
         returns = result.returns
         spread = returns.std(ddof=1) if returns.size > 1 else 0.0
         return float(returns.mean() / spread) if spread > 1e-12 else 0.0
 
-    def fit(self, history: MarketData, validation_start: np.datetime64, seed: int) -> None:
+    def fit(
+        self, history: MarketData, validation_start: np.datetime64, seed: int, info: Optional[InfoPanel] = None,
+        crypto: Optional[bool] = None,
+    ) -> None:
         split = history.index_of(validation_start)
         if split < 2:
             raise ValueError("Need at least two sessions before validation_start to train")
-        env = PortfolioEnv(history.rows(0, split), self.transaction_cost, self.episode_length)
+        if crypto is not None:
+            self.crypto = bool(crypto)
+        scores = None
+        if self.llm_strength > 0:
+            if info is None:
+                raise ValueError("llm_strength needs the submission's declared information source")
+            scores = score_panel(info, history.dates, history.tickers, crypto=self.crypto)
+        env = PortfolioEnv(
+            history.rows(0, split), self.transaction_cost, self.episode_length,
+            extra=None if scores is None else scores[:split], sentiment_strength=self.llm_strength,
+        )
         has_validation = split < len(history)
         self._validation = (history, split) if has_validation else None
+        self._validation_scores = scores if has_validation else None
+        self.reset()
         kwargs = dict(self.algo_kwargs)
         if self.algo in _OFF_POLICY:
             kwargs.setdefault("buffer_size", min(self.timesteps, 1_000_000))
@@ -307,13 +356,34 @@ class SB3Policy(Policy):
                 model.learn(self.timesteps)
                 self.best_step, self.best_sharpe = model.num_timesteps, None
         self._validation = None
+        self._validation_scores = None
         self.model = model
         self.actor = Actor.from_model(self.algo, model)
+
+    def reset(self) -> None:
+        self._info_seen = 0
+        self._last_date = None
+
+    def _previous_close(self, view: MarketView):
+        """The previous session's close, or ``None`` when the view has one session."""
+        dates = view.history.dates
+        return session_close(dates[-2], crypto=self.crypto) if len(dates) >= 2 else None
+
+    def _scores_at(self, view: MarketView) -> np.ndarray:
+        """The current session's scores; an older item is not carried forward."""
+        if len(view.info) < self._info_seen or (self._last_date is not None and view.date <= self._last_date):
+            self._info_seen = 0
+        scores = empty_scores(len(view.tickers))
+        update_scores(scores, view.info, view.tickers, start=self._info_seen, since=self._previous_close(view))
+        self._info_seen = len(view.info)
+        self._last_date = view.date
+        return scores
 
     def act(self, view: MarketView) -> Decision:
         if self.actor is None:
             raise RuntimeError("SB3Policy has no model: call fit() or load() first")
-        return self._decide(self.actor, self.actor.input_size, view)
+        scores = self._scores_at(view) if self.llm_strength > 0 else None
+        return self._decide(self.actor, self.actor.input_size, view, scores)
 
     def save(self, directory: Path) -> None:
         if self.actor is None:

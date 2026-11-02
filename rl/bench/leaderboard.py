@@ -66,7 +66,7 @@ _TRACK_INTRO = {
 README_START = "<!-- leaderboard:start -->"
 README_END = "<!-- leaderboard:end -->"
 HEADLINE_ROWS = 3
-REEVALUATIONS = ("paper-2021",)
+REEVALUATIONS = ("paper-2021", "us-ndx80")
 #: The submission whose policy is every record's benchmark; its row is shown
 #: as the benchmark instead of a duplicate synthesized row.
 BENCHMARK_SUBMISSION = "equal-weight-buy-hold"

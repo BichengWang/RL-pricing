@@ -1,0 +1,38 @@
+{
+  "name": "R5 L2 P01 (PPO)",
+  "kind": "llm",
+  "policy": "rl.bench.policies.sb3:SB3Policy",
+  "params": {
+    "algo": "ppo",
+    "timesteps": 200000,
+    "episode_length": 252,
+    "net_arch": [
+      64,
+      64
+    ],
+    "llm_strength": 0.001
+  },
+  "trials": 14,
+  "tasks": [
+    "us-ndx80"
+  ],
+  "authors": [
+    "RL-pricing"
+  ],
+  "url": "https://arxiv.org/abs/2502.07393",
+  "info_sources": [
+    {
+      "source": "jsonl",
+      "path": "../../datasets/r5-finrl-deepseek/deepseek-lagged.jsonl"
+    }
+  ],
+  "model_cutoffs": [
+    {
+      "model": "deepseek-ai/DeepSeek-V3",
+      "training_cutoff": "2024-07-31",
+      "source_url": "https://www.secrss.com/articles/80153"
+    }
+  ],
+  "contamination": "possible",
+  "description": "Registered R5 L2 arm P01: the reference PPO entrant on us-ndx80 with the DeepSeek-V3 scores, lagged alignment (visible from the next session) with sentiment/risk strength s=0.001; the checkpoint with the best 2018 validation Sharpe is tested on 2019-2023. trials = 14 (every registered L2 arm); the task is a survivorship-biased re-evaluation, not a ranked universe."
+}

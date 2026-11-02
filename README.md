@@ -300,7 +300,9 @@ train on sessions before `validation_start`, select on the rest, and set
 `stochastic = True` to be evaluated over several seeds. They also implement
 `save`/`load` so the frozen live version can be restored. See
 [`rl/bench/policies/sb3.py`](rl/bench/policies/sb3.py) for a full example.
-Set `trials` honestly to the number of configurations you tried.
+Set `trials` honestly to the number of configurations you tried. Add
+`"tasks": ["us-ndx80"]` to an entrant that only belongs to one task: it is
+then neither run nor frozen on the others.
 
 Then:
 
@@ -324,6 +326,7 @@ Then:
 | `us-multi-asset` | SPY, QQQ, IWM, EFA, EEM, TLT, IEF, LQD, GLD, VNQ | 2018–2025 | 5 bps | all listed since 2004 |
 | `crypto-majors` | top 10 Binance USDT pairs by Q2-2018 volume | 2023–2025 | 10 bps | chosen before the data starts; BCC and EOS delist mid-sample |
 | `paper-2021` | the 2021 paper's 20 large caps | 2019–2020 | 10 bps | *it is not*: shown as a re-evaluation, not ranked |
+| `us-ndx80` | FinRL-DeepSeek's 80 Nasdaq-100 names Yahoo still serves | 2019–2023 | 10 bps | *it is not*: shown as a re-evaluation, not ranked |
 | `synthetic` | 5 random walks | 2018–2019 | 10 bps | offline demo |
 
 Each task trains before its validation window, selects on validation, and

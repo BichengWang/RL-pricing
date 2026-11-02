@@ -2,7 +2,9 @@
 
 Only an :class:`InfoView` containing already-visible records reaches a policy.
 Model-produced fields use ``{"value": 0.7, "model": "model-revision"}``;
-ordinary numeric fields may be bare numbers. JSONL text hashes cover UTF-8 text.
+ordinary numeric fields may be bare numbers. JSONL text hashes cover UTF-8 text;
+``source_sha256`` anchors source text (licensed news, for example) that is not
+retained in the item.
 """
 
 from __future__ import annotations
@@ -65,6 +67,7 @@ class InfoItem:
     text_sha256: str
     text: str
     fields: Mapping[str, float | ModelField] = field(default_factory=dict)
+    source_sha256: str | None = None
 
     def __post_init__(self):
         for name in ("id", "source"):
@@ -76,6 +79,10 @@ class InfoItem:
             raise ValueError("Information title and text must be strings")
         if self.text_sha256 != hashlib.sha256(self.text.encode("utf-8")).hexdigest():
             raise ValueError("Information text_sha256 does not match text")
+        if self.source_sha256 is not None and (
+            not isinstance(self.source_sha256, str) or not re.fullmatch(r"[0-9a-f]{64}", self.source_sha256)
+        ):
+            raise ValueError("Information source_sha256 must be a lowercase SHA-256 hex digest")
         fields = {}
         for key, value in self.fields.items():
             if not isinstance(key, str) or not key:
@@ -100,6 +107,8 @@ class InfoItem:
                 key: {"value": value.value, "model": value.model} if isinstance(value, ModelField) else value
                 for key, value in self.fields.items()
             }
+        if self.source_sha256 is not None:
+            result["source_sha256"] = self.source_sha256
         return result
 
 
@@ -109,10 +118,16 @@ class InfoView:
 
     _visible: tuple[InfoItem, ...] = ()
 
-    def items(self, ticker=None, since=None) -> tuple[InfoItem, ...]:
+    def __len__(self) -> int:
+        return len(self._visible)
+
+    def items(self, ticker=None, since=None, start=0) -> tuple[InfoItem, ...]:
+        """Visible items from position ``start`` (a sequential policy keeps its place)."""
+        if isinstance(start, bool) or not isinstance(start, int) or not 0 <= start <= len(self._visible):
+            raise ValueError("start must be a position in the visible items")
         since = None if since is None else timestamp(since)
         return tuple(
-            item for item in self._visible
+            item for item in self._visible[start:]
             if (ticker is None or ticker in item.tickers)
             and (since is None or item.published_at >= since)
         )
@@ -130,6 +145,11 @@ class InfoPanel:
             unique[key] = item
         self._items = tuple(sorted(unique.values(), key=lambda i: (i.published_at, i.source, i.id)))
         self._times = tuple(i.published_at for i in self._items)
+
+    @property
+    def items(self) -> tuple[InfoItem, ...]:
+        """Every item, oldest first; only run-owned preprocessing reads this (policies get a view)."""
+        return self._items
 
     def before(self, close) -> InfoView:
         return InfoView(self._items[:bisect_left(self._times, timestamp(close))])
