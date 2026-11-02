@@ -1,9 +1,9 @@
 # R6 pre-registration: a frozen LLM allocates the US sector ETFs, live
 
-Written 2026-11-02, before the first ledger entry. This report was merged to
-`main` in its own pull request (the pre-registration-only PR) before the code it
-governs, as `.plan/lab-protocol.md` requires; that merge commit and this file's
-git commit time are the evidence that the plan came first. The first entry under
+Written 2026-11-02, before the first ledger entry. This report is merged to
+`main` in its own pull request, #123, before the code it governs, as
+`.plan/lab-protocol.md` requires; that merge commit and this file's git commit
+time are the evidence that the plan came first. The first entry under
 `submissions/llm-portfolio/ledger/us-sectors/` must be committed after it. The
 report follows `.plan/lab-protocol.md` and `reports/README.md` and is level
 **L3**: the entrant runs prospectively in the decision ledger. No historical
