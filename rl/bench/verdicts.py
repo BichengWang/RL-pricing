@@ -12,7 +12,9 @@ Every report lives in ``reports/<id>/`` and states its claims in
 ``ours``     our seed-averaged value (number) or ``null`` when not measured
 ``ci95``     ``[low, high]`` 95% interval of ``ours`` or ``null``
 ``level``    ``"L1"`` replication, ``"L2"`` robustness, ``"L3"`` generalization
-``verdict``  ``"holds"``, ``"partly"``, ``"does-not-hold"`` or ``"inconclusive"``
+``verdict``  ``"holds"``, ``"partly"``, ``"does-not-hold"`` or ``"inconclusive"``;
+             ``null`` while the claim is pre-registered and not yet tested (it is
+             validated but has no row in the table)
 ``note``     one-sentence reason (free text)
 
 :func:`load_reports` validates all of them (unknown fields are rejected, errors
@@ -69,7 +71,7 @@ class Claim:
     ours: float | None
     ci95: tuple[float, float] | None
     level: str
-    verdict: str
+    verdict: str | None
     note: str
 
 
@@ -111,8 +113,10 @@ def _parse_claim(entry, index: int, where: str) -> Claim:
         interval = (float(interval[0]), float(interval[1]))
     if entry["level"] not in LEVELS:
         raise ClaimsError("{}: level {!r} is not one of {}".format(label, entry["level"], ", ".join(LEVELS)))
-    if entry["verdict"] not in VERDICTS:
-        raise ClaimsError("{}: verdict {!r} is not one of {}".format(label, entry["verdict"], ", ".join(VERDICTS)))
+    if entry["verdict"] is not None and entry["verdict"] not in VERDICTS:
+        raise ClaimsError(
+            "{}: verdict {!r} is not one of {} or null".format(label, entry["verdict"], ", ".join(VERDICTS))
+        )
     return Claim(
         id=entry["id"],
         quote=entry["quote"],
@@ -178,19 +182,17 @@ def _ours(claim: Claim) -> str:
 def render_table(reports: list[Report], link_prefix: str = "") -> str:
     """The verdict table: ``Report | Claim | Level | Claimed | Ours | Verdict``.
 
-    Rows follow report-id order, then the order of each ``claims.json``.
-    ``link_prefix`` is the path from the document to ``reports/``.
+    Rows follow report-id order, then the order of each ``claims.json``; claims
+    without a verdict yet are left out.  ``link_prefix`` is the path from the
+    document to ``reports/``.
     """
-    if not reports:
-        return "No reports yet."
-    lines = [
-        "| Report | Claim | Level | Claimed | Ours (95% interval) | Verdict |",
-        "| --- | --- | --- | --- | --- | --- |",
-    ]
+    rows = []
     for report in reports:
         link = "[{0}]({1}{0}/report.md)".format(report.id, link_prefix)
         for claim in report.claims:
-            lines.append(
+            if claim.verdict is None:
+                continue
+            rows.append(
                 "| {} | {} | {} | {} | {} | {} |".format(
                     link,
                     _cell("`{}` ({})".format(claim.id, claim.metric)),
@@ -200,6 +202,13 @@ def render_table(reports: list[Report], link_prefix: str = "") -> str:
                     "{} {}".format(VERDICTS[claim.verdict], _LABELS[claim.verdict]),
                 )
             )
+    if not rows:
+        return "No reports yet."
+    lines = [
+        "| Report | Claim | Level | Claimed | Ours (95% interval) | Verdict |",
+        "| --- | --- | --- | --- | --- | --- |",
+        *rows,
+    ]
     legend = "{}.".format(", ".join("{} {}".format(symbol, _LABELS[name]) for name, symbol in VERDICTS.items()))
     rules = "[How a verdict is decided]({}README.md#how-a-verdict-is-decided)".format(link_prefix)
     return "\n".join([*lines, "", "Verdicts: {} {}.".format(legend, rules)])
