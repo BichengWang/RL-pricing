@@ -1,0 +1,33 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "8d7dd58ac079ca7c0c763c52520c686da9b1fab8",
+    "code_sha256": "923284ca293769e3ec335b64568fd532a88d37ab9789494cb813f36752b4c634"
+  },
+  "policy_sha256": "21749b1c4f028caa319fca1031a553e81c424f8b703b3c9b179308dbe89080f2",
+  "submission": "ledger-canary",
+  "task": "us-aapl",
+  "decision_date": "2026-11-02",
+  "weights": null,
+  "hold": true,
+  "reason": null,
+  "cost_usd": 0.0,
+  "reserved_cost_usd": 0.0,
+  "inputs": {
+    "cost_basis": "reservation",
+    "policy": "rl.bench.policies.baselines:EqualWeightBuyHold",
+    "params": {}
+  },
+  "data_sha256": "5bc6d64c47d6bc1ec3baf2137e2791118ab63d3f242443e76e80ae0e4dfde974",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "41631145909",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-03T11:54:24+00:00"
+  },
+  "created_at": "2026-11-03T11:54:24+00:00",
+  "decision_sha256": "6ec45796458a71386c146ee7366388375d33eb185cc4850e7e513fb5e24f9cf5"
+}
