@@ -30,6 +30,9 @@ Three public instruments back every verdict: a causal backtesting benchmark,
 a live track scored only on market data that did not exist when a policy was
 published, and a ledger of decisions committed before each US market open.
 
+In the press: [*Five Years After His Trading-AI Paper, a Bay Area Engineer Put It on Trial*](https://www.sfbayareatimes.com/articles/bicheng-kenneth-wang-rl-pricing-trading-ai-claims),
+SF Bay Area Times, October 2026.
+
 ## Verdicts
 
 <!-- reports:start -->
