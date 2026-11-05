@@ -5,7 +5,6 @@ import gymnasium as gym
 import numpy as np
 import pandas as pd
 from gymnasium import spaces
-from stable_baselines3.common.vec_env import DummyVecEnv
 
 from rl.config import config
 from rl.env.env_stocktrading import panel_arrays
@@ -254,8 +253,3 @@ class StockPortfolioEnv(gym.Env):
         executions = self.save_action_memory().reset_index().rename(columns={"date": "signal_date"})
         executions.insert(1, "fill_date", self.date_memory[1:])
         return executions
-
-    def get_sb_env(self):
-        e = DummyVecEnv([lambda: self])
-        obs = e.reset()
-        return e, obs

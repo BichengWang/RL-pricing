@@ -3,7 +3,6 @@ from copy import deepcopy
 
 import pandas as pd
 
-from rl.config import config
 from rl.marketdata.yahoodownloader import YahooDownloader
 from rl.trade import metrics
 
@@ -69,23 +68,6 @@ def plot_account_values(account_values, save_path=None, title="Backtest"):
     if save_path is not None:
         fig.savefig(save_path, dpi=120)
     return fig
-
-
-def backtest_plot(
-    account_value,
-    baseline_start=config.START_TRADE_DATE,
-    baseline_end=config.END_DATE,
-    baseline_ticker="^DJI",
-    value_col_name="account_value",
-    save_path=None,
-):
-    """Plot an account against a Yahoo Finance benchmark ticker."""
-    baseline_df = get_baseline(ticker=baseline_ticker, start=baseline_start, end=baseline_end)
-    strategy = account_value.rename(columns={value_col_name: "account_value"})
-    frames = {"Strategy": strategy}
-    if not baseline_df.empty:
-        frames[baseline_ticker] = baseline_df[["date", "close"]]
-    return plot_account_values(frames, save_path=save_path)
 
 
 def get_baseline(ticker, start, end):

@@ -152,10 +152,6 @@ def _utc(now: dt.datetime | None) -> str:
     return now.astimezone(dt.timezone.utc).replace(microsecond=0).isoformat()
 
 
-def _day(value) -> str:
-    return str(as_day(value))
-
-
 def _write_json(path: Path, document: dict, **dumps) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(path.name + ".tmp")
