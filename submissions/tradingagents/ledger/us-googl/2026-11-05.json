@@ -1,0 +1,120 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "56209c74d3f2ef1de21b2fddf78ad3305d835dac",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-googl",
+  "decision_date": "2026-11-05",
+  "weights": {
+    "GOOGL": 0.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.6569339999999999,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "GOOGL",
+    "trade_date": "2026-11-05",
+    "signal": "Underweight",
+    "weight": 0.0,
+    "decision_sha256": "75c3f7fe9aed554dc07cd06233f97333615166be548b71a7dbba24d3750d8dfa",
+    "decision_head": "**Rating**: Underweight\n\n**Executive Summary**: Reduce GOOGL to about 60-70% of a standard allocation. Do not exit fully and do not short. Sell the shares you are trimming into relief rallies toward the 288-297 resistance zone rather than at today's oversold ~282.57. Cut further to about 50% if price closes below 277 on above-average volume or the 50-day SMA crosses below the 200-day. Treat 264.45",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 128893,
+        "cached_input": 0,
+        "output": 25476,
+        "calls": 14
+      },
+      "claude-opus-5-5": {
+        "input": 14162,
+        "cached_input": 0,
+        "output": 4387,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "40c6d88245b9c3487c25c897f29d2691ffcf0957698b1781c1f755900c389129",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "42214808715",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-06T12:09:09+00:00"
+  },
+  "created_at": "2026-11-06T12:09:09+00:00",
+  "decision_sha256": "1b2dc103dc45ada6636df5f8219fb53e1ca50707a4e7eb969063b0aca67a70be"
+}

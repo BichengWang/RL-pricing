@@ -1,0 +1,120 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "56209c74d3f2ef1de21b2fddf78ad3305d835dac",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-amzn",
+  "decision_date": "2026-11-05",
+  "weights": {
+    "AMZN": 1.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.6963119999999999,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "AMZN",
+    "trade_date": "2026-11-05",
+    "signal": "Overweight",
+    "weight": 1.0,
+    "decision_sha256": "6d372a9341fd8b4c44a695acd604aab44935591dddd243ee9c1f91a121107f1e",
+    "decision_head": "**Rating**: Overweight\n\n**Executive Summary**: Move AMZN toward a 1.25x overweight in steps. Buy a smaller first tranche now, about 35-40% of the target, in the $255-262 range, and do not chase prices of $265 or more. Add on a retest that holds $253-254 or on a daily close above $273.23. Add the last part only after the next filing shows capex leveling off and cash stabilizing. Place the hard stop",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 137439,
+        "cached_input": 0,
+        "output": 27381,
+        "calls": 14
+      },
+      "claude-opus-5-5": {
+        "input": 14351,
+        "cached_input": 0,
+        "output": 4511,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "053fd1b81761766484e106382c8004a63e1724b31e748e8de6a69112fad60d63",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "42214808715",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-06T12:12:59+00:00"
+  },
+  "created_at": "2026-11-06T12:12:59+00:00",
+  "decision_sha256": "e6e45084661e936dad0c0f68a70ad01caaf930308aa60dcb4deab1503d82a971"
+}
