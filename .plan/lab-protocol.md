@@ -23,9 +23,16 @@ Before the first run, commit `reports/<id>/preregistration.md` containing:
    the verdict (below).
 3. Seeds, costs, data sources with hashes once downloaded, software commits.
 4. The smallest effect the test can detect. Rule of thumb: the standard error of
-   an annualised Sharpe ratio is about √((1 + SR²/2) / years) (Lo, 2002). That
-   is roughly 0.7 over two years and 2.0 over three months. Reports compute it
-   by bootstrap.
+   an annualised Sharpe ratio SR is about √((1 + SR²/(2q)) / years) for q
+   periods a year (Lo, 2002; q = 252 for daily returns, so the SR term barely
+   matters). That is roughly 0.7 over two years and 2.0 over three months.
+   Reports compute it by bootstrap. Until 2026-11-07 this line read
+   √((1 + SR²/2) / years), which puts the annual Sharpe where Lo has the
+   per-period one and overstates the error at high Sharpe ratios (0.65 instead
+   of 0.48 at SR 1.3 over 4.3 years; 8.3 instead of 2.1 at SR 5.6 over three
+   months). The R0, R1, R3 and R6 pre-registrations quote the old form in
+   their smallest-effect sections; no verdict rule uses it, and each report
+   states the corrected figure.
 5. Planned analyses. Anything added later is reported under "Deviations",
    with the reason.
 

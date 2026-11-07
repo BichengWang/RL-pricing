@@ -222,7 +222,8 @@ def benchmark_task() -> dict:
         "annual_return": bench_row["cagr"],
         "max_drawdown": bench_row["max_drawdown"],
         "sharpe_bootstrap_se": stationary_se(bench_returns, ppy),
-        "sharpe_lo_se": math.sqrt((1 + bench_row["sharpe"] ** 2 / 2) / (len(bench_returns) / ppy)),
+        # Lo (2002) with the per-session Sharpe (corrected 2026-11-07; report § Corrections).
+        "sharpe_lo_se": math.sqrt((1 + bench_row["sharpe"] ** 2 / ppy / 2) / (len(bench_returns) / ppy)),
     }
     out["data_sha256"] = sample["data"]["sha256"]
     out["commit"] = sample["commit"]
