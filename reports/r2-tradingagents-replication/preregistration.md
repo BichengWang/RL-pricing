@@ -471,7 +471,8 @@ replaces them with the bootstrap on the agent's own series.
   $SR^2/2$ term takes the daily Sharpe, so the annualised standard error is
   $\sqrt{(1 + SR_{ann}^2/504)/\text{years}}$. That gives **2.03 at SR 0, 2.09 at
   5.60 and 2.16 at 8.21**. Putting the annualised Sharpe into the $SR^2/2$
-  term, as the protocol's rule of thumb and R3 §7 do, gives the same 2.0 at
+  term, as R3 §7 and the protocol's rule of thumb did (the protocol was
+  corrected on 2026-11-07, #138), gives the same 2.0 at
   SR 0 but 8.30 at 5.60 and 11.97 at 8.21, which overstates the uncertainty of
   a high Sharpe from daily data four- to fivefold.
 - **Bootstrap of buy and hold** (block 4, 4,000 resamples, seed 0): standard
