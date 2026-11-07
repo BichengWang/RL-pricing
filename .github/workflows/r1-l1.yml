@@ -39,14 +39,19 @@ jobs:
         run: |
           apt-get update
           apt-get install -y --no-install-recommends build-essential libopenmpi-dev libgl1 libglib2.0-0
-      - name: Download the preregistered authors' revision
+      # A git checkout of the pinned commit, not the API zipball: five
+      # parallel zipball requests all got HTTP 504 (run 42420982142).
+      - name: Check out the preregistered authors' revision
+        uses: actions/checkout@v4
+        with:
+          repository: AI4Finance-Foundation/FinRL-Trading
+          ref: 5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc
+          path: authors
+          persist-credentials: false
+      - name: Record the authors' directory
         run: |
-          curl --fail --location --retry 3 \
-            https://api.github.com/repos/AI4Finance-Foundation/FinRL-Trading/zipball/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc \
-            --output "$RUNNER_TEMP/authors.zip"
-          mkdir "$RUNNER_TEMP/authors"
-          unzip -q "$RUNNER_TEMP/authors.zip" -d "$RUNNER_TEMP/authors"
-          echo "AUTHORS_DIR=$(find "$RUNNER_TEMP/authors" -mindepth 1 -maxdepth 1 -type d)" >> "$GITHUB_ENV"
+          test "$(git -c safe.directory="*" -C authors rev-parse HEAD)" = 5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc
+          echo "AUTHORS_DIR=$GITHUB_WORKSPACE/authors" >> "$GITHUB_ENV"
       - name: Install the authors' Python 3.7 requirements
         working-directory: ${{ runner.temp }}
         run: |
