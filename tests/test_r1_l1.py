@@ -47,11 +47,11 @@ def test_verdict_rules_apply_in_preregistered_order():
     # Interval spans 0 and the claimed gap: inconclusive, even with every run below the level.
     assert l1.verdict(0.2, -0.3, 0.9, 0.2, 0.83, [0.5], 0.8, 1.30) == "inconclusive"
     # Wrong direction and the claimed gap above the interval: does not hold.
-    assert l1.verdict(-0.1, -0.6, 0.4, 0.6, 0.83) == "does_not_hold"
+    assert l1.verdict(-0.1, -0.6, 0.4, 0.6, 0.83) == "does-not-hold"
     # Every run below the level and the level above its interval: does not hold.
-    assert l1.verdict(0.5, 0.1, 0.7, 0.01, 0.83, [0.9, 1.0], 1.1, 1.30) == "does_not_hold"
+    assert l1.verdict(0.5, 0.1, 0.7, 0.01, 0.83, [0.9, 1.0], 1.1, 1.30) == "does-not-hold"
     # Positive and significant, claimed gap above the interval, one run reaches the level.
-    assert l1.verdict(0.5, 0.1, 0.7, 0.01, 0.83, [0.9, 1.4], 1.1, 1.30) == "partly_holds"
+    assert l1.verdict(0.5, 0.1, 0.7, 0.01, 0.83, [0.9, 1.4], 1.1, 1.30) == "partly"
 
 
 def test_holm_is_monotone_and_capped():

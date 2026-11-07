@@ -167,15 +167,15 @@ def bootstrap(R: np.ndarray, b: np.ndarray, sessions: int, block: int, metrics, 
 
 
 def verdict(d_hat, l_d, u_d, p_d, c_d, m_runs=None, u_m=None, c=None) -> str:
-    """§7 rules, applied in order."""
+    """§7 rules, applied in order; names as in ``rl.bench.verdicts``."""
     has_level = c is not None
     if p_d < 0.05 and u_d >= c_d and (not has_level or u_m >= c):
         return "holds"
     if l_d <= 0 < c_d <= u_d:
         return "inconclusive"
     if (d_hat <= 0 and u_d < c_d) or (has_level and all(m < c for m in m_runs) and u_m < c):
-        return "does_not_hold"
-    return "partly_holds"
+        return "does-not-hold"
+    return "partly"
 
 
 def holm(p: dict[str, float]) -> dict[str, float]:
