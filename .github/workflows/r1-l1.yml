@@ -1,0 +1,89 @@
+name: R1 L1 (authors' code)
+
+# Pull requests touching this file run the build smoke (five A2C steps).
+# `workflow_dispatch` with mode `full` runs the authors' unmodified
+# `run_DRL.py` five times in parallel, unseeded as their code is
+# (R1 pre-registration §5.1), and uploads each run's account values.
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "smoke: build and train A2C for 5 steps; full: 5 complete runs of run_DRL.py"
+        type: choice
+        options: [smoke, full]
+        default: smoke
+  pull_request:
+    paths:
+      - ".github/scripts/r1_l1_smoke.py"
+      - ".github/workflows/r1-l1.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  authors-code:
+    runs-on: ubuntu-latest
+    container: python:3.7
+    timeout-minutes: ${{ fromJSON(inputs.mode == 'full' && '355' || '30') }}
+    strategy:
+      fail-fast: false
+      matrix:
+        run: ${{ fromJSON(inputs.mode == 'full' && '[1, 2, 3, 4, 5]' || '[0]') }}
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install system build and MPI libraries
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends build-essential libopenmpi-dev libgl1 libglib2.0-0
+      - name: Download the preregistered authors' revision
+        run: |
+          curl --fail --location --retry 3 \
+            https://api.github.com/repos/AI4Finance-Foundation/FinRL-Trading/zipball/5dbb44dfcb8a01a94762dc44fca2bcb2c626d1dc \
+            --output "$RUNNER_TEMP/authors.zip"
+          mkdir "$RUNNER_TEMP/authors"
+          unzip -q "$RUNNER_TEMP/authors.zip" -d "$RUNNER_TEMP/authors"
+          echo "AUTHORS_DIR=$(find "$RUNNER_TEMP/authors" -mindepth 1 -maxdepth 1 -type d)" >> "$GITHUB_ENV"
+      - name: Install the authors' Python 3.7 requirements
+        working-directory: ${{ runner.temp }}
+        run: |
+          sed 's/^stable-baselines\[mpi\]$/stable-baselines[mpi]==2.10.1/' \
+            "$AUTHORS_DIR/requirements.txt" > "$RUNNER_TEMP/requirements.txt"
+          printf 'protobuf==3.20.3\n' > "$RUNNER_TEMP/constraints.txt"
+          python -m pip install --upgrade 'pip<24.1'
+          python -m pip install --constraint "$RUNNER_TEMP/constraints.txt" \
+            -r "$RUNNER_TEMP/requirements.txt"
+      - name: Import dependencies and build the authors' training entry point
+        if: matrix.run == 0
+        working-directory: ${{ env.AUTHORS_DIR }}
+        run: |
+          python -c 'import gym, stable_baselines, tensorflow; print("gym", gym.__version__, "stable-baselines", stable_baselines.__version__, "tensorflow", tensorflow.__version__)'
+          python "$GITHUB_WORKSPACE/.github/scripts/r1_l1_smoke.py"
+      - name: Run the authors' run_DRL.py unmodified
+        if: matrix.run != 0
+        working-directory: ${{ env.AUTHORS_DIR }}
+        run: |
+          set -o pipefail
+          echo "1969cdec86154daa57df8cafb027defe85693adbaa1883928922780a86052372  done_data.csv" | sha256sum --check
+          out="$RUNNER_TEMP/l1-run-${{ matrix.run }}"
+          mkdir -p "$out"
+          python -m pip freeze > "$out/pip-freeze.txt"
+          { echo "run: ${{ matrix.run }}"; python --version; uname -m; nproc; head -1 /proc/meminfo;
+            echo "started_utc: $(date -u +%FT%TZ)"; } > "$out/environment.txt"
+          python run_DRL.py 2>&1 | tee "$out/run_DRL.log"
+          echo "finished_utc: $(date -u +%FT%TZ)" >> "$out/environment.txt"
+          # Account values only. last_state_*.csv holds the vendor prices of
+          # the state vector and stays out of the artifact.
+          cp results/account_value_trade_ensemble_*.csv results/account_value_validation_*.csv "$out/"
+          echo "L1_OUT=$out" >> "$GITHUB_ENV"
+      - name: Upload the run's account values and log
+        if: matrix.run != 0
+        uses: actions/upload-artifact@v4
+        with:
+          name: r1-l1-run-${{ matrix.run }}
+          path: ${{ env.L1_OUT }}
+          retention-days: 90
+          if-no-files-found: error
