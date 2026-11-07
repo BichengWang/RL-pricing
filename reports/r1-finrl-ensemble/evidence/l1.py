@@ -167,15 +167,15 @@ def bootstrap(R: np.ndarray, b: np.ndarray, sessions: int, block: int, metrics, 
 
 
 def verdict(d_hat, l_d, u_d, p_d, c_d, m_runs=None, u_m=None, c=None) -> str:
-    """§7 rules, applied in order."""
+    """§7 rules, applied in order; names as in ``rl.bench.verdicts``."""
     has_level = c is not None
     if p_d < 0.05 and u_d >= c_d and (not has_level or u_m >= c):
         return "holds"
     if l_d <= 0 < c_d <= u_d:
         return "inconclusive"
     if (d_hat <= 0 and u_d < c_d) or (has_level and all(m < c for m in m_runs) and u_m < c):
-        return "does_not_hold"
-    return "partly_holds"
+        return "does-not-hold"
+    return "partly"
 
 
 def holm(p: dict[str, float]) -> dict[str, float]:
@@ -210,6 +210,30 @@ def picks(run_dir: Path, u: np.ndarray) -> list[str]:
     return out
 
 
+def update_claims(path: Path, claims: dict) -> None:
+    """Write the L1 results into ``claims.json`` (level where there is one, else gap)."""
+    entries = json.loads(path.read_text())
+    for entry in entries:
+        result = claims.get(entry["id"])
+        if result is None:
+            continue
+        g, lv = result["gap"], result.get("level")
+        shown = lv if lv is not None else g
+        if lv is None:
+            entry["claimed"] = round(g["claimed"], 4)
+        entry["ours"] = round(shown["estimate"], 4)
+        entry["ci95"] = [round(x, 4) for x in shown["ci95"]]
+        entry["verdict"] = result["verdict"]
+        runs = ", ".join(f"{x:.3f}" for x in result["per_run"])
+        entry["note"] = (
+            f"L1, the authors' code, 5 unseeded runs ({runs}); gap to the DJIA "
+            f"{g['estimate']:+.3f} [{g['ci95'][0]:+.3f}, {g['ci95'][1]:+.3f}] against "
+            f"{g['claimed']:+.3f} claimed, one-sided p {g['p_one_sided']:.4f} "
+            f"(Holm {g['p_holm']:.4f}); preregistration §7 with addendum 2026-11-07."
+        )
+    path.write_text(json.dumps(entries, indent=2, ensure_ascii=False) + "\n")
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("runs", type=Path, help="directory holding r1-l1-run-<n>/ artifacts")
@@ -217,6 +241,7 @@ def main(argv=None) -> int:
     ap.add_argument("--workflow-run", type=int, action="append", default=[],
                     help="Actions run id(s) the artifacts came from")
     ap.add_argument("--out", type=Path, default=OUT)
+    ap.add_argument("--claims", type=Path, help="fill this claims.json's L1 rows")
     args = ap.parse_args(argv)
 
     inputs = check_inputs(args.authors)
@@ -330,6 +355,8 @@ def main(argv=None) -> int:
     (args.out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     runs.index.name = "date"
     runs.to_csv(args.out / "account_values.csv", float_format="%.6f")
+    if args.claims:
+        update_claims(args.claims, claims)
     for cid, e in claims.items():
         g = e["gap"]
         print(f"{cid:28s} gap {g['estimate']:+.3f} [{g['ci95'][0]:+.3f}, {g['ci95'][1]:+.3f}] "
