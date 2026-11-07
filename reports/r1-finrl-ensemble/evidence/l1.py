@@ -61,6 +61,38 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+DTB3_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTB3&cosd=2008-12-01&coed=2025-12-31"
+
+
+def dtb3(refresh: bool = False) -> tuple[pd.Series, dict]:
+    """FRED DTB3, the 3-month T-bill rate in percent, by date (cached)."""
+    path = ROOT / ".cache" / "r1-finrl-ensemble" / "fred-DTB3.csv"
+    if refresh or not path.exists():
+        import urllib.request
+
+        # Python's default User-Agent: FRED drops connections from unrecognised ones.
+        with urllib.request.urlopen(DTB3_URL, timeout=90) as response:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(response.read())
+    frame = pd.read_csv(path)
+    rate = pd.to_numeric(frame.iloc[:, 1], errors="coerce")  # FRED writes "." for holidays
+    series = pd.Series(rate.to_numpy(), index=frame.iloc[:, 0].str.replace("-", "").astype(int)).dropna()
+    return series, {"url": DTB3_URL, "sha256": sha256(path)}
+
+
+def excess_sharpe(values: np.ndarray, dates, rate: pd.Series, spans=None) -> np.ndarray:
+    """Secondary Sharpe (§6): returns minus DTB3 known at the previous value date.
+
+    The annual rate accrues per session (``/252``), times ``spans`` sessions for
+    returns that span more than one (L1's seams).
+    """
+    dates = np.asarray(dates)
+    known = rate.reindex(rate.index.union(dates)).ffill().reindex(dates[:-1]).to_numpy()
+    rf = known / 100.0 / PPY * (1.0 if spans is None else np.asarray(spans, dtype=float))
+    excess = values[..., 1:] / values[..., :-1] - 1.0 - rf
+    return math.sqrt(PPY) * excess.mean(axis=-1) / excess.std(axis=-1, ddof=1)
+
+
 def check_inputs(authors: Path) -> dict:
     manifest = json.loads((HERE / "hashes.json").read_text())
     files = next(e["files"] for e in manifest["authors_repository"] if "files" in e)
@@ -327,6 +359,14 @@ def main(argv=None) -> int:
             for j, name in enumerate(window.columns)
         },
         "sharpe_of_run_averaged_returns": float(path_metrics(R.mean(axis=0), sessions)["sharpe"]),
+    }
+    rate, rate_meta = dtb3()
+    position = {int(d): k for k, d in enumerate(u)}
+    spans = np.diff([position[int(d)] for d in window.index])
+    secondary["sharpe_excess_dtb3"] = {
+        "ensemble_run_mean": float(excess_sharpe(V, window.index, rate, spans).mean()),
+        "djia": float(excess_sharpe(bv, window.index, rate, spans)),
+        "source": rate_meta,
     }
 
     envs = {}
