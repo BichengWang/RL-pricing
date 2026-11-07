@@ -15,6 +15,25 @@ submissions need.
 | P1.7 | R4 gate: AlphaMix+ versus RD-Agent(Q). Check data licence and do a compute probe for each | agent; owner decides | – | Decision in `decisions.md` by **2026-12-15** |
 | P1.8 | Issue templates: "Nominate a claim" (shipped in #87), "Submit a policy" | agent | – | Templates live; first nomination scored with the rubric |
 
+## Status (2026-11-07)
+
+| ID | State | Evidence and gap |
+| --- | --- | --- |
+| P1.1 | ◐ L1 running; L2/L3 wait for data | L1 choices fixed in [`addendum-2026-11-07.md`](../reports/r1-finrl-ensemble/addendum-2026-11-07.md) (#131) before any run; workflow mode `full` (#130); scorer `evidence/l1.py` (#132). Five runs of the authors' unmodified `run_DRL.py` started 22:31 UTC (Actions run 42420982142, commit `25e03bc`). §12 code is merged, so L2 needs only the Sharadar extract (P0.6, owner): about 4.5 hours for arms A and B at seeds 0–4 on the laptop, 11–12 hours for all 25 runs. **Data must be local by 11-19** to draft on 11-24 |
+| P1.2 | not started | Due 12-01. The paper's models are OpenAI's and no OpenAI key is available (decision 2026-10-29); the pre-registration needs the owner's choice of models and an API budget (about $0.65 per ticker-session on Claude, so about $120 for 61 sessions × 3 tickers per model) |
+| P1.3 | CI | 12-02 06:00 UTC. First month with the five M3 entrants, published on all three live tasks |
+| P1.5 | ✅ | – |
+| P1.6 | ✅ done by M1 (#117) | Records carry `protocol_version: "2"` (schema 1 still read); a submission with a `retired` date leaves the ranking and its records are listed apart (`rl/bench/leaderboard.py`) |
+| P1.7 | not started | Due 12-15 |
+| P1.8 | ◐ | "Submit a policy" template added 11-07; labels `nomination` and `submission` created 11-07 (the nomination template's label had not existed, so earlier issues carry none). No nomination yet |
+
+Carried over from Phase 0, owner: P0.6 Sharadar confirmation and purchase
+(now on R1's critical path); P0.1 social preview; P0.10 Show HN, Reddit and the
+R1/R2 author heads-up emails; R0's seven days end 11-08, then `reply.md`
+records the reply or "no reply by 2026-11-08". From v2: M5 waits for the R6
+recall probe with a real key and `LLM_PORTFOLIO_ENABLED`; M4's L1 go/no-go
+(11-24) needs a 128 GB host.
+
 ## Exit criteria
 
 - R1 published on 2026-12-01 with the authors' reply or a dated "no reply".
