@@ -436,7 +436,7 @@
    "max_drawdown": -0.29429468207612086,
    "sharpe": 1.1107804722134151,
    "sharpe_bootstrap_se": 0.6872877200422223,
-   "sharpe_lo_se": 0.8982524182040764
+   "sharpe_lo_se": 0.7072704702422432
   },
   "section": {
    "first": "2019-01-02",
@@ -456,7 +456,7 @@
  "detectability": {
   "one_sided_5pct_threshold": 1.1305882994694556,
   "sharpe_se_bootstrap": 0.6872877200422223,
-  "sharpe_se_lo2002": 0.8982524182040764,
+  "sharpe_se_lo2002": 0.7072704702422432,
   "years": 2.003968253968254
  },
  "lstm": {

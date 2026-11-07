@@ -106,7 +106,7 @@ Quoted verbatim, with table and page, in
   daily account values in [E]; setup C uses [B].
 - **Smallest detectable effect**: the bootstrap standard error of the
   annualised Sharpe ratio over these 505 sessions is 0.69 (Lo's formula:
-  0.90) ([sum] `detectability`). A one-sided 5% test needs about 1.13. The
+  0.71; 0.90 before the correction of 2026-11-07) ([sum] `detectability`). A one-sided 5% test needs about 1.13. The
   claimed edge of the best agent over 1/N (1.38 vs 1.10, a difference of 0.28)
   is far below this: the window cannot confirm or reject a Sharpe advantage of
   that size, so rule 1 (no seed reaches the claimed value) is the only way a
@@ -332,7 +332,13 @@ above are the uncorrected ones.
 
 ## Corrections
 
-None yet.
+- **2026-11-07, smallest detectable effect.** "Lo's formula: 0.90" was
+  computed with the annual Sharpe ratio of 1/N (1.11) in the term where Lo
+  (2002) uses the per-session one; the correct value is 0.71 (`analyze.py`
+  and `evidence/summary.json` fixed). The same form is in this report's
+  pre-registration and in `.plan/lab-protocol.md`, now corrected there. The
+  bootstrap standard error (0.69), the 1.13 threshold derived from it and
+  every verdict are unchanged. Found while drafting the R2 pre-registration.
 
 ## Reproduce
 
