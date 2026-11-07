@@ -1,7 +1,8 @@
 # RL-pricing plan: the reproducibility lab for trading AI
 
 Status: 2026-11-07; Phase 1 status in
-[`phase-1-first-reports.md`](phase-1-first-reports.md#status-2026-11-07). Owner:
+[`phase-1-first-reports.md`](phase-1-first-reports.md#status-2026-11-07), open
+owner decisions in its [table](phase-1-first-reports.md#owner-decisions). Owner:
 Bicheng Wang. This directory is the source of truth for direction; change
 [`decisions.md`](decisions.md) first when direction changes.
 
