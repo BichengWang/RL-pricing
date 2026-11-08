@@ -24,12 +24,17 @@ import numpy as np
 from rl.trade import metrics as _m
 
 __all__ = [
+    "MIN_SHARPE_SESSIONS",
     "annualised_sharpe",
     "deflated_sharpe",
     "metrics",
     "probabilistic_sharpe",
     "sharpe_difference",
 ]
+
+#: Live and ledger results report Sharpe ratios and other annualised or
+#: inferential statistics only from this many scored sessions.
+MIN_SHARPE_SESSIONS = 20
 
 _NORMAL = NormalDist()
 _EULER_GAMMA = 0.5772156649015329

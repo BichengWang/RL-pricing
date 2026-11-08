@@ -30,6 +30,7 @@ import numpy as np
 
 from rl.bench import scoring
 from rl.bench.runner import READABLE_SCHEMAS
+from rl.bench.scoring import MIN_SHARPE_SESSIONS
 from rl.bench.submission import SUBMISSIONS_DIR, discover
 from rl.bench.tasks import TASKS
 
@@ -37,8 +38,6 @@ log = logging.getLogger(__name__)
 
 TRACKS = ("live", "ledger")
 REPORTS_DIR = "reports"
-#: Sharpe ratios are only reported from this many scored sessions.
-MIN_SHARPE_SESSIONS = 20
 _MONTH = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 
 
