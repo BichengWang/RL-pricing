@@ -117,103 +117,103 @@ Policies frozen, then published at the date shown and scored on the sessions aft
 
 2026-10-15 to 2026-11-01 (18 sessions) · fee 0.1% per side · BTCUSDT, ETHUSDT, BNBUSDT, EOSUSDT, BCCUSDT, NEOUSDT, ADAUSDT, LTCUSDT, XRPUSDT, ONTUSDT
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [Cash](../submissions/cash/) | baseline | – | 0.0% | – | 0.0% | – | 0.00 | – | – | – | 1 |
-| 2 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | – | -2.8% | – | -5.4% | – | 0.09 | – | – | – | 3 |
-| 3 | [Minimum variance](../submissions/minimum-variance/) | baseline | – | -3.6% | – | -7.2% | – | 0.88 | – | – | – | 1 |
-| 4 | [Momentum (top 3)](../submissions/momentum/) | baseline | – | -4.3% | – | -7.6% | – | 0.77 | – | – | – | 1 |
-| 5 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | – | -5.2% | – | -7.3% | – | 0.71 | – | – | – | 1 |
-| 6 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | – | -7.6% | – | -9.9% | – | 0.96 | – | – | – | 1 |
-| 7 | [PPO](../submissions/ppo/) | rl | – | -7.8% | – | -9.3% | – | 0.84 | – | – | – | 3 |
-| 8 | [DDPG](../submissions/ddpg/) | rl | – | -7.8% | – | -9.2% | – | 0.69 | – | – | – | 3 |
-| 9 | [A2C](../submissions/a2c/) | rl | – | -8.0% | – | -9.7% | – | 0.88 | – | – | – | 3 |
-| 10 | [SAC](../submissions/sac/) | rl | – | -8.1% | – | -10.0% | – | 0.90 | – | – | – | 3 |
-| 11 | [TD3](../submissions/td3/) | rl | – | -8.5% | – | -10.2% | – | 0.89 | – | – | – | 3 |
-| 12 | **1/N buy and hold** ◆ | baseline | – | -9.0% | – | -10.9% | – | 1.00 | – | – | – | – |
-| 13 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | – | -9.0% | – | -10.9% | – | 1.00 | – | – | – | 1 |
+| 1 | [Cash](../submissions/cash/) | baseline | – | 0.0% | – | 0.0% | – | – | – | – | – | 1 |
+| 2 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | – | -2.8% | – | -5.4% | – | – | – | – | – | 3 |
+| 3 | [Minimum variance](../submissions/minimum-variance/) | baseline | – | -3.6% | – | -7.2% | – | – | – | – | – | 1 |
+| 4 | [Momentum (top 3)](../submissions/momentum/) | baseline | – | -4.3% | – | -7.6% | – | – | – | – | – | 1 |
+| 5 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | – | -5.2% | – | -7.3% | – | – | – | – | – | 1 |
+| 6 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | – | -7.6% | – | -9.9% | – | – | – | – | – | 1 |
+| 7 | [PPO](../submissions/ppo/) | rl | – | -7.8% | – | -9.3% | – | – | – | – | – | 3 |
+| 8 | [DDPG](../submissions/ddpg/) | rl | – | -7.8% | – | -9.2% | – | – | – | – | – | 3 |
+| 9 | [A2C](../submissions/a2c/) | rl | – | -8.0% | – | -9.7% | – | – | – | – | – | 3 |
+| 10 | [SAC](../submissions/sac/) | rl | – | -8.1% | – | -10.0% | – | – | – | – | – | 3 |
+| 11 | [TD3](../submissions/td3/) | rl | – | -8.5% | – | -10.2% | – | – | – | – | – | 3 |
+| 12 | **1/N buy and hold** ◆ | baseline | – | -9.0% | – | -10.9% | – | – | – | – | – | – |
+| 12 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | – | -9.0% | – | -10.9% | – | – | – | – | – | 1 |
 
 ### Crypto majors (published 2026-10-16) — `crypto-majors`
 
 2026-10-17 to 2026-11-01 (16 sessions) · fee 0.1% per side · BTCUSDT, ETHUSDT, BNBUSDT, EOSUSDT, BCCUSDT, NEOUSDT, ADAUSDT, LTCUSDT, XRPUSDT, ONTUSDT
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | – | -6.7% | – | -8.8% | – | 0.78 | – | – | – | 3 |
-| 2 | [SAC (tuned)](../submissions/sac-tuned/) | rl | – | -8.2% | – | -10.4% | – | 0.87 | – | – | – | 3 |
+| 1 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | – | -6.7% | – | -8.8% | – | – | – | – | – | 3 |
+| 2 | [SAC (tuned)](../submissions/sac-tuned/) | rl | – | -8.2% | – | -10.4% | – | – | – | – | – | 3 |
 | 3 | **1/N buy and hold** ◆ | benchmark | – | -8.2% | – | -10.9% | – | – | – | – | – | – |
 
 ### US multi-asset allocation (published 2026-10-14) — `us-multi-asset`
 
 2026-10-15 to 2026-10-30 (12 sessions) · fee 0.05% per side · SPY, QQQ, IWM, EFA, EEM, TLT, IEF, LQD, GLD, VNQ
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [Minimum variance](../submissions/minimum-variance/) | baseline | – | 1.1% | – | -0.6% | – | -0.28 | – | – | – | 1 |
-| 2 | [TD3](../submissions/td3/) | rl | – | 0.4% | – | -0.9% | – | 0.73 | – | – | – | 3 |
-| 3 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | – | 0.2% | – | -0.7% | – | 0.58 | – | – | – | 1 |
-| 4 | [Cash](../submissions/cash/) | baseline | – | 0.0% | – | 0.0% | – | 0.00 | – | – | – | 1 |
-| 5 | [DDPG](../submissions/ddpg/) | rl | – | -0.2% | – | -1.5% | – | 0.84 | – | – | – | 3 |
-| 6 | **1/N buy and hold** ◆ | baseline | – | -0.6% | – | -1.3% | – | 1.00 | – | – | – | – |
-| 7 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | – | -0.6% | – | -1.3% | – | 1.00 | – | – | – | 1 |
-| 8 | [SAC](../submissions/sac/) | rl | – | -0.7% | – | -1.3% | – | 0.97 | – | – | – | 3 |
-| 9 | [PPO](../submissions/ppo/) | rl | – | -0.8% | – | -1.2% | – | 0.92 | – | – | – | 3 |
-| 10 | [A2C](../submissions/a2c/) | rl | – | -0.8% | – | -1.3% | – | 0.98 | – | – | – | 3 |
-| 11 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | – | -0.8% | – | -1.2% | – | 0.71 | – | – | – | 1 |
-| 12 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | – | -1.0% | – | -2.0% | – | 1.43 | – | – | – | 3 |
-| 13 | [Momentum (top 3)](../submissions/momentum/) | baseline | – | -1.5% | – | -3.1% | – | 2.16 | – | – | – | 1 |
+| 1 | [Minimum variance](../submissions/minimum-variance/) | baseline | – | 1.1% | – | -0.6% | – | – | – | – | – | 1 |
+| 2 | [TD3](../submissions/td3/) | rl | – | 0.4% | – | -0.9% | – | – | – | – | – | 3 |
+| 3 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | – | 0.2% | – | -0.7% | – | – | – | – | – | 1 |
+| 4 | [Cash](../submissions/cash/) | baseline | – | 0.0% | – | 0.0% | – | – | – | – | – | 1 |
+| 5 | [DDPG](../submissions/ddpg/) | rl | – | -0.2% | – | -1.5% | – | – | – | – | – | 3 |
+| 6 | **1/N buy and hold** ◆ | baseline | – | -0.6% | – | -1.3% | – | – | – | – | – | – |
+| 6 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | – | -0.6% | – | -1.3% | – | – | – | – | – | 1 |
+| 8 | [SAC](../submissions/sac/) | rl | – | -0.7% | – | -1.3% | – | – | – | – | – | 3 |
+| 9 | [PPO](../submissions/ppo/) | rl | – | -0.8% | – | -1.2% | – | – | – | – | – | 3 |
+| 10 | [A2C](../submissions/a2c/) | rl | – | -0.8% | – | -1.3% | – | – | – | – | – | 3 |
+| 11 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | – | -0.8% | – | -1.2% | – | – | – | – | – | 1 |
+| 12 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | – | -1.0% | – | -2.0% | – | – | – | – | – | 3 |
+| 13 | [Momentum (top 3)](../submissions/momentum/) | baseline | – | -1.5% | – | -3.1% | – | – | – | – | – | 1 |
 
 ### US multi-asset allocation (published 2026-10-16) — `us-multi-asset`
 
 2026-10-19 to 2026-10-30 (10 sessions) · fee 0.05% per side · SPY, QQQ, IWM, EFA, EEM, TLT, IEF, LQD, GLD, VNQ
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | **1/N buy and hold** ◆ | benchmark | – | -0.7% | – | -1.3% | – | – | – | – | – | – |
-| 2 | [SAC (tuned)](../submissions/sac-tuned/) | rl | – | -0.7% | – | -1.2% | – | 0.92 | – | – | – | 3 |
-| 3 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | – | -0.7% | – | -1.2% | – | 0.93 | – | – | – | 3 |
+| 2 | [SAC (tuned)](../submissions/sac-tuned/) | rl | – | -0.7% | – | -1.2% | – | – | – | – | – | 3 |
+| 3 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | – | -0.7% | – | -1.2% | – | – | – | – | – | 3 |
 
 ### US sector rotation (published 2026-10-14) — `us-sectors`
 
 2026-10-15 to 2026-10-30 (12 sessions) · fee 0.05% per side · XLB, XLE, XLF, XLI, XLK, XLP, XLU, XLV, XLY
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [DDPG](../submissions/ddpg/) | rl | – | 2.9% | – | -0.9% | – | 0.80 | – | – | – | 3 |
-| 2 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | – | 2.5% | – | -0.8% | – | 1.12 | – | – | – | 1 |
-| 3 | **1/N buy and hold** ◆ | baseline | – | 2.2% | – | -0.6% | – | 1.00 | – | – | – | – |
-| 4 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | – | 2.2% | – | -0.6% | – | 1.00 | – | – | – | 1 |
-| 5 | [SAC](../submissions/sac/) | rl | – | 2.1% | – | -0.8% | – | 0.72 | – | – | – | 3 |
-| 6 | [A2C](../submissions/a2c/) | rl | – | 2.1% | – | -0.6% | – | 0.90 | – | – | – | 3 |
-| 7 | [PPO](../submissions/ppo/) | rl | – | 2.0% | – | -0.6% | – | 0.88 | – | – | – | 3 |
-| 8 | [Minimum variance](../submissions/minimum-variance/) | baseline | – | 1.9% | – | -0.5% | – | 0.96 | – | – | – | 1 |
-| 9 | [TD3](../submissions/td3/) | rl | – | 1.6% | – | -0.8% | – | 0.61 | – | – | – | 3 |
-| 10 | [Momentum (top 3)](../submissions/momentum/) | baseline | – | 1.4% | – | -0.9% | – | 0.40 | – | – | – | 1 |
-| 11 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | – | 1.0% | – | -0.2% | – | 0.48 | – | – | – | 1 |
-| 12 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | – | 0.9% | – | -1.1% | – | 0.66 | – | – | – | 3 |
-| 13 | [Cash](../submissions/cash/) | baseline | – | 0.0% | – | 0.0% | – | 0.00 | – | – | – | 1 |
+| 1 | [DDPG](../submissions/ddpg/) | rl | – | 2.9% | – | -0.9% | – | – | – | – | – | 3 |
+| 2 | [Inverse volatility](../submissions/inverse-volatility/) | baseline | – | 2.5% | – | -0.8% | – | – | – | – | – | 1 |
+| 3 | **1/N buy and hold** ◆ | baseline | – | 2.2% | – | -0.6% | – | – | – | – | – | – |
+| 3 | [1/N monthly rebalance](../submissions/equal-weight-monthly/) | baseline | – | 2.2% | – | -0.6% | – | – | – | – | – | 1 |
+| 5 | [SAC](../submissions/sac/) | rl | – | 2.1% | – | -0.8% | – | – | – | – | – | 3 |
+| 6 | [A2C](../submissions/a2c/) | rl | – | 2.1% | – | -0.6% | – | – | – | – | – | 3 |
+| 7 | [PPO](../submissions/ppo/) | rl | – | 2.0% | – | -0.6% | – | – | – | – | – | 3 |
+| 8 | [Minimum variance](../submissions/minimum-variance/) | baseline | – | 1.9% | – | -0.5% | – | – | – | – | – | 1 |
+| 9 | [TD3](../submissions/td3/) | rl | – | 1.6% | – | -0.8% | – | – | – | – | – | 3 |
+| 10 | [Momentum (top 3)](../submissions/momentum/) | baseline | – | 1.4% | – | -0.9% | – | – | – | – | – | 1 |
+| 11 | [Trend following (200d SMA)](../submissions/trend-following/) | baseline | – | 1.0% | – | -0.2% | – | – | – | – | – | 1 |
+| 12 | [LSTM forecast](../submissions/lstm-forecast/) | forecast | – | 0.9% | – | -1.1% | – | – | – | – | – | 3 |
+| 13 | [Cash](../submissions/cash/) | baseline | – | 0.0% | – | 0.0% | – | – | – | – | – | 1 |
 
 ### US sector rotation (published 2026-10-16) — `us-sectors`
 
 2026-10-19 to 2026-10-30 (10 sessions) · fee 0.05% per side · XLB, XLE, XLF, XLI, XLK, XLP, XLU, XLV, XLY
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | **1/N buy and hold** ◆ | benchmark | – | 1.9% | – | -0.6% | – | – | – | – | – | – |
-| 2 | [SAC (tuned)](../submissions/sac-tuned/) | rl | – | 1.7% | – | -0.5% | – | 0.87 | – | – | – | 3 |
-| 3 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | – | 1.7% | – | -0.5% | – | 0.84 | – | – | – | 3 |
+| 2 | [SAC (tuned)](../submissions/sac-tuned/) | rl | – | 1.7% | – | -0.5% | – | – | – | – | – | 3 |
+| 3 | [PPO (tuned)](../submissions/ppo-tuned/) | rl | – | 1.7% | – | -0.5% | – | – | – | – | – | 3 |
 
 ## Ledger track: decisions committed before each open
 
@@ -223,45 +223,45 @@ Each decision is committed to the repository by a scheduled workflow before the 
 
 2026-10-26 to 2026-10-30 (5 sessions) · fee 0.05% per side · AAPL
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [Ledger canary (1/N)](../submissions/ledger-canary/) | baseline | – | 0.2% | – | -1.2% | – | 1.00 | – | – | – | 1 |
-| 2 | **1/N buy and hold** ◆ | benchmark | – | 0.2% | – | -1.2% | – | – | – | – | – | – |
+| 1 | **1/N buy and hold** ◆ | benchmark | – | 0.2% | – | -1.2% | – | – | – | – | – | – |
+| 1 | [Ledger canary (1/N)](../submissions/ledger-canary/) | baseline | – | 0.2% | – | -1.2% | – | – | – | – | – | 1 |
 
 ### AAPL (TradingAgents paper window) (decisions from 2026-10-28) — `us-aapl`
 
 2026-10-29 to 2026-10-30 (2 sessions) · fee 0.05% per side · AAPL
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [TradingAgents](../submissions/tradingagents/) | llm | – | -1.0% | – | -1.2% | – | 1.00 | – | – | – | 1 |
-| 2 | **1/N buy and hold** ◆ | benchmark | – | -1.0% | – | -1.2% | – | – | – | – | – | – |
+| 1 | **1/N buy and hold** ◆ | benchmark | – | -1.0% | – | -1.2% | – | – | – | – | – | – |
+| 1 | [TradingAgents](../submissions/tradingagents/) | llm | – | -1.0% | – | -1.2% | – | – | – | – | – | 1 |
 
 ### AMZN (TradingAgents paper window) (decisions from 2026-10-28) — `us-amzn`
 
 2026-10-29 to 2026-10-30 (2 sessions) · fee 0.05% per side · AMZN
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [TradingAgents](../submissions/tradingagents/) | llm | – | -2.7% | – | -2.7% | – | 1.00 | – | – | – | 1 |
-| 2 | **1/N buy and hold** ◆ | benchmark | – | -2.7% | – | -2.7% | – | – | – | – | – | – |
+| 1 | **1/N buy and hold** ◆ | benchmark | – | -2.7% | – | -2.7% | – | – | – | – | – | – |
+| 1 | [TradingAgents](../submissions/tradingagents/) | llm | – | -2.7% | – | -2.7% | – | – | – | – | – | 1 |
 
 ### GOOGL (TradingAgents paper window) (decisions from 2026-10-28) — `us-googl`
 
 2026-10-29 to 2026-10-30 (2 sessions) · fee 0.05% per side · GOOGL
 
-*Fewer than 20 sessions: ranked by return; annualised and inferential statistics are not shown yet.*
+*Fewer than 20 sessions: ranked by return; annualised, regression and inferential statistics are not shown yet.*
 
 | # | Strategy | Kind | Sharpe | Return | CAGR | Max DD | Turnover/yr | Beta | Alpha (t) | ΔSharpe vs 1/N | DSR | Seeds |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | [TradingAgents](../submissions/tradingagents/) | llm | – | -2.5% | – | -2.5% | – | 1.00 | – | – | – | 1 |
-| 2 | **1/N buy and hold** ◆ | benchmark | – | -2.5% | – | -2.5% | – | – | – | – | – | – |
+| 1 | **1/N buy and hold** ◆ | benchmark | – | -2.5% | – | -2.5% | – | – | – | – | – | – |
+| 1 | [TradingAgents](../submissions/tradingagents/) | llm | – | -2.5% | – | -2.5% | – | – | – | – | – | 1 |
 
 ◆ marks the 1/N buy-and-hold benchmark (equal weights at the start of the period, never rebalanced); every ΔSharpe is measured against it over the same sessions.
 
