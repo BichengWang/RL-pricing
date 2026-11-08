@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from rl import cli
-from rl.bench import leaderboard, monthly, runner
+from rl.bench import leaderboard, monthly, runner, scoring
 from rl.bench.data import load_task_data
 from rl.bench.engine import simulate
 from rl.bench.market import as_day
@@ -307,6 +307,61 @@ def test_readme_block_replacement_is_idempotent(board, tmp_path):
     plain.write_text("no markers\n")
     leaderboard.write_leaderboard(board, readme=plain)
     assert plain.read_text() == "no markers\n"
+
+
+def _cells(text, name):
+    [line] = [line for line in text.splitlines() if name in line]
+    return [cell.strip() for cell in line.strip("|").split("|")]
+
+
+def test_short_live_window_keeps_return_and_drawdown_only(tilt, data, tmp_path):
+    out = tmp_path / "board"
+    early, _ = freeze_early(tilt, data)
+    publish(tilt, tmp_path, early.dates[-1])
+    runner.update_live(LIVE, tilt, data=data.between(None, "2019-01-15"), out_root=out)
+    summary = leaderboard.build(out)
+    [section] = summary["sections"]
+    assert section["sessions"] < scoring.MIN_SHARPE_SESSIONS and section["ranked_by"] == "total_return"
+    returns = [row["total_return"] for row in section["rows"]]
+    assert len(returns) == 2 and np.isfinite(returns).all() and returns == sorted(returns, reverse=True)
+    tilt_row = next(row for row in section["rows"] if row["id"] == "tilt")
+    assert {"turnover", "alpha", "alpha_t", "delta_sharpe", "dsr"} <= tilt_row.keys()
+    for row in section["rows"]:
+        assert np.isfinite(row["max_drawdown"])
+        assert all(np.isnan(row[key]) for key in leaderboard._ANNUALISED if key in row)
+
+    text = leaderboard.render_markdown(summary)
+    assert "Fewer than {} sessions".format(scoring.MIN_SHARPE_SESSIONS) in text
+    cells = dict(zip(leaderboard._COLUMNS, _cells(text, "[Tilt](../submissions/tilt/)")))
+    assert cells["Return"].endswith("%") and cells["Max DD"].endswith("%")
+    assert {cells[key] for key in ("Sharpe", "CAGR", "Turnover/yr", "Alpha (t)", "ΔSharpe vs 1/N", "DSR")} == {"–"}
+
+    runner.update_live(LIVE, tilt, data=data, out_root=out)  # the same record, now long enough
+    [section] = leaderboard.build(out)["sections"]
+    assert section["ranked_by"] == "sharpe" and all(np.isfinite(row["sharpe"]) for row in section["rows"])
+
+
+def test_headline_shows_the_window_of_each_section_of_a_task(tilt, data, tmp_path):
+    out = tmp_path / "board"
+    early, _ = freeze_early(tilt, data)
+    publish(tilt, tmp_path, "2019-01-15")
+    fixed = Submission.load(shipped(tmp_path))
+    runner.freeze(LIVE, fixed, data=early)
+    publish(fixed, tmp_path, "2019-03-01")
+    for sub in (tilt, fixed):
+        runner.update_live(LIVE, sub, data=data, out_root=out)
+    summary = leaderboard.build(out)
+    first, second = summary["sections"]
+    assert first["task"] == second["task"] == LIVE.id
+    assert (first["published"], first["first"]) == ("2019-01-15", "2019-01-16")
+    assert (second["published"], second["first"]) == ("2019-03-01", "2019-03-04")
+
+    text = leaderboard.render_markdown(summary)
+    assert "(published 2019-01-15)" in text and "(published 2019-03-01)" in text
+    benchmarks = [line for line in leaderboard.render_headline(summary).splitlines() if "◆" in line]
+    assert len(benchmarks) == 2
+    for section, line in zip((first, second), benchmarks):
+        assert "| `{}` (from {}, {} sessions) |".format(LIVE.id, section["first"], section["sessions"]) in line
 
 
 def test_cli_lists_tasks_and_runs_a_submission(tmp_path, capsys):

@@ -173,52 +173,53 @@ how many you tried.
 ## Leaderboard
 
 <!-- leaderboard:start -->
-| Track | Task | # | Strategy | Sharpe | CAGR | Max DD | ΔSharpe vs 1/N | DSR |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| historical | `crypto-majors` | 1 | Minimum variance | 1.64 | 90.9% | -33.3% | +0.86 (p<0.001) | 1.00 |
-| historical | `crypto-majors` | 2 | Decision Transformer | 1.25 ± 0.20 | 68.9% | -33.9% | +0.59 (p=0.002) | 0.89 |
-| historical | `crypto-majors` | 3 | CQL | 1.21 ± 0.09 | 58.1% | -34.1% | +0.44 (p=0.022) | 0.82 |
-| historical | `crypto-majors` | 7 | **1/N buy and hold** ◆ | 0.78 | 32.7% | -44.5% | – | 0.91 |
-| historical | `us-multi-asset` | 1 | **1/N buy and hold** ◆ | 0.73 | 8.9% | -26.6% | – | 0.98 |
-| historical | `us-multi-asset` | 2 | Momentum (top 3) | 0.72 | 9.9% | -23.7% | -0.01 (p=0.506) | 0.98 |
-| historical | `us-multi-asset` | 3 | 1/N monthly rebalance | 0.69 | 8.0% | -25.8% | -0.04 (p=0.827) | 0.97 |
-| historical | `us-multi-asset` | 4 | IQL | 0.68 ± 0.07 | 6.8% | -23.3% | -0.04 (p=0.714) | 0.77 |
-| historical | `us-sectors` | 1 | 1/N monthly rebalance | 0.69 | 11.6% | -36.7% | +0.01 (p=0.449) | 0.97 |
-| historical | `us-sectors` | 2 | **1/N buy and hold** ◆ | 0.68 | 11.5% | -35.5% | – | 0.97 |
-| historical | `us-sectors` | 3 | A2C | 0.67 ± 0.01 | 10.3% | -34.3% | -0.01 (p=0.650) | 0.97 |
-| historical | `paper-2021` (re-evaluation) | – | Momentum (top 3) | 1.31 | 48.6% | -30.4% | +0.20 (p=0.240) | 0.96 |
-| historical | `paper-2021` (re-evaluation) | – | **1/N buy and hold** ◆ | 1.11 | 29.9% | -29.4% | – | 0.94 |
-| historical | `paper-2021` (re-evaluation) | – | 1/N monthly rebalance | 1.04 | 26.7% | -29.5% | -0.07 (p=0.777) | 0.93 |
-| historical | `paper-2021` (re-evaluation) | – | A2C | 1.03 ± 0.01 | 25.1% | -28.2% | -0.08 (p=0.825) | 0.92 |
-| live | `crypto-majors` | 1 | Minimum variance | -1.88 | -52.3% | -7.2% | +2.78 (p=0.179) | 0.32 |
-| live | `crypto-majors` | 2 | Momentum (top 3) | -2.63 | -58.8% | -7.6% | +2.03 (p=0.188) | 0.25 |
-| live | `crypto-majors` | 3 | LSTM forecast | -3.67 ± 0.85 | -43.2% | -5.4% | +0.77 (p=0.424) | 0.21 |
-| live | `crypto-majors` | 7 | **1/N buy and hold** ◆ | -4.66 | -85.1% | -10.9% | – | 0.11 |
-| live | `crypto-majors` | 1 | **1/N buy and hold** ◆ | -4.50 | -86.0% | -10.9% | – | – |
-| live | `crypto-majors` | 2 | PPO (tuned) | -4.72 ± 0.59 | -79.2% | -8.8% | -0.18 (p=0.625) | 0.00 |
-| live | `crypto-majors` | 3 | SAC (tuned) | -4.96 ± 1.12 | -85.2% | -10.4% | -0.58 (p=0.819) | 0.00 |
-| live | `us-multi-asset` | 1 | Minimum variance | 3.71 | 25.9% | -0.6% | +5.12 (p=0.145) | 0.81 |
-| live | `us-multi-asset` | 2 | DDPG | 1.56 ± 5.94 | 1.2% | -1.5% | +0.99 (p=0.246) | 0.46 |
-| live | `us-multi-asset` | 3 | TD3 | 1.39 ± 2.15 | 9.6% | -0.9% | +2.72 (p=0.022) | 0.61 |
-| live | `us-multi-asset` | 6 | **1/N buy and hold** ◆ | -1.41 | -12.0% | -1.3% | – | 0.38 |
-| live | `us-multi-asset` | 1 | **1/N buy and hold** ◆ | -1.91 | -16.1% | -1.3% | – | – |
-| live | `us-multi-asset` | 2 | PPO (tuned) | -2.07 ± 0.29 | -16.3% | -1.2% | -0.17 (p=0.650) | 0.03 |
-| live | `us-multi-asset` | 3 | SAC (tuned) | -2.10 ± 0.09 | -16.2% | -1.2% | -0.19 (p=0.924) | 0.03 |
-| live | `us-sectors` | 1 | DDPG | 6.62 ± 4.81 | 86.9% | -0.9% | +0.82 (p=0.431) | 0.93 |
-| live | `us-sectors` | 2 | PPO | 6.58 ± 0.38 | 52.6% | -0.6% | +0.13 (p=0.366) | 0.91 |
-| live | `us-sectors` | 3 | A2C | 6.50 ± 0.30 | 53.5% | -0.6% | +0.07 (p=0.353) | 0.91 |
-| live | `us-sectors` | 4 | **1/N buy and hold** ◆ | 6.46 | 59.5% | -0.6% | – | 0.90 |
-| live | `us-sectors` | 1 | PPO (tuned) | 5.97 ± 0.22 | 51.2% | -0.5% | +0.26 (p=0.151) | 0.40 |
-| live | `us-sectors` | 2 | SAC (tuned) | 5.94 ± 0.35 | 52.7% | -0.5% | +0.21 (p=0.181) | 0.40 |
-| live | `us-sectors` | 3 | **1/N buy and hold** ◆ | 5.74 | 59.6% | -0.6% | – | – |
-| ledger | `us-aapl` | 1 | Ledger canary (1/N) | 0.50 | 8.2% | -1.2% | +0.00 (p=1.000) | 0.53 |
-| ledger | `us-aapl` | 2 | **1/N buy and hold** ◆ | 0.50 | 8.2% | -1.2% | – | – |
-| ledger | `us-aapl` | 1 | TradingAgents | -7.92 | -72.4% | -1.2% | +0.00 (p=1.000) | 0.31 |
-| ledger | `us-aapl` | 2 | **1/N buy and hold** ◆ | -7.92 | -72.4% | -1.2% | – | – |
-| ledger | `us-amzn` | 1 | TradingAgents | -374.63 | -96.9% | -2.7% | +0.00 (p=1.000) | 0.00 |
-| ledger | `us-amzn` | 2 | **1/N buy and hold** ◆ | -374.63 | -96.9% | -2.7% | – | – |
-| ledger | `us-googl` | 1 | TradingAgents | -98.77 | -95.9% | -2.5% | +0.00 (p=1.000) | 0.00 |
-| ledger | `us-googl` | 2 | **1/N buy and hold** ◆ | -98.77 | -95.9% | -2.5% | – | – |
+| Track | Task | # | Strategy | Sharpe | Return | CAGR | Max DD | ΔSharpe vs 1/N | DSR |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| historical | `crypto-majors` | 1 | Minimum variance | 1.64 | 597.2% | 90.9% | -33.3% | +0.86 (p<0.001) | 1.00 |
+| historical | `crypto-majors` | 2 | Decision Transformer | 1.25 ± 0.20 | 410.4% | 68.9% | -33.9% | +0.59 (p=0.002) | 0.89 |
+| historical | `crypto-majors` | 3 | CQL | 1.21 ± 0.09 | 297.8% | 58.1% | -34.1% | +0.44 (p=0.022) | 0.82 |
+| historical | `crypto-majors` | 7 | **1/N buy and hold** ◆ | 0.78 | 134.0% | 32.7% | -44.5% | – | 0.91 |
+| historical | `us-multi-asset` | 1 | **1/N buy and hold** ◆ | 0.73 | 96.8% | 8.9% | -26.6% | – | 0.98 |
+| historical | `us-multi-asset` | 2 | Momentum (top 3) | 0.72 | 112.1% | 9.9% | -23.7% | -0.01 (p=0.506) | 0.98 |
+| historical | `us-multi-asset` | 3 | 1/N monthly rebalance | 0.69 | 84.7% | 8.0% | -25.8% | -0.04 (p=0.827) | 0.97 |
+| historical | `us-multi-asset` | 4 | IQL | 0.68 ± 0.07 | 69.8% | 6.8% | -23.3% | -0.04 (p=0.714) | 0.77 |
+| historical | `us-sectors` | 1 | 1/N monthly rebalance | 0.69 | 140.9% | 11.6% | -36.7% | +0.01 (p=0.449) | 0.97 |
+| historical | `us-sectors` | 2 | **1/N buy and hold** ◆ | 0.68 | 138.5% | 11.5% | -35.5% | – | 0.97 |
+| historical | `us-sectors` | 3 | A2C | 0.67 ± 0.01 | 119.0% | 10.3% | -34.3% | -0.01 (p=0.650) | 0.97 |
+| historical | `paper-2021` (re-evaluation) | – | Momentum (top 3) | 1.31 | 121.1% | 48.6% | -30.4% | +0.20 (p=0.240) | 0.96 |
+| historical | `paper-2021` (re-evaluation) | – | **1/N buy and hold** ◆ | 1.11 | 68.9% | 29.9% | -29.4% | – | 0.94 |
+| historical | `paper-2021` (re-evaluation) | – | 1/N monthly rebalance | 1.04 | 60.6% | 26.7% | -29.5% | -0.07 (p=0.777) | 0.93 |
+| historical | `paper-2021` (re-evaluation) | – | A2C | 1.03 ± 0.01 | 56.7% | 25.1% | -28.2% | -0.08 (p=0.825) | 0.92 |
+| live | `crypto-majors` (from 2026-10-15, 18 sessions) | 1 | Cash | – | 0.0% | – | 0.0% | – | – |
+| live | `crypto-majors` (from 2026-10-15, 18 sessions) | 2 | LSTM forecast | – | -2.8% | – | -5.4% | – | – |
+| live | `crypto-majors` (from 2026-10-15, 18 sessions) | 3 | Minimum variance | – | -3.6% | – | -7.2% | – | – |
+| live | `crypto-majors` (from 2026-10-15, 18 sessions) | 12 | **1/N buy and hold** ◆ | – | -9.0% | – | -10.9% | – | – |
+| live | `crypto-majors` (from 2026-10-17, 16 sessions) | 1 | PPO (tuned) | – | -6.7% | – | -8.8% | – | – |
+| live | `crypto-majors` (from 2026-10-17, 16 sessions) | 2 | SAC (tuned) | – | -8.2% | – | -10.4% | – | – |
+| live | `crypto-majors` (from 2026-10-17, 16 sessions) | 3 | **1/N buy and hold** ◆ | – | -8.2% | – | -10.9% | – | – |
+| live | `us-multi-asset` (from 2026-10-15, 12 sessions) | 1 | Minimum variance | – | 1.1% | – | -0.6% | – | – |
+| live | `us-multi-asset` (from 2026-10-15, 12 sessions) | 2 | TD3 | – | 0.4% | – | -0.9% | – | – |
+| live | `us-multi-asset` (from 2026-10-15, 12 sessions) | 3 | Inverse volatility | – | 0.2% | – | -0.7% | – | – |
+| live | `us-multi-asset` (from 2026-10-15, 12 sessions) | 6 | **1/N buy and hold** ◆ | – | -0.6% | – | -1.3% | – | – |
+| live | `us-multi-asset` (from 2026-10-19, 10 sessions) | 1 | **1/N buy and hold** ◆ | – | -0.7% | – | -1.3% | – | – |
+| live | `us-multi-asset` (from 2026-10-19, 10 sessions) | 2 | SAC (tuned) | – | -0.7% | – | -1.2% | – | – |
+| live | `us-multi-asset` (from 2026-10-19, 10 sessions) | 3 | PPO (tuned) | – | -0.7% | – | -1.2% | – | – |
+| live | `us-sectors` (from 2026-10-15, 12 sessions) | 1 | DDPG | – | 2.9% | – | -0.9% | – | – |
+| live | `us-sectors` (from 2026-10-15, 12 sessions) | 2 | Inverse volatility | – | 2.5% | – | -0.8% | – | – |
+| live | `us-sectors` (from 2026-10-15, 12 sessions) | 3 | **1/N buy and hold** ◆ | – | 2.2% | – | -0.6% | – | – |
+| live | `us-sectors` (from 2026-10-19, 10 sessions) | 1 | **1/N buy and hold** ◆ | – | 1.9% | – | -0.6% | – | – |
+| live | `us-sectors` (from 2026-10-19, 10 sessions) | 2 | SAC (tuned) | – | 1.7% | – | -0.5% | – | – |
+| live | `us-sectors` (from 2026-10-19, 10 sessions) | 3 | PPO (tuned) | – | 1.7% | – | -0.5% | – | – |
+| ledger | `us-aapl` (from 2026-10-26, 5 sessions) | 1 | Ledger canary (1/N) | – | 0.2% | – | -1.2% | – | – |
+| ledger | `us-aapl` (from 2026-10-26, 5 sessions) | 2 | **1/N buy and hold** ◆ | – | 0.2% | – | -1.2% | – | – |
+| ledger | `us-aapl` (from 2026-10-29, 2 sessions) | 1 | TradingAgents | – | -1.0% | – | -1.2% | – | – |
+| ledger | `us-aapl` (from 2026-10-29, 2 sessions) | 2 | **1/N buy and hold** ◆ | – | -1.0% | – | -1.2% | – | – |
+| ledger | `us-amzn` (from 2026-10-29, 2 sessions) | 1 | TradingAgents | – | -2.7% | – | -2.7% | – | – |
+| ledger | `us-amzn` (from 2026-10-29, 2 sessions) | 2 | **1/N buy and hold** ◆ | – | -2.7% | – | -2.7% | – | – |
+| ledger | `us-googl` (from 2026-10-29, 2 sessions) | 1 | TradingAgents | – | -2.5% | – | -2.5% | – | – |
+| ledger | `us-googl` (from 2026-10-29, 2 sessions) | 2 | **1/N buy and hold** ◆ | – | -2.5% | – | -2.5% | – | – |
+
+Windows of fewer than 20 sessions are ranked by return and show no Sharpe, CAGR, ΔSharpe or DSR yet.
 
 Full tables: [leaderboard/LEADERBOARD.md](leaderboard/LEADERBOARD.md).
 <!-- leaderboard:end -->
