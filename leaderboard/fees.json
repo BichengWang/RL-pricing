@@ -1,0 +1,2800 @@
+{
+ "schema": 1,
+ "fees_bp": [
+  0.0,
+  1.0,
+  2.0,
+  5.0,
+  10.0,
+  25.0,
+  50.0
+ ],
+ "headline": [
+  {
+   "fee_bp": "charged",
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 0,
+     "significant": 0
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 4,
+     "significant": 2
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 5,
+     "significant": 1
+    }
+   }
+  },
+  {
+   "fee_bp": 0.0,
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 19,
+     "significant": 3
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 9,
+     "significant": 3
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 6,
+     "significant": 1
+    }
+   }
+  },
+  {
+   "fee_bp": 1.0,
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 11,
+     "significant": 1
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 9,
+     "significant": 2
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 6,
+     "significant": 1
+    }
+   }
+  },
+  {
+   "fee_bp": 2.0,
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 6,
+     "significant": 0
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 6,
+     "significant": 2
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 5,
+     "significant": 1
+    }
+   }
+  },
+  {
+   "fee_bp": 5.0,
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 4,
+     "significant": 0
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 4,
+     "significant": 2
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 5,
+     "significant": 1
+    }
+   }
+  },
+  {
+   "fee_bp": 10.0,
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 0,
+     "significant": 0
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 3,
+     "significant": 2
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 5,
+     "significant": 1
+    }
+   }
+  },
+  {
+   "fee_bp": 25.0,
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 0,
+     "significant": 0
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 3,
+     "significant": 2
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 5,
+     "significant": 1
+    }
+   }
+  },
+  {
+   "fee_bp": 50.0,
+   "groups": {
+    "SB3 RL and LSTM": {
+     "entries": 30,
+     "ahead": 0,
+     "significant": 0
+    },
+    "Other learned": {
+     "entries": 15,
+     "ahead": 2,
+     "significant": 1
+    },
+    "Rule-based": {
+     "entries": 20,
+     "ahead": 4,
+     "significant": 1
+    }
+   }
+  }
+ ],
+ "sections": [
+  {
+   "task": "crypto-majors",
+   "title": "Crypto majors",
+   "role": "ranked",
+   "first": "2023-01-01",
+   "last": "2025-12-31",
+   "sessions": 1096,
+   "periods_per_year": 365,
+   "charged_bp": 10.0,
+   "fees_bp": [
+    0.0,
+    1.0,
+    2.0,
+    5.0,
+    10.0,
+    25.0,
+    50.0
+   ],
+   "benchmark": {
+    "id": "equal-weight-buy-hold",
+    "name": "1/N buy and hold",
+    "turnover": 0.3444,
+    "sharpe": [
+     0.7762,
+     0.7761,
+     0.7761,
+     0.7759,
+     0.7756,
+     0.7747,
+     0.7732
+    ]
+   },
+   "entries": [
+    {
+     "id": "minimum-variance",
+     "name": "Minimum variance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 2.5939,
+     "sharpe": [
+      1.6443,
+      1.6438,
+      1.6432,
+      1.6415,
+      1.6386,
+      1.6301,
+      1.6159
+     ],
+     "delta_sharpe": [
+      0.8682,
+      0.8676,
+      0.8671,
+      0.8656,
+      0.8631,
+      0.8554,
+      0.8426
+     ],
+     "p_value": [
+      0.0005,
+      0.0005,
+      0.0005,
+      0.0005,
+      0.0005,
+      0.0005,
+      0.0005
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "decision-transformer",
+     "name": "Decision Transformer",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 9.0731,
+     "sharpe": [
+      1.3892,
+      1.3873,
+      1.3854,
+      1.3795,
+      1.3698,
+      1.3407,
+      1.2922
+     ],
+     "delta_sharpe": [
+      0.6131,
+      0.6112,
+      0.6093,
+      0.6037,
+      0.5943,
+      0.566,
+      0.519
+     ],
+     "p_value": [
+      0.0015,
+      0.0015,
+      0.0015,
+      0.0015,
+      0.002,
+      0.004,
+      0.0075
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "cql",
+     "name": "CQL",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 11.1838,
+     "sharpe": [
+      1.239,
+      1.2366,
+      1.2342,
+      1.227,
+      1.215,
+      1.179,
+      1.119
+     ],
+     "delta_sharpe": [
+      0.4628,
+      0.4605,
+      0.4581,
+      0.4511,
+      0.4394,
+      0.4043,
+      0.3458
+     ],
+     "p_value": [
+      0.0175,
+      0.0175,
+      0.0185,
+      0.02,
+      0.022,
+      0.0305,
+      0.0535
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "inverse-volatility",
+     "name": "Inverse volatility",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 2.5362,
+     "sharpe": [
+      0.8833,
+      0.8828,
+      0.8824,
+      0.8811,
+      0.8789,
+      0.8724,
+      0.8614
+     ],
+     "delta_sharpe": [
+      0.1071,
+      0.1067,
+      0.1063,
+      0.1052,
+      0.1033,
+      0.0976,
+      0.0882
+     ],
+     "p_value": [
+      0.081,
+      0.083,
+      0.084,
+      0.0855,
+      0.089,
+      0.1019,
+      0.1279
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "bc",
+     "name": "Behaviour cloning",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 28.7393,
+     "sharpe": [
+      0.9232,
+      0.9179,
+      0.9126,
+      0.8967,
+      0.8701,
+      0.7904,
+      0.6576
+     ],
+     "delta_sharpe": [
+      0.147,
+      0.1418,
+      0.1365,
+      0.1208,
+      0.0945,
+      0.0157,
+      -0.1156
+     ],
+     "p_value": [
+      0.0445,
+      0.051,
+      0.06,
+      0.084,
+      0.1404,
+      0.4413,
+      0.904
+     ],
+     "break_even_bp": 27.9958
+    },
+    {
+     "id": "momentum",
+     "name": "Momentum (top 3)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 5.2595,
+     "sharpe": [
+      0.8454,
+      0.8445,
+      0.8436,
+      0.8409,
+      0.8363,
+      0.8226,
+      0.7998
+     ],
+     "delta_sharpe": [
+      0.0693,
+      0.0684,
+      0.0675,
+      0.065,
+      0.0607,
+      0.0479,
+      0.0266
+     ],
+     "p_value": [
+      0.3878,
+      0.3903,
+      0.3913,
+      0.3943,
+      0.4008,
+      0.4293,
+      0.4668
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "ppo-tuned",
+     "name": "PPO (tuned)",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 146.1369,
+     "sharpe": [
+      1.0207,
+      0.9921,
+      0.9635,
+      0.8775,
+      0.7343,
+      0.3041,
+      -0.4141
+     ],
+     "delta_sharpe": [
+      0.2446,
+      0.216,
+      0.1874,
+      0.1017,
+      -0.0413,
+      -0.4706,
+      -1.1874
+     ],
+     "p_value": [
+      0.02,
+      0.0365,
+      0.0565,
+      0.1964,
+      0.6212,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 8.5554
+    },
+    {
+     "id": "equal-weight-monthly",
+     "name": "1/N monthly rebalance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 1.452,
+     "sharpe": [
+      0.7178,
+      0.7176,
+      0.7174,
+      0.7167,
+      0.7155,
+      0.7119,
+      0.706
+     ],
+     "delta_sharpe": [
+      -0.0583,
+      -0.0585,
+      -0.0587,
+      -0.0592,
+      -0.0601,
+      -0.0628,
+      -0.0672
+     ],
+     "p_value": [
+      0.7446,
+      0.7451,
+      0.7471,
+      0.7501,
+      0.7526,
+      0.7666,
+      0.7836
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "iql",
+     "name": "IQL",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 16.0966,
+     "sharpe": [
+      0.7345,
+      0.7316,
+      0.7288,
+      0.7203,
+      0.7062,
+      0.6638,
+      0.593
+     ],
+     "delta_sharpe": [
+      -0.0417,
+      -0.0445,
+      -0.0472,
+      -0.0555,
+      -0.0694,
+      -0.1109,
+      -0.1802
+     ],
+     "p_value": [
+      0.7186,
+      0.7356,
+      0.7496,
+      0.7831,
+      0.8411,
+      0.951,
+      0.9975
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "a2c",
+     "name": "A2C",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 15.8757,
+     "sharpe": [
+      0.7332,
+      0.7303,
+      0.7274,
+      0.7186,
+      0.7041,
+      0.6603,
+      0.5874
+     ],
+     "delta_sharpe": [
+      -0.043,
+      -0.0458,
+      -0.0487,
+      -0.0572,
+      -0.0715,
+      -0.1144,
+      -0.1858
+     ],
+     "p_value": [
+      0.7041,
+      0.7196,
+      0.7316,
+      0.7666,
+      0.8221,
+      0.942,
+      0.9935
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "td3",
+     "name": "TD3",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 216.5369,
+     "sharpe": [
+      1.0937,
+      1.0543,
+      1.0149,
+      0.8965,
+      0.6991,
+      0.1055,
+      -0.8876
+     ],
+     "delta_sharpe": [
+      0.3175,
+      0.2782,
+      0.2388,
+      0.1206,
+      -0.0765,
+      -0.6692,
+      -1.6608
+     ],
+     "p_value": [
+      0.0415,
+      0.0625,
+      0.092,
+      0.2559,
+      0.6567,
+      0.9995,
+      1.0
+     ],
+     "break_even_bp": 8.0608
+    },
+    {
+     "id": "ppo",
+     "name": "PPO",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 145.5415,
+     "sharpe": [
+      0.9405,
+      0.9141,
+      0.8876,
+      0.8082,
+      0.6759,
+      0.2785,
+      -0.3851
+     ],
+     "delta_sharpe": [
+      0.1643,
+      0.1379,
+      0.1116,
+      0.0324,
+      -0.0997,
+      -0.4963,
+      -1.1583
+     ],
+     "p_value": [
+      0.085,
+      0.1244,
+      0.1724,
+      0.3883,
+      0.7776,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 6.2251
+    },
+    {
+     "id": "ddpg",
+     "name": "DDPG",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 214.698,
+     "sharpe": [
+      0.9725,
+      0.931,
+      0.8895,
+      0.7649,
+      0.5571,
+      -0.0678,
+      -1.1131
+     ],
+     "delta_sharpe": [
+      0.1963,
+      0.1549,
+      0.1134,
+      -0.011,
+      -0.2185,
+      -0.8425,
+      -1.8863
+     ],
+     "p_value": [
+      0.086,
+      0.1444,
+      0.2089,
+      0.5212,
+      0.9195,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 4.7357
+    },
+    {
+     "id": "cvar-ppo",
+     "name": "CVaR-PPO",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 76.7512,
+     "sharpe": [
+      0.6966,
+      0.6826,
+      0.6685,
+      0.6263,
+      0.5559,
+      0.3447,
+      -0.0077
+     ],
+     "delta_sharpe": [
+      -0.0795,
+      -0.0935,
+      -0.1076,
+      -0.1496,
+      -0.2197,
+      -0.43,
+      -0.781
+     ],
+     "p_value": [
+      0.8361,
+      0.8791,
+      0.91,
+      0.969,
+      0.9975,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "sac",
+     "name": "SAC",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 326.3758,
+     "sharpe": [
+      1.1206,
+      1.0591,
+      0.9975,
+      0.8128,
+      0.5046,
+      -0.4223,
+      -1.9736
+     ],
+     "delta_sharpe": [
+      0.3444,
+      0.2829,
+      0.2215,
+      0.0369,
+      -0.271,
+      -1.197,
+      -2.7469
+     ],
+     "p_value": [
+      0.027,
+      0.057,
+      0.1099,
+      0.4178,
+      0.8991,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 5.6
+    },
+    {
+     "id": "trend-following",
+     "name": "Trend following (200d SMA)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 3.2913,
+     "sharpe": [
+      0.1031,
+      0.1023,
+      0.1015,
+      0.0992,
+      0.0952,
+      0.0833,
+      0.0635
+     ],
+     "delta_sharpe": [
+      -0.673,
+      -0.6738,
+      -0.6745,
+      -0.6767,
+      -0.6804,
+      -0.6914,
+      -0.7097
+     ],
+     "p_value": [
+      0.969,
+      0.97,
+      0.97,
+      0.97,
+      0.971,
+      0.973,
+      0.976
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "sac-tuned",
+     "name": "SAC (tuned)",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 322.8295,
+     "sharpe": [
+      0.6993,
+      0.6349,
+      0.5704,
+      0.377,
+      0.0544,
+      -0.9151,
+      -2.5357
+     ],
+     "delta_sharpe": [
+      -0.0769,
+      -0.1412,
+      -0.2056,
+      -0.3989,
+      -0.7212,
+      -1.6898,
+      -3.3089
+     ],
+     "p_value": [
+      0.6502,
+      0.7676,
+      0.8581,
+      0.98,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "lstm-forecast",
+     "name": "LSTM forecast",
+     "kind": "forecast",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 246.7439,
+     "sharpe": [
+      0.1451,
+      0.0952,
+      0.0454,
+      -0.1041,
+      -0.3537,
+      -1.104,
+      -2.3565
+     ],
+     "delta_sharpe": [
+      -0.6311,
+      -0.6809,
+      -0.7306,
+      -0.88,
+      -1.1293,
+      -1.8787,
+      -3.1298
+     ],
+     "p_value": [
+      0.9295,
+      0.9465,
+      0.956,
+      0.982,
+      0.996,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "cash",
+     "name": "Cash",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 0.0,
+     "sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "delta_sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "p_value": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "break_even_bp": null
+    }
+   ]
+  },
+  {
+   "task": "us-multi-asset",
+   "title": "US multi-asset allocation",
+   "role": "ranked",
+   "first": "2018-01-02",
+   "last": "2025-12-31",
+   "sessions": 2011,
+   "periods_per_year": 252,
+   "charged_bp": 5.0,
+   "fees_bp": [
+    0.0,
+    1.0,
+    2.0,
+    5.0,
+    10.0,
+    25.0,
+    50.0
+   ],
+   "benchmark": {
+    "id": "equal-weight-buy-hold",
+    "name": "1/N buy and hold",
+    "turnover": 0.1252,
+    "sharpe": [
+     0.7294,
+     0.7293,
+     0.7292,
+     0.7289,
+     0.7284,
+     0.7269,
+     0.7244
+    ]
+   },
+   "entries": [
+    {
+     "id": "momentum",
+     "name": "Momentum (top 3)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 4.952,
+     "sharpe": [
+      0.734,
+      0.7307,
+      0.7273,
+      0.7172,
+      0.7004,
+      0.6496,
+      0.5644
+     ],
+     "delta_sharpe": [
+      0.0047,
+      0.0014,
+      -0.0018,
+      -0.0116,
+      -0.028,
+      -0.0773,
+      -0.16
+     ],
+     "p_value": [
+      0.4833,
+      0.4883,
+      0.4953,
+      0.5062,
+      0.5257,
+      0.6062,
+      0.7246
+     ],
+     "break_even_bp": 1.4356
+    },
+    {
+     "id": "bc",
+     "name": "Behaviour cloning",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 15.3413,
+     "sharpe": [
+      0.7824,
+      0.7672,
+      0.7521,
+      0.7066,
+      0.6309,
+      0.4035,
+      0.0244
+     ],
+     "delta_sharpe": [
+      0.053,
+      0.038,
+      0.0229,
+      -0.0222,
+      -0.0975,
+      -0.3234,
+      -0.7
+     ],
+     "p_value": [
+      0.2619,
+      0.3223,
+      0.3878,
+      0.6002,
+      0.8591,
+      0.9995,
+      1.0
+     ],
+     "break_even_bp": 3.5238
+    },
+    {
+     "id": "iql",
+     "name": "IQL",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 12.2663,
+     "sharpe": [
+      0.7516,
+      0.7397,
+      0.7279,
+      0.6924,
+      0.6333,
+      0.4559,
+      0.1601
+     ],
+     "delta_sharpe": [
+      0.0222,
+      0.0105,
+      -0.0012,
+      -0.0364,
+      -0.0951,
+      -0.271,
+      -0.5643
+     ],
+     "p_value": [
+      0.4043,
+      0.4678,
+      0.5322,
+      0.7141,
+      0.92,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 1.8936
+    },
+    {
+     "id": "equal-weight-monthly",
+     "name": "1/N monthly rebalance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 0.4313,
+     "sharpe": [
+      0.6899,
+      0.6895,
+      0.6892,
+      0.6881,
+      0.6864,
+      0.6811,
+      0.6723
+     ],
+     "delta_sharpe": [
+      -0.0395,
+      -0.0397,
+      -0.04,
+      -0.0407,
+      -0.042,
+      -0.0458,
+      -0.0521
+     ],
+     "p_value": [
+      0.8211,
+      0.8211,
+      0.8236,
+      0.8271,
+      0.8331,
+      0.8596,
+      0.8916
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "a2c",
+     "name": "A2C",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 7.1974,
+     "sharpe": [
+      0.6965,
+      0.6901,
+      0.6837,
+      0.6646,
+      0.6326,
+      0.5368,
+      0.3772
+     ],
+     "delta_sharpe": [
+      -0.0329,
+      -0.0392,
+      -0.0455,
+      -0.0643,
+      -0.0958,
+      -0.1901,
+      -0.3472
+     ],
+     "p_value": [
+      0.7906,
+      0.8221,
+      0.8581,
+      0.9395,
+      0.988,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "decision-transformer",
+     "name": "Decision Transformer",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 6.3278,
+     "sharpe": [
+      0.6894,
+      0.6835,
+      0.6777,
+      0.66,
+      0.6305,
+      0.5421,
+      0.3945
+     ],
+     "delta_sharpe": [
+      -0.0399,
+      -0.0457,
+      -0.0515,
+      -0.0689,
+      -0.0979,
+      -0.1848,
+      -0.3299
+     ],
+     "p_value": [
+      0.6982,
+      0.7206,
+      0.7481,
+      0.8031,
+      0.8866,
+      0.99,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "inverse-volatility",
+     "name": "Inverse volatility",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 1.0549,
+     "sharpe": [
+      0.6617,
+      0.6606,
+      0.6595,
+      0.6562,
+      0.6508,
+      0.6344,
+      0.6069
+     ],
+     "delta_sharpe": [
+      -0.0677,
+      -0.0687,
+      -0.0697,
+      -0.0726,
+      -0.0776,
+      -0.0925,
+      -0.1175
+     ],
+     "p_value": [
+      0.7576,
+      0.7616,
+      0.7656,
+      0.7766,
+      0.7881,
+      0.8356,
+      0.8896
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "lstm-forecast",
+     "name": "LSTM forecast",
+     "kind": "forecast",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 34.9442,
+     "sharpe": [
+      0.7467,
+      0.7228,
+      0.6989,
+      0.6272,
+      0.5078,
+      0.15,
+      -0.4433
+     ],
+     "delta_sharpe": [
+      0.0173,
+      -0.0065,
+      -0.0303,
+      -0.1017,
+      -0.2206,
+      -0.5769,
+      -1.1677
+     ],
+     "p_value": [
+      0.4538,
+      0.5492,
+      0.6332,
+      0.8681,
+      0.99,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.727
+    },
+    {
+     "id": "ppo",
+     "name": "PPO",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 24.1051,
+     "sharpe": [
+      0.7095,
+      0.6885,
+      0.6675,
+      0.6044,
+      0.4992,
+      0.1837,
+      -0.3422
+     ],
+     "delta_sharpe": [
+      -0.0198,
+      -0.0407,
+      -0.0617,
+      -0.1245,
+      -0.2292,
+      -0.5432,
+      -1.0666
+     ],
+     "p_value": [
+      0.6832,
+      0.8216,
+      0.9195,
+      0.9985,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "sac-tuned",
+     "name": "SAC (tuned)",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 22.6935,
+     "sharpe": [
+      0.6894,
+      0.6696,
+      0.6497,
+      0.5901,
+      0.4908,
+      0.1927,
+      -0.3038
+     ],
+     "delta_sharpe": [
+      -0.0399,
+      -0.0597,
+      -0.0795,
+      -0.1388,
+      -0.2376,
+      -0.5342,
+      -1.0282
+     ],
+     "p_value": [
+      0.7586,
+      0.8586,
+      0.916,
+      0.9945,
+      0.9995,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "cvar-ppo",
+     "name": "CVaR-PPO",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 23.792,
+     "sharpe": [
+      0.6952,
+      0.674,
+      0.6529,
+      0.5894,
+      0.4836,
+      0.1662,
+      -0.3629
+     ],
+     "delta_sharpe": [
+      -0.0342,
+      -0.0552,
+      -0.0763,
+      -0.1395,
+      -0.2448,
+      -0.5607,
+      -1.0873
+     ],
+     "p_value": [
+      0.7941,
+      0.904,
+      0.964,
+      0.999,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "ppo-tuned",
+     "name": "PPO (tuned)",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 23.5654,
+     "sharpe": [
+      0.6813,
+      0.6606,
+      0.6399,
+      0.5778,
+      0.4743,
+      0.1637,
+      -0.3542
+     ],
+     "delta_sharpe": [
+      -0.048,
+      -0.0686,
+      -0.0892,
+      -0.151,
+      -0.2541,
+      -0.5632,
+      -1.0786
+     ],
+     "p_value": [
+      0.8641,
+      0.9405,
+      0.979,
+      0.9995,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "trend-following",
+     "name": "Trend following (200d SMA)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 2.3762,
+     "sharpe": [
+      0.5881,
+      0.5851,
+      0.582,
+      0.5728,
+      0.5575,
+      0.5114,
+      0.4343
+     ],
+     "delta_sharpe": [
+      -0.1412,
+      -0.1442,
+      -0.1471,
+      -0.156,
+      -0.1709,
+      -0.2155,
+      -0.2901
+     ],
+     "p_value": [
+      0.7501,
+      0.7546,
+      0.7591,
+      0.7741,
+      0.7896,
+      0.8476,
+      0.9095
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "cql",
+     "name": "CQL",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 6.9448,
+     "sharpe": [
+      0.5992,
+      0.5895,
+      0.5798,
+      0.5506,
+      0.502,
+      0.3562,
+      0.1132
+     ],
+     "delta_sharpe": [
+      -0.1302,
+      -0.1398,
+      -0.1494,
+      -0.1783,
+      -0.2264,
+      -0.3707,
+      -0.6112
+     ],
+     "p_value": [
+      0.7086,
+      0.7226,
+      0.7346,
+      0.7726,
+      0.8321,
+      0.939,
+      0.992
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "minimum-variance",
+     "name": "Minimum variance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 1.0125,
+     "sharpe": [
+      0.544,
+      0.5425,
+      0.5409,
+      0.5362,
+      0.5285,
+      0.5051,
+      0.466
+     ],
+     "delta_sharpe": [
+      -0.1853,
+      -0.1868,
+      -0.1882,
+      -0.1926,
+      -0.1999,
+      -0.2218,
+      -0.2584
+     ],
+     "p_value": [
+      0.7616,
+      0.7636,
+      0.7661,
+      0.7706,
+      0.7791,
+      0.8106,
+      0.8441
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "sac",
+     "name": "SAC",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 45.8507,
+     "sharpe": [
+      0.7314,
+      0.6912,
+      0.651,
+      0.5304,
+      0.3293,
+      -0.2741,
+      -1.2784
+     ],
+     "delta_sharpe": [
+      0.002,
+      -0.0381,
+      -0.0782,
+      -0.1985,
+      -0.399,
+      -1.001,
+      -2.0028
+     ],
+     "p_value": [
+      0.5077,
+      0.8031,
+      0.948,
+      0.9995,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.0503
+    },
+    {
+     "id": "td3",
+     "name": "TD3",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 148.9077,
+     "sharpe": [
+      0.896,
+      0.7759,
+      0.6557,
+      0.2952,
+      -0.306,
+      -2.1084,
+      -5.0923
+     ],
+     "delta_sharpe": [
+      0.1667,
+      0.0466,
+      -0.0734,
+      -0.4337,
+      -1.0344,
+      -2.8353,
+      -5.8167
+     ],
+     "p_value": [
+      0.1504,
+      0.4088,
+      0.7561,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 1.3886
+    },
+    {
+     "id": "ddpg",
+     "name": "DDPG",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 155.3804,
+     "sharpe": [
+      0.8468,
+      0.7241,
+      0.6013,
+      0.233,
+      -0.3809,
+      -2.2197,
+      -5.2579
+     ],
+     "delta_sharpe": [
+      0.1175,
+      -0.0052,
+      -0.1279,
+      -0.4959,
+      -1.1093,
+      -2.9466,
+      -5.9823
+     ],
+     "p_value": [
+      0.1894,
+      0.5512,
+      0.8696,
+      0.9995,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.9577
+    },
+    {
+     "id": "cash",
+     "name": "Cash",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 0.0,
+     "sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "delta_sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "p_value": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "break_even_bp": null
+    }
+   ]
+  },
+  {
+   "task": "us-sectors",
+   "title": "US sector rotation",
+   "role": "ranked",
+   "first": "2018-01-02",
+   "last": "2025-12-31",
+   "sessions": 2011,
+   "periods_per_year": 252,
+   "charged_bp": 5.0,
+   "fees_bp": [
+    0.0,
+    1.0,
+    2.0,
+    5.0,
+    10.0,
+    25.0,
+    50.0
+   ],
+   "benchmark": {
+    "id": "equal-weight-buy-hold",
+    "name": "1/N buy and hold",
+    "turnover": 0.1252,
+    "sharpe": [
+     0.684,
+     0.684,
+     0.6839,
+     0.6837,
+     0.6834,
+     0.6823,
+     0.6806
+    ]
+   },
+   "entries": [
+    {
+     "id": "decision-transformer",
+     "name": "Decision Transformer",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 3.6787,
+     "sharpe": [
+      0.7036,
+      0.7014,
+      0.6993,
+      0.6928,
+      0.6819,
+      0.6494,
+      0.5951
+     ],
+     "delta_sharpe": [
+      0.0196,
+      0.0175,
+      0.0154,
+      0.0091,
+      -0.0015,
+      -0.033,
+      -0.0855
+     ],
+     "p_value": [
+      0.3983,
+      0.4058,
+      0.4123,
+      0.4353,
+      0.4758,
+      0.5732,
+      0.7426
+     ],
+     "break_even_bp": 9.3091
+    },
+    {
+     "id": "equal-weight-monthly",
+     "name": "1/N monthly rebalance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 0.444,
+     "sharpe": [
+      0.691,
+      0.6908,
+      0.6905,
+      0.6898,
+      0.6886,
+      0.685,
+      0.679
+     ],
+     "delta_sharpe": [
+      0.007,
+      0.0068,
+      0.0066,
+      0.0061,
+      0.0052,
+      0.0027,
+      -0.0016
+     ],
+     "p_value": [
+      0.4398,
+      0.4413,
+      0.4433,
+      0.4493,
+      0.4583,
+      0.4828,
+      0.5237
+     ],
+     "break_even_bp": 40.4451
+    },
+    {
+     "id": "bc",
+     "name": "Behaviour cloning",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 15.3677,
+     "sharpe": [
+      0.7247,
+      0.7152,
+      0.7057,
+      0.6771,
+      0.6295,
+      0.4865,
+      0.2481
+     ],
+     "delta_sharpe": [
+      0.0407,
+      0.0312,
+      0.0218,
+      -0.0066,
+      -0.0539,
+      -0.1959,
+      -0.4326
+     ],
+     "p_value": [
+      0.3258,
+      0.3728,
+      0.4148,
+      0.5447,
+      0.7416,
+      0.9885,
+      1.0
+     ],
+     "break_even_bp": 4.3013
+    },
+    {
+     "id": "a2c",
+     "name": "A2C",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 9.9975,
+     "sharpe": [
+      0.7007,
+      0.6947,
+      0.6888,
+      0.6709,
+      0.641,
+      0.5515,
+      0.4022
+     ],
+     "delta_sharpe": [
+      0.0167,
+      0.0108,
+      0.0049,
+      -0.0128,
+      -0.0424,
+      -0.1309,
+      -0.2784
+     ],
+     "p_value": [
+      0.3428,
+      0.4068,
+      0.4698,
+      0.6502,
+      0.9095,
+      0.9995,
+      1.0
+     ],
+     "break_even_bp": 2.8244
+    },
+    {
+     "id": "inverse-volatility",
+     "name": "Inverse volatility",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 0.85,
+     "sharpe": [
+      0.6703,
+      0.6698,
+      0.6693,
+      0.6679,
+      0.6655,
+      0.6583,
+      0.6463
+     ],
+     "delta_sharpe": [
+      -0.0138,
+      -0.0142,
+      -0.0146,
+      -0.0158,
+      -0.0179,
+      -0.024,
+      -0.0343
+     ],
+     "p_value": [
+      0.6452,
+      0.6492,
+      0.6532,
+      0.6637,
+      0.6817,
+      0.7341,
+      0.8016
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "momentum",
+     "name": "Momentum (top 3)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 5.672,
+     "sharpe": [
+      0.6808,
+      0.6779,
+      0.675,
+      0.6663,
+      0.6517,
+      0.6078,
+      0.5345
+     ],
+     "delta_sharpe": [
+      -0.0032,
+      -0.006,
+      -0.0089,
+      -0.0174,
+      -0.0317,
+      -0.0745,
+      -0.1462
+     ],
+     "p_value": [
+      0.4853,
+      0.4928,
+      0.5002,
+      0.5222,
+      0.5592,
+      0.6667,
+      0.8076
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "iql",
+     "name": "IQL",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 12.776,
+     "sharpe": [
+      0.6966,
+      0.6887,
+      0.6808,
+      0.6573,
+      0.618,
+      0.5001,
+      0.3037
+     ],
+     "delta_sharpe": [
+      0.0125,
+      0.0047,
+      -0.0031,
+      -0.0264,
+      -0.0654,
+      -0.1822,
+      -0.3769
+     ],
+     "p_value": [
+      0.3913,
+      0.4608,
+      0.5272,
+      0.7011,
+      0.9,
+      0.9995,
+      1.0
+     ],
+     "break_even_bp": 1.6072
+    },
+    {
+     "id": "sac-tuned",
+     "name": "SAC (tuned)",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 14.97,
+     "sharpe": [
+      0.6927,
+      0.6836,
+      0.6746,
+      0.6475,
+      0.6023,
+      0.4667,
+      0.2406
+     ],
+     "delta_sharpe": [
+      0.0086,
+      -0.0003,
+      -0.0093,
+      -0.0362,
+      -0.0811,
+      -0.2157,
+      -0.4401
+     ],
+     "p_value": [
+      0.4303,
+      0.5107,
+      0.6037,
+      0.8226,
+      0.983,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.9624
+    },
+    {
+     "id": "cvar-ppo",
+     "name": "CVaR-PPO",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 23.0984,
+     "sharpe": [
+      0.7052,
+      0.6913,
+      0.6775,
+      0.6359,
+      0.5667,
+      0.359,
+      0.0128
+     ],
+     "delta_sharpe": [
+      0.0211,
+      0.0073,
+      -0.0064,
+      -0.0478,
+      -0.1167,
+      -0.3234,
+      -0.6678
+     ],
+     "p_value": [
+      0.3083,
+      0.4413,
+      0.5882,
+      0.904,
+      0.998,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 1.5329
+    },
+    {
+     "id": "ppo-tuned",
+     "name": "PPO (tuned)",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 28.0889,
+     "sharpe": [
+      0.7022,
+      0.6855,
+      0.6687,
+      0.6183,
+      0.5344,
+      0.2824,
+      -0.1376
+     ],
+     "delta_sharpe": [
+      0.0182,
+      0.0015,
+      -0.0152,
+      -0.0654,
+      -0.149,
+      -0.3999,
+      -0.8183
+     ],
+     "p_value": [
+      0.3388,
+      0.4998,
+      0.6557,
+      0.958,
+      0.999,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 1.0887
+    },
+    {
+     "id": "cql",
+     "name": "CQL",
+     "kind": "rl",
+     "group": "Other learned",
+     "seeds": 5,
+     "turnover": 7.0161,
+     "sharpe": [
+      0.6361,
+      0.6316,
+      0.6272,
+      0.6138,
+      0.5915,
+      0.5246,
+      0.4131
+     ],
+     "delta_sharpe": [
+      -0.048,
+      -0.0524,
+      -0.0568,
+      -0.0699,
+      -0.0919,
+      -0.1577,
+      -0.2675
+     ],
+     "p_value": [
+      0.7276,
+      0.7396,
+      0.7536,
+      0.7881,
+      0.8486,
+      0.948,
+      0.9955
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "lstm-forecast",
+     "name": "LSTM forecast",
+     "kind": "forecast",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 41.2334,
+     "sharpe": [
+      0.7264,
+      0.7037,
+      0.681,
+      0.6127,
+      0.499,
+      0.1572,
+      -0.4125
+     ],
+     "delta_sharpe": [
+      0.0424,
+      0.0197,
+      -0.003,
+      -0.071,
+      -0.1844,
+      -0.5252,
+      -1.0931
+     ],
+     "p_value": [
+      0.3493,
+      0.4343,
+      0.5422,
+      0.8271,
+      0.9945,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 1.8698
+    },
+    {
+     "id": "ppo",
+     "name": "PPO",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 28.7901,
+     "sharpe": [
+      0.6937,
+      0.6765,
+      0.6592,
+      0.6076,
+      0.5214,
+      0.263,
+      -0.1678
+     ],
+     "delta_sharpe": [
+      0.0097,
+      -0.0075,
+      -0.0247,
+      -0.0761,
+      -0.1619,
+      -0.4194,
+      -0.8484
+     ],
+     "p_value": [
+      0.4043,
+      0.5982,
+      0.7511,
+      0.9785,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.5628
+    },
+    {
+     "id": "trend-following",
+     "name": "Trend following (200d SMA)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 2.5176,
+     "sharpe": [
+      0.5974,
+      0.5951,
+      0.5928,
+      0.5859,
+      0.5744,
+      0.5399,
+      0.4822
+     ],
+     "delta_sharpe": [
+      -0.0867,
+      -0.0889,
+      -0.0911,
+      -0.0978,
+      -0.109,
+      -0.1425,
+      -0.1985
+     ],
+     "p_value": [
+      0.6722,
+      0.6777,
+      0.6817,
+      0.6952,
+      0.7176,
+      0.7706,
+      0.8411
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "minimum-variance",
+     "name": "Minimum variance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 1.5589,
+     "sharpe": [
+      0.5577,
+      0.5567,
+      0.5557,
+      0.5527,
+      0.5477,
+      0.5327,
+      0.5077
+     ],
+     "delta_sharpe": [
+      -0.1263,
+      -0.1273,
+      -0.1282,
+      -0.131,
+      -0.1356,
+      -0.1496,
+      -0.173
+     ],
+     "p_value": [
+      0.8141,
+      0.8141,
+      0.8166,
+      0.8201,
+      0.8276,
+      0.8496,
+      0.8891
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "sac",
+     "name": "SAC",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 74.3369,
+     "sharpe": [
+      0.7584,
+      0.7141,
+      0.6698,
+      0.5368,
+      0.3152,
+      -0.3503,
+      -1.4589
+     ],
+     "delta_sharpe": [
+      0.0744,
+      0.0301,
+      -0.0141,
+      -0.1469,
+      -0.3682,
+      -1.0326,
+      -2.1395
+     ],
+     "p_value": [
+      0.1084,
+      0.3078,
+      0.6102,
+      0.9865,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 1.6809
+    },
+    {
+     "id": "ddpg",
+     "name": "DDPG",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 134.5866,
+     "sharpe": [
+      0.6944,
+      0.6207,
+      0.547,
+      0.3258,
+      -0.043,
+      -1.1492,
+      -2.9884
+     ],
+     "delta_sharpe": [
+      0.0104,
+      -0.0633,
+      -0.1369,
+      -0.3579,
+      -0.7263,
+      -1.8315,
+      -3.6691
+     ],
+     "p_value": [
+      0.4798,
+      0.8066,
+      0.962,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.1407
+    },
+    {
+     "id": "td3",
+     "name": "TD3",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 120.8819,
+     "sharpe": [
+      0.66,
+      0.5917,
+      0.5235,
+      0.3186,
+      -0.0231,
+      -1.0483,
+      -2.7541
+     ],
+     "delta_sharpe": [
+      -0.024,
+      -0.0922,
+      -0.1605,
+      -0.3652,
+      -0.7064,
+      -1.7307,
+      -3.4348
+     ],
+     "p_value": [
+      0.6542,
+      0.9105,
+      0.9865,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "cash",
+     "name": "Cash",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 0.0,
+     "sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "delta_sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "p_value": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "break_even_bp": null
+    }
+   ]
+  },
+  {
+   "task": "paper-2021",
+   "title": "Wang & Zhang (2021) setup",
+   "role": "reevaluation",
+   "first": "2019-01-02",
+   "last": "2020-12-31",
+   "sessions": 505,
+   "periods_per_year": 252,
+   "charged_bp": 10.0,
+   "fees_bp": [
+    0.0,
+    1.0,
+    2.0,
+    5.0,
+    10.0,
+    25.0,
+    50.0
+   ],
+   "benchmark": {
+    "id": "equal-weight-buy-hold",
+    "name": "1/N buy and hold",
+    "turnover": 0.4985,
+    "sharpe": [
+     1.1125,
+     1.1124,
+     1.1122,
+     1.1117,
+     1.1108,
+     1.1081,
+     1.1037
+    ]
+   },
+   "entries": [
+    {
+     "id": "momentum",
+     "name": "Momentum (top 3)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 6.6943,
+     "sharpe": [
+      1.3269,
+      1.3249,
+      1.323,
+      1.3172,
+      1.3076,
+      1.2785,
+      1.2297
+     ],
+     "delta_sharpe": [
+      0.2143,
+      0.2126,
+      0.2108,
+      0.2056,
+      0.1968,
+      0.1704,
+      0.126
+     ],
+     "p_value": [
+      0.2209,
+      0.2224,
+      0.2239,
+      0.2309,
+      0.2399,
+      0.2704,
+      0.3193
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "equal-weight-monthly",
+     "name": "1/N monthly rebalance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 1.0311,
+     "sharpe": [
+      1.0459,
+      1.0455,
+      1.0451,
+      1.0439,
+      1.042,
+      1.0362,
+      1.0265
+     ],
+     "delta_sharpe": [
+      -0.0667,
+      -0.0669,
+      -0.0671,
+      -0.0677,
+      -0.0688,
+      -0.0719,
+      -0.0771
+     ],
+     "p_value": [
+      0.7716,
+      0.7716,
+      0.7726,
+      0.7746,
+      0.7771,
+      0.7886,
+      0.8066
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "a2c",
+     "name": "A2C",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 9.1834,
+     "sharpe": [
+      1.0627,
+      1.059,
+      1.0553,
+      1.0443,
+      1.0259,
+      0.9706,
+      0.8784
+     ],
+     "delta_sharpe": [
+      -0.0498,
+      -0.0534,
+      -0.0569,
+      -0.0674,
+      -0.0849,
+      -0.1375,
+      -0.2253
+     ],
+     "p_value": [
+      0.7226,
+      0.7311,
+      0.7451,
+      0.7816,
+      0.8251,
+      0.9195,
+      0.974
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "inverse-volatility",
+     "name": "Inverse volatility",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 1.6827,
+     "sharpe": [
+      1.0134,
+      1.0128,
+      1.0121,
+      1.0101,
+      1.0068,
+      0.9968,
+      0.98
+     ],
+     "delta_sharpe": [
+      -0.0991,
+      -0.0996,
+      -0.1001,
+      -0.1016,
+      -0.104,
+      -0.1114,
+      -0.1236
+     ],
+     "p_value": [
+      0.8316,
+      0.8321,
+      0.8331,
+      0.8371,
+      0.8431,
+      0.8616,
+      0.8816
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "ppo",
+     "name": "PPO",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 22.4734,
+     "sharpe": [
+      1.0729,
+      1.0639,
+      1.0549,
+      1.028,
+      0.983,
+      0.848,
+      0.6229
+     ],
+     "delta_sharpe": [
+      -0.0396,
+      -0.0484,
+      -0.0572,
+      -0.0837,
+      -0.1278,
+      -0.2601,
+      -0.4808
+     ],
+     "p_value": [
+      0.6707,
+      0.7011,
+      0.7316,
+      0.8141,
+      0.8981,
+      0.976,
+      0.997
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "lstm-forecast",
+     "name": "LSTM forecast",
+     "kind": "forecast",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 79.0774,
+     "sharpe": [
+      1.1748,
+      1.141,
+      1.1072,
+      1.0057,
+      0.8365,
+      0.3291,
+      -0.5146
+     ],
+     "delta_sharpe": [
+      0.0623,
+      0.0286,
+      -0.005,
+      -0.106,
+      -0.2742,
+      -0.779,
+      -1.6182
+     ],
+     "p_value": [
+      0.3653,
+      0.4203,
+      0.4688,
+      0.6432,
+      0.8311,
+      0.9835,
+      1.0
+     ],
+     "break_even_bp": 1.8509
+    },
+    {
+     "id": "minimum-variance",
+     "name": "Minimum variance",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 2.7039,
+     "sharpe": [
+      0.8182,
+      0.817,
+      0.8157,
+      0.8118,
+      0.8053,
+      0.7859,
+      0.7533
+     ],
+     "delta_sharpe": [
+      -0.2943,
+      -0.2954,
+      -0.2965,
+      -0.2999,
+      -0.3055,
+      -0.3223,
+      -0.3504
+     ],
+     "p_value": [
+      0.8456,
+      0.8471,
+      0.8476,
+      0.8491,
+      0.8501,
+      0.8631,
+      0.8746
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "trend-following",
+     "name": "Trend following (200d SMA)",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 2.5762,
+     "sharpe": [
+      0.7514,
+      0.7499,
+      0.7483,
+      0.7436,
+      0.7358,
+      0.7122,
+      0.6728
+     ],
+     "delta_sharpe": [
+      -0.3611,
+      -0.3625,
+      -0.3639,
+      -0.3681,
+      -0.375,
+      -0.3959,
+      -0.4309
+     ],
+     "p_value": [
+      0.956,
+      0.956,
+      0.956,
+      0.958,
+      0.96,
+      0.966,
+      0.9765
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "ddpg",
+     "name": "DDPG",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 98.7467,
+     "sharpe": [
+      1.099,
+      1.0605,
+      1.0221,
+      0.9069,
+      0.7148,
+      0.1382,
+      -0.8232
+     ],
+     "delta_sharpe": [
+      -0.0136,
+      -0.0518,
+      -0.0901,
+      -0.2048,
+      -0.396,
+      -0.97,
+      -1.9269
+     ],
+     "p_value": [
+      0.5507,
+      0.6747,
+      0.7766,
+      0.9265,
+      0.985,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": null
+    },
+    {
+     "id": "td3",
+     "name": "TD3",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 102.397,
+     "sharpe": [
+      1.1159,
+      1.0752,
+      1.0345,
+      0.9124,
+      0.7088,
+      0.0974,
+      -0.9226
+     ],
+     "delta_sharpe": [
+      0.0034,
+      -0.0372,
+      -0.0777,
+      -0.1993,
+      -0.402,
+      -1.0107,
+      -2.0263
+     ],
+     "p_value": [
+      0.5127,
+      0.6212,
+      0.7151,
+      0.8931,
+      0.977,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.0827
+    },
+    {
+     "id": "sac",
+     "name": "SAC",
+     "kind": "rl",
+     "group": "SB3 RL and LSTM",
+     "seeds": 5,
+     "turnover": 122.7877,
+     "sharpe": [
+      1.1556,
+      1.1077,
+      1.0599,
+      0.9162,
+      0.6767,
+      -0.0413,
+      -1.2361
+     ],
+     "delta_sharpe": [
+      0.0431,
+      -0.0046,
+      -0.0523,
+      -0.1955,
+      -0.434,
+      -1.1494,
+      -2.3398
+     ],
+     "p_value": [
+      0.3528,
+      0.5412,
+      0.7421,
+      0.9665,
+      0.998,
+      1.0,
+      1.0
+     ],
+     "break_even_bp": 0.9032
+    },
+    {
+     "id": "cash",
+     "name": "Cash",
+     "kind": "baseline",
+     "group": "Rule-based",
+     "seeds": 1,
+     "turnover": 0.0,
+     "sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "delta_sharpe": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "p_value": [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     "break_even_bp": null
+    }
+   ]
+  }
+ ]
+}

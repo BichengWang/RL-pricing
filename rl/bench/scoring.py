@@ -12,6 +12,9 @@ Sharpe-ratio inference:
   the Sharpe ratio expected from the best of ``trials`` skill-less strategies.
 * :func:`sharpe_difference` - one-sided paired stationary-bootstrap test
   (Politis & Romano 1994) of "policy Sharpe > benchmark Sharpe".
+
+:func:`reprice` gives a recorded backtest's returns at another fee, with its
+decisions held fixed.
 """
 
 from __future__ import annotations
@@ -28,6 +31,7 @@ __all__ = [
     "deflated_sharpe",
     "metrics",
     "probabilistic_sharpe",
+    "reprice",
     "sharpe_difference",
 ]
 
@@ -277,3 +281,29 @@ def sharpe_difference(
         diffs[lo : lo + rows] = d * scale
     exceed = int(np.count_nonzero(diffs - observed >= observed))
     return float(observed), (1 + exceed) / (n_boot + 1)
+
+
+def reprice(equity, turnover, charged: float, fee: float) -> np.ndarray:
+    """Per-period returns of a recorded backtest re-priced from fee ``charged`` to ``fee``.
+
+    ``equity`` (``n + 1`` values, net of fees at ``charged``) and ``turnover``
+    (``n`` sessions of traded notional over pre-trade equity) are as
+    :func:`rl.bench.engine.simulate` records them. A fill turns pre-trade
+    equity ``B`` into post-fee equity ``B (1 - charged * turnover)``, and the
+    weights after it are the targets whatever the fee, so with the decisions
+    held fixed::
+
+        1 + r' = (1 + r) (1 - fee * turnover) / (1 - charged * turnover)
+
+    This is exact at ``fee`` 0. At other fees it keeps the turnover of the
+    charged run, which shifts slightly with the fee. To first order,
+    ``r' = r + (charged - fee) * turnover``.
+    """
+    e = _series(equity, "equity", floor=0.0)
+    t = _series(turnover, "turnover", minimum=1, floor=0.0)
+    if t.size != e.size - 1:
+        raise ValueError(f"turnover ({t.size}) must have one value per return ({e.size - 1})")
+    for name, value in (("charged", charged), ("fee", fee)):
+        if not (math.isfinite(value) and 0 <= value < 1):
+            raise ValueError(f"{name} must be in [0, 1), got {value!r}")
+    return e[1:] / e[:-1] * ((1.0 - fee * t) / (1.0 - charged * t)) - 1.0
