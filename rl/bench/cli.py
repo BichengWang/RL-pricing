@@ -8,7 +8,7 @@ import sys
 from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
 from pathlib import Path
 
-from rl.bench import ledger, leaderboard, monthly, runner, sweep, verdicts
+from rl.bench import fees, ledger, leaderboard, monthly, runner, sweep, verdicts
 from rl.bench.submission import SUBMISSIONS_DIR, Submission, discover
 from rl.bench.tasks import TASKS, get_task
 
@@ -93,6 +93,7 @@ def build_parser() -> ArgumentParser:
     # Commands that register themselves and carry their handler.
     ledger.add_cli(commands, common)
     monthly.add_cli(commands, common)
+    fees.add_cli(commands, common)
     sweep.add_cli(commands, common)
     verdicts.add_cli(commands, common)
     return parser

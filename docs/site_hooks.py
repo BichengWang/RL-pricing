@@ -84,6 +84,8 @@ def _nav(published: dict[str, Path]) -> list:
         nav.append({"Reports": reports})
     if "leaderboard/index.md" in published:
         nav.append({"Leaderboard": "leaderboard/index.md"})
+    if "leaderboard/FEES.md" in published:
+        nav.append({"Fee sensitivity": "leaderboard/FEES.md"})
     monthly = sorted((name for name in published if name.startswith("leaderboard/reports/") and name.endswith(".md")), reverse=True)
     if monthly:
         nav.append({"Live track": [{Path(name).stem: name} for name in monthly]})
