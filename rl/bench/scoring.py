@@ -295,14 +295,16 @@ def reprice(equity, turnover, charged: float, fee: float) -> np.ndarray:
     (``n`` sessions of traded notional over pre-trade equity) are as
     :func:`rl.bench.engine.simulate` records them. A fill turns pre-trade
     equity ``B`` into post-fee equity ``B (1 - charged * turnover)``, and the
-    weights after it are the targets whatever the fee, so with the decisions
-    held fixed::
+    weights after a trade are the targets whatever the fee, so with the
+    decisions held fixed::
 
         1 + r' = (1 + r) (1 - fee * turnover) / (1 - charged * turnover)
 
-    This is exact at ``fee`` 0. At other fees it keeps the turnover of the
-    charged run, which shifts slightly with the fee. To first order,
-    ``r' = r + (charged - fee) * turnover``.
+    This is exact at ``fee`` 0, except after a forced sale of a delisted
+    holding on a session the policy holds: only the sold part pays the fee, so
+    the later weights depend slightly on it. At other fees it also keeps the
+    turnover of the charged run, which shifts slightly with the fee. To first
+    order, ``r' = r + (charged - fee) * turnover``.
     """
     e = _series(equity, "equity", floor=0.0)
     t = _series(turnover, "turnover", minimum=1, floor=0.0)

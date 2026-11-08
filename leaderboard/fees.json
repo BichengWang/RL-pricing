@@ -9,168 +9,344 @@
   25.0,
   50.0
  ],
- "headline": [
-  {
-   "fee_bp": "charged",
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 0,
-     "significant": 0
+ "headline": {
+  "ranked": {
+   "tasks": [
+    "crypto-majors",
+    "us-multi-asset",
+    "us-sectors"
+   ],
+   "rows": [
+    {
+     "fee_bp": "charged",
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 4,
+       "significant": 2
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 4,
+       "significant": 1
+      }
+     }
     },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 4,
-     "significant": 2
+    {
+     "fee_bp": 0.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 17,
+       "significant": 3
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 8,
+       "significant": 3
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 5,
+       "significant": 1
+      }
+     }
     },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 5,
-     "significant": 1
+    {
+     "fee_bp": 1.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 11,
+       "significant": 1
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 8,
+       "significant": 2
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 5,
+       "significant": 1
+      }
+     }
+    },
+    {
+     "fee_bp": 2.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 6,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 6,
+       "significant": 2
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 4,
+       "significant": 1
+      }
+     }
+    },
+    {
+     "fee_bp": 5.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 4,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 4,
+       "significant": 2
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 4,
+       "significant": 1
+      }
+     }
+    },
+    {
+     "fee_bp": 10.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 3,
+       "significant": 2
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 4,
+       "significant": 1
+      }
+     }
+    },
+    {
+     "fee_bp": 25.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 3,
+       "significant": 2
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 4,
+       "significant": 1
+      }
+     }
+    },
+    {
+     "fee_bp": 50.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 27,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 12,
+       "ahead": 2,
+       "significant": 1
+      },
+      "Rule-based": {
+       "entries": 15,
+       "ahead": 3,
+       "significant": 1
+      }
+     }
     }
-   }
+   ]
   },
-  {
-   "fee_bp": 0.0,
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 19,
-     "significant": 3
+  "reevaluation": {
+   "tasks": [
+    "paper-2021"
+   ],
+   "rows": [
+    {
+     "fee_bp": "charged",
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
     },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 9,
-     "significant": 3
+    {
+     "fee_bp": 0.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 3,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
     },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 6,
-     "significant": 1
+    {
+     "fee_bp": 1.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 1,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
+    },
+    {
+     "fee_bp": 2.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
+    },
+    {
+     "fee_bp": 5.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
+    },
+    {
+     "fee_bp": 10.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
+    },
+    {
+     "fee_bp": 25.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
+    },
+    {
+     "fee_bp": 50.0,
+     "groups": {
+      "SB3 RL and LSTM": {
+       "entries": 6,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Other learned": {
+       "entries": 0,
+       "ahead": 0,
+       "significant": 0
+      },
+      "Rule-based": {
+       "entries": 5,
+       "ahead": 1,
+       "significant": 0
+      }
+     }
     }
-   }
-  },
-  {
-   "fee_bp": 1.0,
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 11,
-     "significant": 1
-    },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 9,
-     "significant": 2
-    },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 6,
-     "significant": 1
-    }
-   }
-  },
-  {
-   "fee_bp": 2.0,
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 6,
-     "significant": 0
-    },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 6,
-     "significant": 2
-    },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 5,
-     "significant": 1
-    }
-   }
-  },
-  {
-   "fee_bp": 5.0,
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 4,
-     "significant": 0
-    },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 4,
-     "significant": 2
-    },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 5,
-     "significant": 1
-    }
-   }
-  },
-  {
-   "fee_bp": 10.0,
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 0,
-     "significant": 0
-    },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 3,
-     "significant": 2
-    },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 5,
-     "significant": 1
-    }
-   }
-  },
-  {
-   "fee_bp": 25.0,
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 0,
-     "significant": 0
-    },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 3,
-     "significant": 2
-    },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 5,
-     "significant": 1
-    }
-   }
-  },
-  {
-   "fee_bp": 50.0,
-   "groups": {
-    "SB3 RL and LSTM": {
-     "entries": 30,
-     "ahead": 0,
-     "significant": 0
-    },
-    "Other learned": {
-     "entries": 15,
-     "ahead": 2,
-     "significant": 1
-    },
-    "Rule-based": {
-     "entries": 20,
-     "ahead": 4,
-     "significant": 1
-    }
-   }
+   ]
   }
- ],
+ },
  "sections": [
   {
    "task": "crypto-majors",
@@ -677,7 +853,7 @@
      "id": "cvar-ppo",
      "name": "CVaR-PPO",
      "kind": "rl",
-     "group": "Other learned",
+     "group": "SB3 RL and LSTM",
      "seeds": 5,
      "turnover": 76.7512,
      "sharpe": [
@@ -1288,7 +1464,7 @@
      "id": "cvar-ppo",
      "name": "CVaR-PPO",
      "kind": "rl",
-     "group": "Other learned",
+     "group": "SB3 RL and LSTM",
      "seeds": 5,
      "turnover": 23.792,
      "sharpe": [
@@ -1935,7 +2111,7 @@
      "id": "cvar-ppo",
      "name": "CVaR-PPO",
      "kind": "rl",
-     "group": "Other learned",
+     "group": "SB3 RL and LSTM",
      "seeds": 5,
      "turnover": 23.0984,
      "sharpe": [
