@@ -149,6 +149,10 @@ jobs:
         run: rl-pricing bench run-all --stale
       - name: Render leaderboard
         run: rl-pricing bench leaderboard
+      - name: Re-price the historical records at other fees
+        # FEES.md and fees.json follow the records; a failure here must not lose the freezes above.
+        continue-on-error: true
+        run: rl-pricing bench fees
       - name: Commit frozen policies, publication times and records
         run: |
           git config user.name "github-actions[bot]"
@@ -209,6 +213,7 @@ jobs:
         run: |
           rl-pricing bench leaderboard
           rl-pricing bench reports
+          rl-pricing bench fees
       - name: Commit results
         if: ${{ !cancelled() }}  # a ledger score failure must not discard the rest of the month
         run: |

@@ -2,26 +2,43 @@
 
 How much of the historical track's verdict is the fee? Every historical record is re-priced at fees from 0 to 50 bp per side, and so is 1/N buy-and-hold. Written by `rl-pricing bench fees` from [`historical/`](historical/); every number is also in [`fees.json`](fees.json).
 
-**Method.** Each record keeps, per seed and session, equity net of the charged fee *c* and turnover *τ* (traded notional over pre-trade equity). A fill leaves post-fee equity *B*(1 − *cτ*), so at fee *c′* a session's return becomes 1 + *r′* = (1 + *r*)(1 − *c′τ*)/(1 − *cτ*). Decisions are held fixed, which is what these policies would do at another fee: they decide from prices and their current weights, and the engine's weights do not depend on the fee, so the one approximation is that *τ* keeps its charged-fee value (exact at 0 bp; the error grows with turnover and fee, and `tests/test_bench_fees.py` holds it within 0.01 Sharpe of exact engine runs). This is not retraining: the learned policies were trained and selected on returns net of the charged fee, and a policy trained at another fee could trade differently.
+**Method.** Each record keeps, per seed and session, equity net of the charged fee *c* and turnover *τ* (traded notional over pre-trade equity). A fill leaves post-fee equity *B*(1 − *cτ*), so at fee *c′* a session's return becomes 1 + *r′* = (1 + *r*)(1 − *c′τ*)/(1 − *cτ*). Decisions are held fixed, which is what these policies would do at another fee: they decide from prices and their current weights, and after a trade the weights are the targets whatever the fee. The replay keeps *τ* at its charged-fee value, so it is exact at 0 bp up to forced delisting sales (a holding sold on a session the policy holds pays the fee on the sold part only, which leaves the later weights slightly fee-dependent; largest observed error 5e-6 Sharpe, 1/N on `crypto-majors` after EOSUSDT's delisting). The error grows with turnover and fee; `tests/test_bench_fees.py` holds it within 0.01 Sharpe of exact engine runs up to 50 bp.
 
-*Sharpe* is that of the seed-averaged daily returns (the basis of the leaderboard's ΔSharpe, so it can differ from the leaderboard's mean per-seed Sharpe). *ΔSharpe* is that minus 1/N's, with the leaderboard's one-sided paired stationary-bootstrap p-value (uncorrected for the many comparisons). *Break-even*: the fee at which the entry's Sharpe equals 1/N's; *never* means it trails 1/N even at 0 bp, *> 50 bp* that it leads at every fee shown.
+This is not retraining: the learned policies were trained and selected on returns net of the charged fee, and a policy trained at another fee could trade differently. The LSTM forecaster's buy hurdle is also pinned at 10 bp by its submission (`rl/bench/policies/forecast.py`), so its decision rule is itself fee-shaped.
 
-## Entries ahead of 1/N
+*Sharpe* is that of the seed-averaged daily returns (the basis of the leaderboard's ΔSharpe, so it can differ from the leaderboard's mean per-seed Sharpe). *ΔSharpe* is that minus 1/N's, with the leaderboard's one-sided paired stationary-bootstrap p-value (uncorrected for the many comparisons). *Break-even*: the fee at which the entry's Sharpe equals 1/N's, assuming a single crossing in 0–50 bp (no entry's ΔSharpe changes sign more than once on the fee grid); *never* means it trails 1/N even at 0 bp, *> 50 bp* that it leads at every fee shown.
 
-Entries with a higher Sharpe ratio than 1/N at each fee, out of all entries in the group, over the ranked tasks and the re-evaluations (`crypto-majors`, `us-multi-asset`, `us-sectors`, `paper-2021`); in brackets, how many of them have p<0.05.
+## Entry-task pairs ahead of 1/N
+
+Pairs with a higher Sharpe ratio than 1/N at each fee, out of all pairs in the group; in brackets, how many of them have p<0.05. `paper-2021` is a survivorship-biased re-evaluation, so it is counted apart.
+
+**Ranked tasks**: `crypto-majors`, `us-multi-asset`, `us-sectors`
 
 | Fee per side | SB3 RL and LSTM | Other learned | Rule-based |
 | --- | --- | --- | --- |
-| as charged (5 bp or 10 bp) | 0 of 30 (0) | 4 of 15 (2) | 5 of 20 (1) |
-| 0 bp | 19 of 30 (3) | 9 of 15 (3) | 6 of 20 (1) |
-| 1 bp | 11 of 30 (1) | 9 of 15 (2) | 6 of 20 (1) |
-| 2 bp | 6 of 30 (0) | 6 of 15 (2) | 5 of 20 (1) |
-| 5 bp | 4 of 30 (0) | 4 of 15 (2) | 5 of 20 (1) |
-| 10 bp | 0 of 30 (0) | 3 of 15 (2) | 5 of 20 (1) |
-| 25 bp | 0 of 30 (0) | 3 of 15 (2) | 5 of 20 (1) |
-| 50 bp | 0 of 30 (0) | 2 of 15 (1) | 4 of 20 (1) |
+| as charged (5 bp or 10 bp) | 0 of 27 (0) | 4 of 12 (2) | 4 of 15 (1) |
+| 0 bp | 17 of 27 (3) | 8 of 12 (3) | 5 of 15 (1) |
+| 1 bp | 11 of 27 (1) | 8 of 12 (2) | 5 of 15 (1) |
+| 2 bp | 6 of 27 (0) | 6 of 12 (2) | 4 of 15 (1) |
+| 5 bp | 4 of 27 (0) | 4 of 12 (2) | 4 of 15 (1) |
+| 10 bp | 0 of 27 (0) | 3 of 12 (2) | 4 of 15 (1) |
+| 25 bp | 0 of 27 (0) | 3 of 12 (2) | 4 of 15 (1) |
+| 50 bp | 0 of 27 (0) | 2 of 12 (1) | 3 of 15 (1) |
 
-Groups: *SB3 RL and LSTM*: A2C, DDPG, LSTM forecast, PPO, PPO (tuned), SAC, SAC (tuned), TD3; *Other learned*: Behaviour cloning, CQL, CVaR-PPO, Decision Transformer, IQL; *Rule-based*: 1/N monthly rebalance, Inverse volatility, Minimum variance, Momentum (top 3), Trend following (200d SMA). Constant-return entries (cash) have no Sharpe ratio and are left out.
+**Re-evaluations (survivorship-biased, not ranked)**: `paper-2021`
+
+| Fee per side | SB3 RL and LSTM | Rule-based |
+| --- | --- | --- |
+| as charged (10 bp) | 0 of 6 (0) | 1 of 5 (0) |
+| 0 bp | 3 of 6 (0) | 1 of 5 (0) |
+| 1 bp | 1 of 6 (0) | 1 of 5 (0) |
+| 2 bp | 0 of 6 (0) | 1 of 5 (0) |
+| 5 bp | 0 of 6 (0) | 1 of 5 (0) |
+| 10 bp | 0 of 6 (0) | 1 of 5 (0) |
+| 25 bp | 0 of 6 (0) | 1 of 5 (0) |
+| 50 bp | 0 of 6 (0) | 1 of 5 (0) |
+
+Groups: *SB3 RL and LSTM*: A2C, CVaR-PPO, DDPG, LSTM forecast, PPO, PPO (tuned), SAC, SAC (tuned), TD3; *Other learned*: Behaviour cloning, CQL, Decision Transformer, IQL; *Rule-based*: 1/N monthly rebalance, Inverse volatility, Minimum variance, Momentum (top 3), Trend following (200d SMA). Constant-return entries (cash) have no Sharpe ratio and are left out.
 
 ## By task
 

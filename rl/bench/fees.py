@@ -35,12 +35,16 @@ FEES_BP = (0, 1, 2, 5, 10, 25, 50)
 _BP = 1e-4
 _BISECTIONS = 40
 GROUPS = ("SB3 RL and LSTM", "Other learned", "Rule-based")
+#: Policies built on Stable-Baselines3 (CVaR-PPO is an SB3 PPO).
+_SB3_POLICIES = ("rl.bench.policies.sb3:SB3Policy", "rl.bench.policies.cvar_ppo:CVaRPPOPolicy")
+#: Headline tables, one per task role.
+_ROLES = {"ranked": "Ranked tasks", "reevaluation": "Re-evaluations (survivorship-biased, not ranked)"}
 
 
 def _group(record: dict) -> str:
     if record["kind"] == "baseline":
         return GROUPS[2]
-    if record["kind"] == "forecast" or record["policy"].startswith("rl.bench.policies.sb3:"):
+    if record["kind"] == "forecast" or record["policy"] in _SB3_POLICIES:
         return GROUPS[0]
     return GROUPS[1]
 
@@ -145,21 +149,40 @@ def _section(task_id: str, records: list[dict]) -> dict | None:
     }
 
 
-def _headline(sections: list[dict]) -> list[dict]:
-    rows = []
-    for fee in ("charged", *(float(f) for f in FEES_BP)):
-        counts = {group: {"entries": 0, "ahead": 0, "significant": 0} for group in GROUPS}
-        for section in sections:
-            at = section["fees_bp"].index(section["charged_bp"] if fee == "charged" else fee)
-            for entry in section["entries"]:
-                if not math.isfinite(entry["delta_sharpe"][at]):
-                    continue
-                count = counts[entry["group"]]
-                count["entries"] += 1
-                count["ahead"] += entry["delta_sharpe"][at] > 0
-                count["significant"] += entry["p_value"][at] < 0.05
-        rows.append({"fee_bp": fee, "groups": counts})
-    return rows
+def _counts(sections: list[dict], fee) -> dict:
+    """Entry-task pairs per group, and how many lead 1/N (and with p < 0.05), at ``fee`` bp or "charged"."""
+    counts = {group: {"entries": 0, "ahead": 0, "significant": 0} for group in GROUPS}
+    for section in sections:
+        at = section["fees_bp"].index(section["charged_bp"] if fee == "charged" else fee)
+        for entry in section["entries"]:
+            if not math.isfinite(entry["delta_sharpe"][at]):
+                continue
+            count = counts[entry["group"]]
+            count["entries"] += 1
+            count["ahead"] += entry["delta_sharpe"][at] > 0
+            count["significant"] += entry["p_value"][at] < 0.05
+    return counts
+
+
+def _headline(sections: list[dict]) -> dict:
+    headline = {}
+    for role in _ROLES:
+        chosen = [s for s in sections if s["role"] == role]
+        if chosen:
+            headline[role] = {
+                "tasks": [s["task"] for s in chosen],
+                "rows": [
+                    {"fee_bp": fee, "groups": _counts(chosen, fee)}
+                    for fee in ("charged", *(float(f) for f in FEES_BP))
+                ],
+            }
+    return headline
+
+
+def _crossings(entry: dict) -> int:
+    """How many times the entry's ΔSharpe changes sign across the fee grid."""
+    signs = [d > 0 for d in entry["delta_sharpe"] if math.isfinite(d)]
+    return sum(a != b for a, b in zip(signs, signs[1:]))
 
 
 def build(root="leaderboard", retired=()) -> dict:
@@ -198,12 +221,15 @@ def _break_even(entry: dict) -> str:
 def render_markdown(summary: dict) -> str:
     """The full ``FEES.md``."""
     sections = summary["sections"]
-    charged = sorted({s["charged_bp"] for s in sections})
+    charged = {role: sorted({s["charged_bp"] for s in sections if s["role"] == role}) for role in _ROLES}
     members = {group: set() for group in GROUPS}
+    crossing_twice = []
     for section in sections:
         for entry in section["entries"]:
             if math.isfinite(entry["delta_sharpe"][0]):
                 members[entry["group"]].add(entry["name"])
+            if _crossings(entry) > 1:
+                crossing_twice.append("{} on `{}`".format(entry["name"], section["task"]))
     lines = [
         "# Fee sensitivity",
         "",
@@ -215,40 +241,54 @@ def render_markdown(summary: dict) -> str:
         "*τ* (traded notional over pre-trade equity). A fill leaves post-fee equity *B*(1 − *cτ*), so at fee "
         "*c′* a session's return becomes 1 + *r′* = (1 + *r*)(1 − *c′τ*)/(1 − *cτ*). "
         "Decisions are held fixed, which is what these policies would do at another fee: they decide from "
-        "prices and their current weights, and the engine's weights do not depend on the fee, so the one "
-        "approximation is that *τ* keeps its charged-fee value (exact at 0 bp; the error grows with turnover "
-        "and fee, and `tests/test_bench_fees.py` holds it within 0.01 Sharpe of exact engine runs). "
+        "prices and their current weights, and after a trade the weights are the targets whatever the fee. "
+        "The replay keeps *τ* at its charged-fee value, so it is exact at 0 bp up to forced delisting sales "
+        "(a holding sold on a session the policy holds pays the fee on the sold part only, which leaves the "
+        "later weights slightly fee-dependent; largest observed error 5e-6 Sharpe, 1/N on `crypto-majors` "
+        "after EOSUSDT's delisting). The error grows with turnover and fee; `tests/test_bench_fees.py` holds "
+        "it within 0.01 Sharpe of exact engine runs up to 50 bp.",
+        "",
         "This is not retraining: the learned policies were trained and selected on returns net of the charged "
-        "fee, and a policy trained at another fee could trade differently.",
+        "fee, and a policy trained at another fee could trade differently. The LSTM forecaster's buy hurdle is "
+        "also pinned at 10 bp by its submission (`rl/bench/policies/forecast.py`), so its decision rule is "
+        "itself fee-shaped.",
         "",
         "*Sharpe* is that of the seed-averaged daily returns (the basis of the leaderboard's ΔSharpe, so it can "
         "differ from the leaderboard's mean per-seed Sharpe). *ΔSharpe* is that minus 1/N's, with the "
         "leaderboard's one-sided paired stationary-bootstrap p-value (uncorrected for the many comparisons). "
-        "*Break-even*: the fee at which the entry's Sharpe equals 1/N's; *never* means it trails 1/N even at "
-        "0 bp, *> {}* that it leads at every fee shown.".format(_bp(FEES_BP[-1])),
-        "",
-        "## Entries ahead of 1/N",
-        "",
-        "Entries with a higher Sharpe ratio than 1/N at each fee, out of all entries in the group, over the "
-        "ranked tasks and the re-evaluations ({}); in brackets, how many of them have p<0.05.".format(
-            ", ".join("`{}`".format(s["task"]) for s in sections)
+        "*Break-even*: the fee at which the entry's Sharpe equals 1/N's, assuming a single crossing in "
+        "0–{high} ({crossing}); *never* means it trails 1/N even at 0 bp, *> {high}* that it leads at every "
+        "fee shown.".format(
+            high=_bp(FEES_BP[-1]),
+            crossing="no entry's ΔSharpe changes sign more than once on the fee grid"
+            if not crossing_twice
+            else "on the fee grid, ΔSharpe changes sign more than once for " + ", ".join(crossing_twice),
         ),
         "",
+        "## Entry-task pairs ahead of 1/N",
+        "",
+        "Pairs with a higher Sharpe ratio than 1/N at each fee, out of all pairs in the group; in brackets, how "
+        "many of them have p<0.05. `paper-2021` is a survivorship-biased re-evaluation, so it is counted apart.",
+        "",
     ]
-    rows = []
-    for row in summary["headline"]:
-        if row["fee_bp"] == "charged":
-            label = "as charged ({})".format(" or ".join(_bp(c) for c in charged))
-        else:
-            label = _bp(row["fee_bp"])
-        rows.append(
-            [label]
-            + [
-                "{} of {} ({})".format(c["ahead"], c["entries"], c["significant"])
-                for c in (row["groups"][group] for group in GROUPS)
-            ]
-        )
-    lines += leaderboard._table(["Fee per side", *GROUPS], rows) + [""]
+    for role, headline in summary["headline"].items():
+        shown = [g for g in GROUPS if headline["rows"][0]["groups"][g]["entries"]]
+        rows = []
+        for row in headline["rows"]:
+            if row["fee_bp"] == "charged":
+                label = "as charged ({})".format(" or ".join(_bp(c) for c in charged[role]))
+            else:
+                label = _bp(row["fee_bp"])
+            rows.append(
+                [label]
+                + ["{} of {} ({})".format(c["ahead"], c["entries"], c["significant"]) for c in (row["groups"][g] for g in shown)]
+            )
+        lines += [
+            "**{}**: {}".format(_ROLES[role], ", ".join("`{}`".format(t) for t in headline["tasks"])),
+            "",
+            *leaderboard._table(["Fee per side", *shown], rows),
+            "",
+        ]
     lines += [
         "Groups: {}. Constant-return entries (cash) have no Sharpe ratio and are left out.".format(
             "; ".join("*{}*: {}".format(group, ", ".join(sorted(members[group]))) for group in GROUPS if members[group])
