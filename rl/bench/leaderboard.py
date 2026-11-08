@@ -26,7 +26,8 @@ a later cohort, its earlier cohorts are labelled. Submissions with a
 Live results are grouped by publication date and ledger results by the date of
 the first verified decision, so every table covers the same window. A live or
 ledger table with fewer than ``scoring.MIN_SHARPE_SESSIONS`` sessions shows no
-annualised or inferential statistics and is ranked by total return. Tasks are
+annualised, regression or inferential statistics and is ranked by total return.
+Rows with exactly the same ranking value share a rank. Tasks are
 ordered ranked first, then re-evaluations
 (``paper-2021``: a survivorship-biased universe, shown for comparison with a
 published setup, not as a ranking), then the synthetic demo.
@@ -73,9 +74,11 @@ REEVALUATIONS = ("paper-2021", "us-ndx80")
 #: as the benchmark instead of a duplicate synthesized row.
 BENCHMARK_SUBMISSION = "equal-weight-buy-hold"
 _METRICS = ("cagr", "max_drawdown", "turnover", "beta", "alpha", "alpha_t", "volatility", "total_return")
-#: Left empty for live and ledger windows shorter than ``scoring.MIN_SHARPE_SESSIONS``.
-_ANNUALISED = (
-    "sharpe", "sharpe_sd", "cagr", "turnover", "volatility", "alpha", "alpha_t", "delta_sharpe", "p_value", "dsr",
+#: Annualised, regression and inferential statistics: left empty for live and
+#: ledger windows shorter than ``scoring.MIN_SHARPE_SESSIONS``.
+_NEEDS_MIN_SESSIONS = (
+    "sharpe", "sharpe_sd", "cagr", "turnover", "volatility", "beta", "alpha", "alpha_t", "delta_sharpe",
+    "p_value", "dsr",
 )
 #: Submission kinds the README headline always represents by their best row.
 LEARNED_KINDS = ("rl", "forecast", "llm")
@@ -176,12 +179,12 @@ def _benchmark_row(record: dict) -> dict:
 
 
 def _too_short(record: dict) -> bool:
-    """A live or ledger window too short for annualised or inferential statistics."""
+    """A live or ledger window too short for annualised, regression or inferential statistics."""
     return record["track"] in ("live", "ledger") and len(record["dates"]) - 1 < scoring.MIN_SHARPE_SESSIONS
 
 
-def _blank_annualised(row: dict) -> None:
-    for key in _ANNUALISED:
+def _blank_short_window(row: dict) -> None:
+    for key in _NEEDS_MIN_SESSIONS:
         if key in row:
             row[key] = float("nan")
 
@@ -229,10 +232,16 @@ def _sections(records: list[dict]) -> list[dict]:
         ranked_by = "total_return" if _too_short(latest) else "sharpe"
         if ranked_by == "total_return":
             for row in rows:
-                _blank_annualised(row)
-        rows.sort(key=lambda r: (not math.isfinite(r[ranked_by]), -r[ranked_by] if math.isfinite(r[ranked_by]) else 0.0))
-        for rank, row in enumerate(rows, 1):
-            row["rank"] = rank
+                _blank_short_window(row)
+        rows.sort(
+            key=lambda r: (
+                not math.isfinite(r[ranked_by]), -r[ranked_by] if math.isfinite(r[ranked_by]) else 0.0, not r["benchmark"]
+            )
+        )
+        for index, row in enumerate(rows):
+            # Rows with exactly the same value share a rank; the benchmark is listed first among them.
+            tied = index > 0 and rows[index - 1][ranked_by] == row[ranked_by]
+            row["rank"] = rows[index - 1]["rank"] if tied else index + 1
         task = TASKS.get(latest["task"])
         sections.append(
             {
@@ -265,7 +274,7 @@ def _retired_row(record: dict, retired: str) -> dict:
     row = _analyze_record(record)
     del row["_returns"], row["_benchmark"]
     if _too_short(record):
-        _blank_annualised(row)
+        _blank_short_window(row)
     return {**row, "track": record["track"], "task": record["task"], "retired": retired}
 
 
@@ -360,17 +369,23 @@ def _table(headers, rows) -> list[str]:
     ]
 
 
+def _window_start(section: dict) -> str | None:
+    """When a live or ledger section's window opens; its sessions are scored after it."""
+    if section["track"] == "live":
+        return "published {}".format(section["published"])
+    if section["track"] == "ledger":
+        return "decisions from {}".format(section["decisions_from"])
+    return None
+
+
 def _heading(section: dict) -> str:
     title = section["title"]
     if section["role"] == "reevaluation":
         title = "Re-evaluation: " + title
     elif section["role"] == "demo":
         title = "Demo: " + title
-    if section["track"] == "live":
-        title = "{} (published {})".format(title, section["published"])
-    elif section["track"] == "ledger":
-        title = "{} (decisions from {})".format(title, section["decisions_from"])
-    return title
+    start = _window_start(section)
+    return "{} ({})".format(title, start) if start else title
 
 
 def render_markdown(summary: dict, link_prefix: str | None = "../submissions") -> str:
@@ -415,7 +430,7 @@ def render_markdown(summary: dict, link_prefix: str | None = "../submissions") -
                 ),
                 *(
                     [
-                        "*Fewer than {} sessions: ranked by return; annualised and inferential statistics "
+                        "*Fewer than {} sessions: ranked by return; annualised, regression and inferential statistics "
                         "are not shown yet.*".format(scoring.MIN_SHARPE_SESSIONS),
                         "",
                     ]
@@ -435,7 +450,7 @@ def render_markdown(summary: dict, link_prefix: str | None = "../submissions") -
             "Retired submissions are not ranked and are not updated; their records stay as last written.",
             "",
             *_table(
-                ("Strategy", "Kind", "Track", "Task", "Retired after", "Sharpe", "CAGR", "Max DD", "Seeds"),
+                ("Strategy", "Kind", "Track", "Task", "Retired after", "Sharpe", "Return", "CAGR", "Max DD", "Seeds"),
                 [
                     [
                         row["name"] if link_prefix is None else "[{}]({}/{}/)".format(row["name"], link_prefix, row["id"]),
@@ -444,6 +459,7 @@ def render_markdown(summary: dict, link_prefix: str | None = "../submissions") -
                         "`{}`".format(row["task"]),
                         row["retired"],
                         _fmt(row["sharpe"], "{:.2f}"),
+                        _pct(row.get("total_return")),
                         _pct(row.get("cagr")),
                         _pct(row.get("max_drawdown")),
                         str(row["seeds"]),
@@ -499,8 +515,8 @@ def render_headline(summary: dict, link: str = "leaderboard/LEADERBOARD.md") -> 
         task = "`{}`".format(section["task"])
         if section["role"] == "reevaluation":
             task += " (re-evaluation)"
-        if section["track"] in ("live", "ledger"):
-            task += " (from {}, {} sessions)".format(section["first"], section["sessions"])
+        if _window_start(section):
+            task += " ({}, {} scored sessions)".format(_window_start(section), section["sessions"])
         for row in shown:
             cells = _row_cells(row, None, section["role"] != "reevaluation")
             rows.append(

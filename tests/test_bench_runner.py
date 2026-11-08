@@ -277,7 +277,8 @@ def test_leaderboard_orders_by_sharpe_and_marks_benchmark(board, tmp_path):
     rows = section["rows"]
     sharpes = [row["sharpe"] for row in rows]
     assert sharpes == sorted(sharpes, reverse=True)
-    assert [row["rank"] for row in rows] == [1, 2, 3, 4]
+    assert [row["rank"] for row in rows] == [1, 2, 2, 4]  # buyhold ties the benchmark, which is listed first
+    assert rows[1]["benchmark"] and rows[2]["id"] == "buyhold"
     assert sum(row["benchmark"] for row in rows) == 1
     buyhold = next(row for row in rows if row["id"] == "buyhold")
     assert buyhold["delta_sharpe"] == pytest.approx(0.0, abs=1e-6)
@@ -325,16 +326,17 @@ def test_short_live_window_keeps_return_and_drawdown_only(tilt, data, tmp_path):
     returns = [row["total_return"] for row in section["rows"]]
     assert len(returns) == 2 and np.isfinite(returns).all() and returns == sorted(returns, reverse=True)
     tilt_row = next(row for row in section["rows"] if row["id"] == "tilt")
-    assert {"turnover", "alpha", "alpha_t", "delta_sharpe", "dsr"} <= tilt_row.keys()
+    assert {"turnover", "beta", "alpha", "alpha_t", "delta_sharpe", "dsr"} <= tilt_row.keys()
     for row in section["rows"]:
         assert np.isfinite(row["max_drawdown"])
-        assert all(np.isnan(row[key]) for key in leaderboard._ANNUALISED if key in row)
+        assert all(np.isnan(row[key]) for key in leaderboard._NEEDS_MIN_SESSIONS if key in row)
 
     text = leaderboard.render_markdown(summary)
     assert "Fewer than {} sessions".format(scoring.MIN_SHARPE_SESSIONS) in text
     cells = dict(zip(leaderboard._COLUMNS, _cells(text, "[Tilt](../submissions/tilt/)")))
     assert cells["Return"].endswith("%") and cells["Max DD"].endswith("%")
-    assert {cells[key] for key in ("Sharpe", "CAGR", "Turnover/yr", "Alpha (t)", "ΔSharpe vs 1/N", "DSR")} == {"–"}
+    blank = ("Sharpe", "CAGR", "Turnover/yr", "Beta", "Alpha (t)", "ΔSharpe vs 1/N", "DSR")
+    assert {cells[key] for key in blank} == {"–"}
 
     runner.update_live(LIVE, tilt, data=data, out_root=out)  # the same record, now long enough
     [section] = leaderboard.build(out)["sections"]
@@ -361,7 +363,30 @@ def test_headline_shows_the_window_of_each_section_of_a_task(tilt, data, tmp_pat
     benchmarks = [line for line in leaderboard.render_headline(summary).splitlines() if "◆" in line]
     assert len(benchmarks) == 2
     for section, line in zip((first, second), benchmarks):
-        assert "| `{}` (from {}, {} sessions) |".format(LIVE.id, section["first"], section["sessions"]) in line
+        start = "published {}".format(section["published"])
+        assert "| `{}` ({}, {} scored sessions) |".format(LIVE.id, start, section["sessions"]) in line
+        assert "({}) — `{}`".format(start, LIVE.id) in text  # the same start as the section heading
+
+
+def test_exact_ties_share_a_rank_with_the_benchmark_listed_first(tilt, data, tmp_path):
+    out = tmp_path / "board"
+    buyhold = make_submission(
+        tilt.directory.parent, "buyhold", "rl.bench.policies.baselines:EqualWeightBuyHold", kind="baseline"
+    )
+    early, _ = freeze_early(tilt, data)
+    runner.freeze(LIVE, buyhold, data=early)
+    publish(tilt, tmp_path, early.dates[-1])
+    for sub in (tilt, buyhold):
+        runner.update_live(LIVE, sub, data=data.between(None, "2019-01-15"), out_root=out)
+    summary = leaderboard.build(out)
+    [section] = summary["sections"]
+    tied = [row for row in section["rows"] if row["benchmark"] or row["id"] == "buyhold"]
+    assert [row["benchmark"] for row in tied] == [True, False]
+    assert tied[0]["total_return"] == tied[1]["total_return"] and tied[0]["rank"] == tied[1]["rank"]
+
+    for text, rank in ((leaderboard.render_markdown(summary), 0), (leaderboard.render_headline(summary), 2)):
+        assert _cells(text, "◆ |")[rank] == _cells(text, "Buyhold")[rank] == str(tied[0]["rank"])
+        assert text.index("◆ |") < text.index("Buyhold")
 
 
 def test_cli_lists_tasks_and_runs_a_submission(tmp_path, capsys):
@@ -611,7 +636,7 @@ def test_retired_submissions_leave_the_ranking_but_keep_their_records(board, tmp
     summary = leaderboard.write_leaderboard(board, readme=None, submissions_root=root)
     [section] = summary["sections"]
     assert sorted(r["id"] for r in section["rows"] if r["id"]) == ["buyhold", "conc"]
-    assert [r["rank"] for r in section["rows"]] == [1, 2, 3]
+    assert [r["rank"] for r in section["rows"]] == [1, 2, 2]
     [retired] = summary["retired"]
     assert (retired["id"], retired["track"], retired["task"], retired["retired"]) == (
         "tilt", "historical", "synthetic", "2019-01-01",
@@ -619,6 +644,10 @@ def test_retired_submissions_leave_the_ranking_but_keep_their_records(board, tmp
     text = (board / "LEADERBOARD.md").read_text()
     assert "## Retired" in text and "[Tilt](../submissions/tilt/)" in text.split("## Retired")[1]
     assert "[Tilt]" not in text.split("## Retired")[0]
+    retired_table = text.split("## Retired")[1]
+    headers = _cells(retired_table, "| Strategy |")
+    cells = dict(zip(headers, _cells(retired_table, "[Tilt](../submissions/tilt/)")))
+    assert cells["Return"] == "{:.1f}%".format(retired["total_return"] * 100)
     assert record_path.read_bytes() == kept
 
     out = board.parent / "again"
