@@ -1589,6 +1589,11 @@
    }
   }
  },
+ "pooled_75": {
+  "annual_return_max": 0.4602,
+  "annual_return_median": 0.24531370032844357,
+  "runs": 75
+ },
  "setups": {
   "benchmark": "Benchmark `paper-2021`",
   "share-no-rule": "Share env, no rule",

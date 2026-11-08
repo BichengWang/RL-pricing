@@ -331,6 +331,13 @@ def build() -> dict:
         },
         "sharpe_max": {s: {a: share[s][a]["sharpe"]["max"] for a in AGENTS} for s in ("share-rule", "share-no-rule")},
     }
+    # pooled DRL runs of all three setups (3 setups x 5 agents x 5 seeds)
+    all_returns = [v for setup in SETUPS for agent in AGENTS for v in per_setup[setup][agent]["annual_return"]["values"]]
+    summary["pooled_75"] = {
+        "runs": len(all_returns),
+        "annual_return_max": max(all_returns),
+        "annual_return_median": float(np.median(all_returns)),
+    }
     summary["benchmark_beating_one_over_n"] = {
         agent: sum(v > bench["one_over_n"]["sharpe"] for v in bench["agents"][agent]["sharpe"]["values"]) for agent in AGENTS
     }

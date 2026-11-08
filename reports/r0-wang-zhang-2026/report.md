@@ -1,9 +1,9 @@
-# R0 — Re-testing Wang & Zhang (2021), "Applying Deep Learning to Stock Trading"
+# R0 — Re-testing Wang & Zhang (2026), "Deep Reinforcement Learning for Equity Trading"
 
 **Read first.** This is a re-test of our own paper
-([arXiv:2609.31870](https://arxiv.org/abs/2609.31870); PDF in
-`docs/Wang_Zhang_2021_Deep_Learning_Stock_Trading_arxiv.pdf`) on its own 20
-stocks and 2019–2020 window. Under this repository's execution model (signal
+([arXiv:2609.31870](https://arxiv.org/abs/2609.31870) v1; PDF of an earlier
+version in `docs/Wang_Zhang_2021_Deep_Learning_Stock_Trading_arxiv.pdf`, see
+[Claims](#claims)) on its own 20 stocks and 2019–2020 window. Under this repository's execution model (signal
 at the close, fill at the next open, 0.1% fee per side), the reported 55.51%
 annual return for DDPG does not hold: no run of any agent in any setup
 reaches it (best of 75 runs: 46.0%). The reported Sharpe ratios of the five
@@ -66,6 +66,11 @@ Quoted verbatim, with table and page, in
 [`preregistration.md`](preregistration.md#claims) (and `quote`/`source` in
 `claims.json`). All concern the 2019–2020 test set. Metrics: annual return
 (CAGR), Sharpe ratio (mean/std × √252, risk-free rate 0), maximum drawdown.
+The quotes and page numbers come from the PDF in `docs/`, an earlier version
+titled *Applying Deep Learning to Stock Trading: LSTM Forecasting and Deep
+Reinforcement Learning*; arXiv v1 has the same Table 4 numbers and the same
+quoted p. 6 text, and differs in the abstract's wording (its LSTM drawdown
+reads "(9.6%)" for "(−9.6%)").
 
 ## Method
 
@@ -213,7 +218,7 @@ Sharpe, so the one most favourable to the claims).
 
 **`ddpg-annual-return` — ✗ does not hold.** Claimed 55.51%. The best of the
 15 DDPG runs is 40.5% (B, seed 3) and the best of all 75 DRL runs is 46.0%
-(SAC, B, seed 0), so no seed reaches the claimed value in any setup. DDPG's
+(SAC, B, seed 0; [sum] `pooled_75`), so no seed reaches the claimed value in any setup. DDPG's
 seed-mean annual return (A 24.6%, B 30.6%, C 16.2%) is below 1/N (29.7% / 29.7% /
 29.9%) in A and C and 0.9 points above it in B, and DDPG is not the agent with
 the highest seed-mean return in any setup (A: SAC 25.1%; B: SAC 38.5%; C: A2C

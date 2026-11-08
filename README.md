@@ -140,12 +140,19 @@ Per-seed results, equity curves, commands and the input-data hash are in
 ![Per-seed Sharpe ratios of every strategy against 1/N](leaderboard/sharpe.png)
 
 Historical track, test windows 2018–2025 (US ETFs) and 2023–2025 (crypto),
-Stable-Baselines3 agents with default and tuned hyperparameters, 5 seeds each:
+5 seeds per learned entry:
 
-- **No learned policy beats 1/N buy-and-hold here.** All 30 RL and LSTM entries
-  across the four tasks have a lower seed-averaged Sharpe ratio than holding
-  every asset in equal weight. Only 5 of their 150 individual seeds do better,
-  so cherry-picking one would make a publishable-looking result.
+- **No Stable-Baselines3 or LSTM policy beats 1/N buy-and-hold here.** All 33
+  such entries across the four tasks (SB3 agents with default and tuned
+  hyperparameters, CVaR-PPO, the LSTM forecast) have a lower seed-averaged
+  Sharpe ratio than holding every asset in equal weight. Only 5 of their 165
+  individual seeds do better, so cherry-picking one would make a
+  publishable-looking result.
+- **Decision Transformer and CQL beat 1/N, on crypto only.** Their ΔSharpe is
+  +0.59 (p = 0.002) and +0.44 (p = 0.022), with all five seeds of each ahead.
+  Neither survives a Holm correction over the 45 learned entries, which needs
+  p < 0.0011. On the two US tasks no offline-RL entrant (BC, IQL, CQL,
+  Decision Transformer) is significantly ahead (best p = 0.44).
 - **Tuning doesn't close the gap.** A declared sweep of 8 configurations each
   for PPO and SAC, selected on validation data only, picks configurations that
   still trail 1/N on every task. SAC's choice helps on the US tasks and
@@ -157,9 +164,8 @@ Stable-Baselines3 agents with default and tuned hyperparameters, 5 seeds each:
 - **A2C rediscovers 1/N.** Its five seeds on US sectors land at Sharpe
   0.67 ± 0.01 against 1/N's 0.68: the softmax policy learns to stay close to
   equal weights.
-- **The one significant win is not RL.** In crypto, long-only minimum
-  variance beats 1/N (ΔSharpe +0.86, bootstrap p < 0.001), mostly by holding
-  the two least volatile coins, BTC (50% on average) and BNB (36%).
+- **The largest win is not RL.** In crypto, long-only minimum variance beats
+  1/N (ΔSharpe +0.86, bootstrap p < 0.001).
 
 Better configurations are what the leaderboard is for: submit one, and state
 how many you tried.
@@ -223,7 +229,7 @@ Full tables: [leaderboard/LEADERBOARD.md](leaderboard/LEADERBOARD.md).
 | --- | --- | --- |
 | Execution | Decide at the close, fill at the next open, proportional fees | Fill at the same close used to decide; often no fees |
 | Universe | Fixed ETFs; crypto top-10 by volume *before* the data starts, delistings included | Today's index members, back-tested into the past |
-| Randomness | 5 seeds per learned policy, mean ± sd, every seed plotted | One run |
+| Randomness | 5 seeds per learned policy (3 on the live track), mean ± sd, every seed plotted | One run |
 | Model selection | Validation window before the test; declared `trials` deflate the Sharpe | Tuned on the test period |
 | Out-of-sample | Live track: frozen policy, scored only on sessions after its public freeze | One fixed historical window |
 | Metrics | One implementation for everyone; beta and alpha against 1/N | Per-paper definitions |
@@ -233,7 +239,6 @@ data available today and its artifacts are committed with SHA-256 hashes. A
 CI job on `main` then stamps the time the freeze became public
 (`leaderboard/publications.json`, which pull requests may not edit), and
 from then on it is scored monthly on sessions that start after that stamp.
-The first live scores appear after the next monthly run.
 
 ## Quick start
 
