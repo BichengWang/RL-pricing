@@ -1,0 +1,120 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "da45e81f203cdae3e1cf877dcb6cae40ec0d75f8",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-googl",
+  "decision_date": "2026-11-06",
+  "weights": {
+    "GOOGL": 1.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.67487,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "GOOGL",
+    "trade_date": "2026-11-06",
+    "signal": "Overweight",
+    "weight": 1.0,
+    "decision_sha256": "0dd840bc74dd6141daa7e01a5e5d2dbb6105296e8c221a00e99d63d91735491b",
+    "decision_head": "**Rating**: Overweight\n\n**Executive Summary**: Overweight GOOGL. Build toward about 1.2x a standard weight over 4\u20138 weeks rather than buying the full Buy the trader proposed. Start with about 30% of the planned increase near $285, halve the usual per-share size because ATR (about $10.7) is roughly double normal, and use one invalidation line: a daily close below $260. Add about 35% once momentum c",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 143514,
+        "cached_input": 0,
+        "output": 24665,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 15208,
+        "cached_input": 0,
+        "output": 4018,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "ba62dcce02b06dc9fefdff1b7065f1fa98f721b1dba55a1fcedf7ae4a4f65c32",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "42620003942",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-09T12:52:22+00:00"
+  },
+  "created_at": "2026-11-09T12:52:22+00:00",
+  "decision_sha256": "ead84f30cce560d965b074e4e8965ff7f9c2af42418f48612aa45a2dd2e99545"
+}
