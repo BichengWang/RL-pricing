@@ -1,0 +1,120 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "0bc13639c125586f1fc12b51f5d3da86c76b0ad3",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-googl",
+  "decision_date": "2026-11-09",
+  "weights": {
+    "GOOGL": 1.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.635446,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "GOOGL",
+    "trade_date": "2026-11-09",
+    "signal": "Overweight",
+    "weight": 1.0,
+    "decision_sha256": "95ca2714dc68a4c8aa6d48bcffa811960bd14d08bc05ab32f25ba02b6fd8e8ea",
+    "decision_head": "**Rating**: Overweight\n\n**Executive Summary**: Build GOOGL exposure gradually. Start with about 1/4 of a standard allocation, accumulated near $288 over several sessions. Add the next tranches only on confirmation: a 10-EMA reclaim with RSI in the low 40s, or a clean 10-Q explanation of the Q2/Q3 net income swing. Do not average down on a fixed price grid. Scale toward 2/3 above the 50-SMA (~$332)",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 134738,
+        "cached_input": 0,
+        "output": 23019,
+        "calls": 14
+      },
+      "claude-opus-5-5": {
+        "input": 14195,
+        "cached_input": 0,
+        "output": 3950,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "a252bf7c3fdc1881227f5bfe88da6c8c8a78067a5061105a0f547e9f76a7a14c",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "42817004093",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-10T12:39:45+00:00"
+  },
+  "created_at": "2026-11-10T12:39:45+00:00",
+  "decision_sha256": "77adcde2479f483c8d8e7923f9b17e4f948a075313ae6cb583a30784313ce27f"
+}
