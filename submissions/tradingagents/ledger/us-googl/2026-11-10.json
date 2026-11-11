@@ -1,0 +1,120 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "129e66bef716f3623c18e186600d07d30a6f2a51",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-googl",
+  "decision_date": "2026-11-10",
+  "weights": {
+    "GOOGL": 0.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.641438,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "GOOGL",
+    "trade_date": "2026-11-10",
+    "signal": "Underweight",
+    "weight": 0.0,
+    "decision_sha256": "88e3560bca6119b537413ead570a6c64ed10362d79134df85554216c54ae523f",
+    "decision_head": "**Rating**: Underweight\n\n**Executive Summary**: Reduce GOOGL to about 50\u201360% of a standard allocation. Sell into bounces toward $288\u2013$292, where the 10 EMA and VWMA act as resistance, rather than at the $278\u2013$281 lows. If you are opening a new position, or adding bearish exposure, keep it to 25\u201333% of standard size because ATR (~10.4) is high. A daily close below ~$278 on rising volume means cutti",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 139136,
+        "cached_input": 0,
+        "output": 23541,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 14604,
+        "cached_input": 0,
+        "output": 3467,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "324e934953d945d3e1a830ca6d21ae66e52921a4607a617e31e6363abe7cac3b",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "43015268085",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-11T11:55:25+00:00"
+  },
+  "created_at": "2026-11-11T11:55:25+00:00",
+  "decision_sha256": "339699d0277d3cec4263ba45e6e677dd685cb49c910a09bb035e0f12fee53251"
+}
