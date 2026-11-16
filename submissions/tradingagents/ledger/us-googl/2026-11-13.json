@@ -1,0 +1,120 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "0b32f753c669b570f4f66e6a623f2040e0202890",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-googl",
+  "decision_date": "2026-11-13",
+  "weights": {
+    "GOOGL": 0.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.612318,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "GOOGL",
+    "trade_date": "2026-11-13",
+    "signal": "Underweight",
+    "weight": 0.0,
+    "decision_sha256": "5998d7764f78e0dd2a24fcd9baf492c22baed00c058addb1318631bb9102aa51",
+    "decision_head": "**Rating**: Underweight\n\n**Executive Summary**: Underweight GOOGL: cut exposure to about 50\u201360% of a standard allocation, and keep a core position rather than selling out. Do most of the trimming on strength in the $300\u2013$303 zone (Bollinger mid-band, ~$303.42), not at the current ~$295.77. Cap new money at 25\u201333% of standard. If GOOGL closes below $277 on above-average volume, cut to 25\u201333%. Rebui",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 128263,
+        "cached_input": 0,
+        "output": 22794,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 14253,
+        "cached_input": 0,
+        "output": 3542,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "a350c5a46459e4526dfe3453d55f3cb0d3155530aa42295d40fd44b199422ee9",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "43868837039",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-16T12:45:50+00:00"
+  },
+  "created_at": "2026-11-16T12:45:50+00:00",
+  "decision_sha256": "7b9fccdd7ebe5232bef9651374dfc145d9fff62e4050dde8da67c92001015f43"
+}
