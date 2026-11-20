@@ -1,0 +1,118 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "d29271abd7ae338bb005243345acec9a9c93c406",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-amzn",
+  "decision_date": "2026-11-19",
+  "weights": null,
+  "hold": true,
+  "reason": null,
+  "cost_usd": 0.608732,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "AMZN",
+    "trade_date": "2026-11-19",
+    "signal": "Hold",
+    "weight": null,
+    "decision_sha256": "f4f981b012103dc15eb286a829d7bb2d60418d99eb3f90842bd6f530ab73fabf",
+    "decision_head": "**Rating**: Hold\n\n**Executive Summary**: Hold AMZN at your current weight. Don't add at about $257, and don't cut ahead of a signal. Act on the triggers. On a daily close below $255, trim 10\u201315% right away. If the MACD then turns bearish, keep cutting down to 0.6\u20130.75x a standard weight. On a close below $240, go to about 0.5x. On a close back above about $262.5 (the 10-day EMA and VWMA) with stro",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 127526,
+        "cached_input": 0,
+        "output": 22732,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 14085,
+        "cached_input": 0,
+        "output": 3501,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "23c5ac3cbb14a777e0fb31046e4afe72807409d76fb15afa657c394c56748b0a",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "44739065455",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-20T12:58:49+00:00"
+  },
+  "created_at": "2026-11-20T12:58:49+00:00",
+  "decision_sha256": "8d6c39a391a1969b76feafd26c89ef03d8f3c00f0c67556ec88f0c0e2127cfdf"
+}
