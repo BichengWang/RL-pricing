@@ -357,6 +357,60 @@ def test_short_live_window_keeps_return_and_drawdown_only(tilt, data, tmp_path):
     assert section["ranked_by"] == "sharpe" and all(np.isfinite(row["sharpe"]) for row in section["rows"])
 
 
+def test_a_single_session_record_shows_return_and_drawdown_only(tilt, data, tmp_path):
+    out = tmp_path / "board"
+    early, _ = freeze_early(tilt, data)
+    publish(tilt, tmp_path, early.dates[-1])
+    path = runner.update_live(LIVE, tilt, data=data.rows(0, len(early) + 1), out_root=out)  # the day after
+    record = json.loads(path.read_text())
+    summary = leaderboard.build(out)
+    [section] = summary["sections"]
+    assert section["sessions"] == 1 and section["ranked_by"] == "total_return"
+    tilt_row, bench = (next(row for row in section["rows"] if row["benchmark"] == b) for b in (False, True))
+    seeds = [run["equity"][1] / run["equity"][0] - 1 for run in record["runs"]]
+    assert tilt_row["total_return"] == pytest.approx(np.mean(seeds))
+    equity = record["benchmark"]["equity"]
+    assert bench["total_return"] == pytest.approx(equity[1] / equity[0] - 1)
+    for row in section["rows"]:
+        assert row["max_drawdown"] <= 0
+        assert all(np.isnan(row[key]) for key in leaderboard._NEEDS_MIN_SESSIONS if key in row)
+    cells = dict(zip(leaderboard._COLUMNS, _cells(leaderboard.render_markdown(summary), "[Tilt]")))
+    assert cells["Return"].endswith("%") and cells["Max DD"].endswith("%") and cells["Sharpe"] == "–"
+
+
+def test_a_record_behind_its_table_is_listed_unranked_as_stale(tilt, data, tmp_path):
+    out = tmp_path / "board"
+    conc = make_submission(tilt.directory.parent, "conc", "test_bench_runner:Concentrated")
+    early, _ = freeze_early(tilt, data)
+    runner.freeze(LIVE, conc, data=early)
+    publish(tilt, tmp_path, early.dates[-1])
+    behind = json.loads(runner.update_live(LIVE, conc, data=data.between(None, "2019-01-15"), out_root=out).read_text())
+    current = json.loads(runner.update_live(LIVE, tilt, data=data, out_root=out).read_text())
+    summary = leaderboard.build(out)
+    [section] = summary["sections"]
+    assert (section["last"], section["sessions"]) == (current["dates"][-1], len(current["dates"]) - 1)
+    assert section["ranked_by"] == "sharpe"
+    stale = section["rows"][-1]
+    assert stale["id"] == "conc" and stale["stale"] == behind["dates"][-1] and stale["rank"] is None
+    assert np.isfinite(stale["total_return"])
+    assert all(np.isnan(stale[key]) for key in leaderboard._NEEDS_MIN_SESSIONS if key in stale)
+    assert [row["rank"] for row in section["rows"][:-1]] == [1, 2]
+
+    cells = _cells(leaderboard.render_markdown(summary), "[Conc]")
+    assert cells[0] == "–" and "(stale: last session {})".format(behind["dates"][-1]) in cells[1]
+    # Nor does it move the table's DSR.
+    tilt_dsr = next(row["dsr"] for row in section["rows"] if row["id"] == "tilt")
+    (out / "live" / LIVE.id / "conc.json").unlink()
+    [alone] = leaderboard.build(out)["sections"]
+    assert alone["sharpe_variance"] == section["sharpe_variance"]
+    assert next(row["dsr"] for row in alone["rows"] if row["id"] == "tilt") == tilt_dsr
+
+
+def test_turnover_legend_counts_buys_and_sells():
+    text = leaderboard.render_markdown({"sections": []})
+    assert "one-way" not in text and "traded notional (buys plus sells) over pre-trade equity" in text
+
+
 def test_headline_shows_the_window_of_each_section_of_a_task(tilt, data, tmp_path):
     out = tmp_path / "board"
     early, _ = freeze_early(tilt, data)
