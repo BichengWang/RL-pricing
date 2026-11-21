@@ -10,7 +10,7 @@ import numpy as np
 import pytest
 
 from rl import cli
-from rl.bench import leaderboard, monthly, runner, scoring
+from rl.bench import figures, leaderboard, monthly, runner, scoring
 from rl.bench.data import load_task_data
 from rl.bench.engine import simulate
 from rl.bench.market import as_day
@@ -308,6 +308,20 @@ def test_readme_block_replacement_is_idempotent(board, tmp_path):
     plain.write_text("no markers\n")
     leaderboard.write_leaderboard(board, readme=plain)
     assert plain.read_text() == "no markers\n"
+
+
+def test_sharpe_figure_title_ends_with_the_last_session_year(tmp_path, monkeypatch):
+    from matplotlib.axes import Axes
+
+    titles = []
+    monkeypatch.setattr(Axes, "set_title", lambda self, label, *args, **kwargs: titles.append(label))
+    dates = [str(day) for day in np.arange(np.datetime64("2023-11-28"), np.datetime64("2023-12-29"))]
+    equity = np.cumprod(np.r_[1.0, 1 + np.random.default_rng(0).normal(0.001, 0.01, len(dates) - 1)]).tolist()
+    record = {"track": "historical", "task": "us-ndx80", "submission": "x", "name": "X", "kind": "rl",
+              "periods_per_year": 252, "dates": dates, "runs": [{"equity": equity}], "benchmark": {"equity": equity}}
+    figures.render_sharpe_figure([record], tmp_path / "sharpe.png")
+    # The window is [2019-01-01, 2023-12-29): its last session is in 2023, not 2022.
+    assert titles == ["{}, survivorship-biased\n2019 to 2023".format(TASKS["us-ndx80"].title)]
 
 
 def _cells(text, name):

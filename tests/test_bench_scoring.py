@@ -193,6 +193,17 @@ def test_sharpe_difference_undefined_for_constant_series():
     assert math.isnan(diff) and math.isnan(p)
 
 
+def test_constant_nonzero_returns_have_no_sharpe():
+    r = np.full(30, 0.01)  # std(ddof=1) is 1.8e-18 in floats, not 0
+    b = _noise(30, 0.0, 0.01, 0)
+    assert math.isnan(annualised_sharpe(r, 252)) and math.isnan(metrics(r, 252)["sharpe"])
+    assert math.isnan(probabilistic_sharpe(r))
+    assert all(math.isnan(x) for x in sharpe_difference(r, b, 252))
+    # Resamples that miss the one different session are constant: zero Sharpe, not ~1e17.
+    r[0] = 0.02
+    assert sharpe_difference(r, b, 252)[1] < 0.01
+
+
 def test_stationary_bootstrap_block_lengths():
     rng = np.random.default_rng(0)
     n = 1000

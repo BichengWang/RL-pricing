@@ -48,6 +48,7 @@ def test_max_drawdown_counts_the_starting_capital():
 def test_degenerate_inputs_return_nan():
     flat = pd.Series([0.0, 0.0, 0.0])
     assert np.isnan(metrics.sharpe_ratio(flat))
+    assert np.isnan(metrics.sharpe_ratio(pd.Series([0.01] * 30)))  # std is float residue, not 0
     assert np.isnan(metrics.sortino_ratio(flat))
     assert np.isnan(metrics.annual_return(pd.Series([], dtype=float)))
 

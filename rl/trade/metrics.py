@@ -16,6 +16,14 @@ def _clean(returns):
     return returns
 
 
+def has_variance(std, mean):
+    """Whether ``std`` is above float rounding residue; elementwise, False for NaN."""
+    # A constant series' std is a few ulps of its value, not 0 (1.8e-18 for 30 x 0.01).
+    # 1e-12 x max(1, |mean|) is far above that residue (scaled for |mean| > 1) and
+    # far below the spread of any traded return series.
+    return std > 1e-12 * np.maximum(1.0, np.abs(mean))
+
+
 def cumulative_returns(returns):
     """Total compounded return over the whole period."""
     returns = _clean(returns)
@@ -45,7 +53,7 @@ def sharpe_ratio(returns, risk_free=0.0, periods=TRADING_DAYS_PER_YEAR):
     if len(excess) < 2:
         return float("nan")
     std = excess.std(ddof=1)
-    if std == 0 or np.isnan(std):
+    if not has_variance(std, excess.mean()):
         return float("nan")
     return float(excess.mean() / std * np.sqrt(periods))
 
