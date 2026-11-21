@@ -844,6 +844,23 @@ def test_entry_edited_after_its_commit_is_a_hold(sub, data, tmp_path):
     assert "differs from the one commit" in middle_entry_reason(sub, data, tmp_path, indices)
 
 
+@pytest.mark.parametrize("by_hand", [False, True])
+def test_schema_1_entries_get_the_same_commit_checks(by_hand, sub, data, tmp_path):
+    indices = range(BASE, BASE + 3)
+    paths = record(sub, data, indices)
+    for path in paths:
+        downgrade(path)
+    if by_hand:
+        bot_commit(tmp_path, paths[0], paths[2])
+        push_entries(tmp_path, author=("maintainer", "add an entry by hand"))
+    else:
+        push_entries(tmp_path)
+        rewrite(paths[1], weights={t: float(t == TASK.tickers[0]) for t in TASK.tickers})  # schema 1 has no digest
+    github = FakeGitHub({9000 + i: good_run(data, i) for i in indices})
+    reason = middle_entry_reason(sub, data, tmp_path, indices, github)
+    assert ("not by the ledger workflow" if by_hand else "differs from the one commit") in reason
+
+
 def test_commit_that_does_not_descend_from_the_runs_head_is_a_hold(sub, data, tmp_path):
     indices = range(BASE, BASE + 3)
     record(sub, data, indices)

@@ -72,9 +72,10 @@ Scoring (:func:`score_ledger`)
     descends from the run's ``head_sha``. That ties the entry to a commit and
     the commit to the run; it cannot show who typed the author and message,
     so it does not stop someone with push rights from forging a workflow commit.
-    A schema 1 entry, written before that rule, keeps the check it was made
-    under: its run only had to start before the open (``"run-start"``). A run
-    id may back only one entry per submission and task. Everything else is
+    A schema 1 entry, written before that rule, keeps the timing check it was
+    made under: its run only had to start before the open (``"run-start"``);
+    the checks on the commit that added it apply as well. A run id may back
+    only one entry per submission and task. Everything else is
     treated as a hold and listed in the record. A session without an entry is
     a hold too. The scored window starts at the fill after the first verified
     entry. The GitHub API is reached through an injectable callable
@@ -594,10 +595,11 @@ def _check_run(
     """The rule ``entry`` is verified under, and why its run does not prove a pre-open commit (``None``: it does).
 
     Schema 2 entries need the run's :data:`PUSH_STEP` to have succeeded before
-    ``opens`` and ``commit_problem(run head)`` to find nothing wrong with the
-    commit that added the entry; schema 1 entries were written when a run
-    starting before ``opens`` was the proof, and keep that check. Raises
-    :class:`VerificationUnavailable` when the evidence cannot be read.
+    ``opens``; schema 1 entries were written when a run starting before
+    ``opens`` was the proof, and keep that timing check. Both need
+    ``commit_problem(run head)`` to find nothing wrong with the commit that
+    added the entry. Raises :class:`VerificationUnavailable` when the evidence
+    cannot be read.
     """
     rule = PUSH_TIME if entry.get("schema", 1) >= 2 else RUN_START
     entry_run = entry.get("run")
@@ -629,7 +631,7 @@ def _check_run(
             return rule, "run started {} at or after the open {}".format(
                 started.isoformat(), opens.replace(microsecond=0).isoformat()
             )
-        return rule, None
+        return rule, commit_problem(actual.get("head_sha"))
     attempt = str(entry_run.get("run_attempt") or "")
     jobs = fetch_jobs(run_id, attempt)
     if jobs is None:
