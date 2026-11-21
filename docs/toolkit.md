@@ -48,15 +48,16 @@ python main.py --mode train --data-file datasets/prices.csv --agent a2c
 
 Yahoo downloads (including `--benchmark`) require network access and available
 symbols. For your own CSV, use one row per ticker and date with columns
-`date,tic,open,high,low,close,volume`; dates should be `YYYY-MM-DD`. Supplying
-`--data-file` selects the CSV source automatically, and without `--tickers`
+`date,tic,open,high,low,close,volume`; dates must be `YYYY-MM-DD` or
+`YYYYMMDD`. Supplying `--data-file` selects the CSV source automatically, and without `--tickers`
 the CSV pipeline considers all tickers in the file for fitting-history
 eligibility. Ensure the file covers both training and trading dates; data
 outside `[--start-date, --end-date)` are ignored. Open and close prices must
 be finite, positive and on the same adjustment basis.
 
-The default Dow 30 list is today's constituents, so long backtests on it are
-survivorship-biased. The benchmark tasks avoid this; see the README.
+The default Dow 30 list is the January 2019 membership under current tickers,
+so backtests on it that start earlier are survivorship-biased. The benchmark
+tasks avoid this; see the README.
 
 ## Choosing the checkpoint on validation data
 
@@ -159,7 +160,9 @@ Ensemble-specific settings:
   "ornstein_uhlenbeck", "sigma": 0.5}}}`; an `action_noise` given by name alone
   uses sigma 0.1.
 - `--no-turbulence` turns the liquidation rule off for the ensemble as for the
-  other modes (no turbulence index is computed and none is needed).
+  other modes (no turbulence index is computed and none is needed). The
+  ensemble sets its own threshold every window, so it does not accept
+  `--turbulence-threshold` or `--turbulence-quantile`.
 - `--standalone-agents` also trades A2C, PPO and DDPG each with its own
   account over the same windows: positions carry over, and every window the
   algorithm is refit on all data before it, exactly as the winner is (the

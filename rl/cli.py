@@ -134,8 +134,11 @@ def build_parser():
     )
 
     env = parser.add_argument_group("environment")
-    env.add_argument("--hmax", type=int, default=100, help="max shares traded per stock per day")
-    env.add_argument("--initial-amount", type=float, default=1_000_000)
+    env.add_argument(
+        "--hmax", action=_StoreExplicit, type=int, default=100,
+        help="max shares traded per stock per day",
+    )
+    env.add_argument("--initial-amount", action=_StoreExplicit, type=float, default=1_000_000)
     env.add_argument(
         "--transaction-cost", type=float, default=None,
         help="fraction paid on each buy and sell (train: 0.001; backtest: saved setting)",
@@ -155,6 +158,7 @@ def build_parser():
     )
     env.add_argument(
         "--turbulence-quantile",
+        action=_StoreExplicit,
         type=float,
         default=0.99,
         help="liquidate when turbulence exceeds this quantile of in-sample turbulence",
@@ -268,17 +272,32 @@ def main(argv=None):
 
     if options.mode in ("ensemble", "lstm") and options.task != "trading":
         parser.error("--mode {} supports only --task trading".format(options.mode))
+    if options.mode == "ensemble" and _explicit(
+        options, ["turbulence_threshold", "turbulence_quantile"]
+    ):
+        parser.error(
+            "--mode ensemble sets its own turbulence threshold every window; "
+            "--no-turbulence turns it off"
+        )
 
     if options.mode == "backtest":
         from rl.autotrain.training import run_backtest
 
         if not options.model_dir:
             parser.error("--model-dir is required for --mode backtest")
+        if _explicit(options, ["turbulence_quantile"]):
+            # The saved threshold was resolved on the training split and is not refitted.
+            parser.error(
+                "--mode backtest replays the saved turbulence threshold; use "
+                "--turbulence-threshold or --no-turbulence instead of --turbulence-quantile"
+            )
         overrides = _explicit(
             options,
             ["data_file", "start_trade_date", "end_date", "benchmark", "turbulence_threshold",
-             "results_dir", "leverage"],
+             "results_dir", "leverage", "initial_amount", "hmax"],
         )
+        if options.no_turbulence:
+            overrides["use_turbulence"] = False
         if options.transaction_cost is not None:
             overrides.update(
                 buy_cost_pct=options.transaction_cost, sell_cost_pct=options.transaction_cost

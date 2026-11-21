@@ -71,6 +71,16 @@ def test_train_then_backtest_reproduces_the_run(tmp_path):
     pd.testing.assert_frame_equal(replay["account_value"], account)
     pd.testing.assert_frame_equal(replay["actions"], result["actions"])
 
+    # Replay settings apply; turning turbulence off wins over a threshold, as in training.
+    changed = run_backtest(
+        model_dir, results_dir=str(tmp_path / "changed"), use_turbulence=False,
+        turbulence_threshold=5.0, initial_amount=50_000, hmax=1,
+    )
+    assert changed["account_value"]["account_value"].iloc[0] == 50_000
+    assert changed["executions"][TICKERS].abs().to_numpy().max() <= 1
+    with open(os.path.join(changed["results_dir"], "run_config.json"), encoding="utf-8") as f:
+        assert json.load(f)["resolved_turbulence_threshold"] is None
+
 
 def test_portfolio_task_trains_and_backtests(tmp_path):
     cfg = small_config(tmp_path, task="portfolio", agent="ppo", total_timesteps=128, cov_lookback=60)
