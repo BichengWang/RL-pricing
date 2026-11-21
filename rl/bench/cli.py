@@ -255,7 +255,8 @@ def _cmd_freeze(options) -> int:
                 if data is None:
                     data = load_task_data(task, refresh=options.refresh)
                 path = runner.freeze(
-                    task, submission, data=data, seeds=_seeds(options.seeds), force=options.force or options.stale
+                    task, submission, data=data, seeds=_seeds(options.seeds), force=options.force or options.stale,
+                    refresh=options.refresh,
                 )
             except Exception:
                 log.exception("%s failed to freeze on %s", submission.id, task.id)
@@ -282,7 +283,10 @@ def _cmd_live(options) -> int:
         if task.id not in loaded:
             loaded[task.id] = load_task_data(task, refresh=options.refresh)
         try:
-            path = runner.update_live(task, submissions[submission_id], data=loaded[task.id], out_root=options.out_root)
+            path = runner.update_live(
+                task, submissions[submission_id], data=loaded[task.id], out_root=options.out_root,
+                refresh=options.refresh,
+            )
         except Exception:
             log.exception("%s failed on live %s", submission_id, task.id)
             failures.append("{}/{}".format(task.id, submission_id))

@@ -461,7 +461,7 @@ def record_all(
                 if task_id not in loaded:
                     loaded[task_id] = runner._data_for(spec, None, refresh=refresh)
                 path = record_decision(
-                    spec, sub, data=loaded[task_id], now=now, run=run, budget=budget, root=root
+                    spec, sub, data=loaded[task_id], now=now, run=run, budget=budget, refresh=refresh, root=root
                 )
             except Exception as error:
                 log.exception("Ledger recording failed for %s on %s", sub.id, task_id)

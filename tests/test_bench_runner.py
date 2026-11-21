@@ -682,6 +682,21 @@ def test_freeze_stale_refreezes_only_changed_submissions_and_skips_retired(tmp_p
     assert (marker.parent / "cohorts" / "1" / "freeze.json").read_bytes() == first
 
 
+def test_freeze_and_live_commands_pass_refresh_on_for_the_information_sources(tilt, tmp_path, monkeypatch):
+    monkeypatch.setitem(TASKS, LIVE.id, LIVE)
+    refreshed = []
+    for name in ("freeze", "update_live"):
+        monkeypatch.setattr(runner, name, lambda task, submission, **options: refreshed.append(options.get("refresh")))
+    argv = ["--task", LIVE.id, "--refresh", "--submissions-root", str(tilt.directory.parent),
+            "--out-root", str(tmp_path / "board")]
+    assert cli.main(["bench", "freeze", *argv]) == 0  # no --submission: every unfrozen pair
+    marker = tilt.frozen_dir(LIVE.id) / runner.FREEZE_FILE
+    marker.parent.mkdir(parents=True)
+    marker.write_text("{}")
+    assert cli.main(["bench", "live", *argv]) == 0
+    assert refreshed == [True, True]
+
+
 @pytest.mark.parametrize("bad", ["2019-13-01", "tomorrow", "2019-1-1", 20190101])
 def test_retired_must_be_a_date(tmp_path, bad):
     with pytest.raises(ValueError, match="retired"):
