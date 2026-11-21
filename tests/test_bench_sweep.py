@@ -134,6 +134,29 @@ def test_trials_outputs_and_records(tmp_path, data):
     assert saved["records"] == {"synthetic": str(tmp_path / "board" / records[0])}
 
 
+def test_written_submission_keeps_every_declaration_its_records_were_computed_from(tmp_path, data):
+    root = tmp_path / "submissions"
+    base = make_base(root)
+    (tmp_path / "news.jsonl").write_text("")
+    declared = {
+        "tasks": ["synthetic"], "info_sources": [{"source": "jsonl", "path": "../../news.jsonl"}],
+        "model_cutoffs": [{"model": "m", "training_cutoff": "2009-12-31", "source_url": "https://example.com/m"}],
+        "contamination": "possible", "retired": "2099-12-31",
+    }
+    spec = json.loads((base.directory / "submission.json").read_text())
+    (base.directory / "submission.json").write_text(json.dumps({**spec, **declared}))
+    base = Submission.load(base.directory)
+    sweep.sweep(base, [{"asset": 0}, {"asset": 1}], [TASK], seeds=1, out_id="pick-tuned", processes=1,
+                submissions_root=root, out_root=tmp_path / "board", data={TASK.id: data})
+
+    written = Submission.load(root / "pick-tuned")
+    assert written == dataclasses.replace(
+        base, id="pick-tuned", directory=root / "pick-tuned", name="Pick (tuned)", params=written.params,
+        trials=2, description=written.description,
+    )
+    assert "info_sha256" in json.loads((tmp_path / "board" / "historical" / "synthetic" / "pick-tuned.json").read_text())
+
+
 def test_failed_job_is_reported_and_config_excluded(tmp_path, data):
     document = run(tmp_path, data, [{"asset": -1}, {"asset": 1}, {"asset": 0}])
 

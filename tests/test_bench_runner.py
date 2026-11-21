@@ -212,6 +212,29 @@ def test_live_scoring_waits_for_publication_and_starts_after_it(tilt, data, tmp_
     assert record["dates"][1] == "2019-03-04"
 
 
+def test_a_published_freeze_that_changes_is_refused_not_stamped_again(tilt, data, tmp_path):
+    early, marker = freeze_early(tilt, data)
+    publish(tilt, tmp_path, "2019-01-15")
+    publications = tmp_path / "board" / runner.PUBLICATIONS_FILE
+    stamped = publications.read_bytes()
+    old = json.loads(stamped)["tilt/synthetic-live"]["freeze_sha256"]
+
+    def refused():
+        with pytest.raises(ValueError) as error:
+            publish(tilt, tmp_path, "2019-06-03")
+        message = str(error.value)
+        assert "tilt on synthetic-live: cohort 1" in message and "freeze --force" in message
+        assert old in message and runner._sha256_file(marker) in message
+        assert publications.read_bytes() == stamped
+
+    frozen = json.loads(marker.read_text())
+    marker.write_text(json.dumps({**frozen, "frozen_at": "2019-01-01T00:00:01+00:00"}, indent=2) + "\n")
+    refused()
+    shutil.rmtree(marker.parent)  # deleted and frozen again: cohort 1 once more
+    runner.freeze(LIVE, tilt, data=early, now=dt.datetime(2019, 6, 1, tzinfo=dt.timezone.utc))
+    refused()
+
+
 def test_tampered_artifact_is_rejected(tilt, data, tmp_path):
     _, marker = freeze_early(tilt, data)
     (marker.parent / "seed1" / "weights.json").write_text(json.dumps([1, 0, 0, 0, 0]))
