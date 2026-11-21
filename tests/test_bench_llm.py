@@ -85,7 +85,7 @@ def test_us_ndx80_is_the_registered_re_evaluation_task():
     assert TASKS["us-ndx80"].tickers[0] == "AAPL"
 
 
-def test_the_fourteen_arms_are_declared_for_us_ndx80_only():
+def test_the_fourteen_arms_are_declared_for_us_ndx80_only(tmp_path):
     found = discover(REPO / "submissions")
     assert set(ARM_IDS) <= set(found)
     for arm in ARM_IDS:
@@ -95,7 +95,7 @@ def test_the_fourteen_arms_are_declared_for_us_ndx80_only():
         assert submission.trials == 14
         assert submission.applies_to("us-ndx80") and not submission.applies_to("us-sectors")
         with pytest.raises(ValueError, match="declared for"):
-            runner.evaluate(get_task("us-sectors"), submission, seeds=[0], out_root="/tmp/never")
+            runner.evaluate(get_task("us-sectors"), submission, seeds=[0], out_root=str(tmp_path / "never"))
     score_arms = [found[arm] for arm in ARM_IDS if found[arm].info_sources]
     assert len(score_arms) == 12
     for submission in score_arms:
@@ -347,32 +347,33 @@ def test_every_registered_arm_passes_the_lookahead_check(arm, market):
     assert check_causal(TASK, submission, data=market, info=info, seed=0)
 
 
-def test_cli_check_causal_passes_for_every_arm_with_a_jsonl_fixture(tmp_path, market):
+# The arms differ only in params and info_sources; the registry test above covers all fourteen.
+@pytest.mark.parametrize("arm", ["r5-p10", "r5-p0"])  # with and without info_sources
+def test_cli_check_causal_passes_with_and_without_a_jsonl_fixture(arm, tmp_path, market):
     root = tmp_path / "subs"
     root.mkdir()
     fixture = tmp_path / "scores.jsonl"
     fixture.write_text("".join(json.dumps(item.to_dict()) + "\n" for item in fixture_panel(market).items))
     from rl import cli
 
-    for arm in ARM_IDS:
-        submission = tiny(discover(REPO / "submissions")[arm])
-        spec = {
-            "name": submission.name, "kind": submission.kind, "policy": submission.policy,
-            "params": submission.params, "trials": submission.trials,
-            "authors": list(submission.authors), "url": submission.url,
-            "description": submission.description, "tasks": list(submission.tasks),
-            "model_cutoffs": [dict(entry) for entry in submission.model_cutoffs],
-        }
-        if submission.info_sources:
-            spec["info_sources"] = [{"source": "jsonl", "path": "scores.jsonl"}]
-            spec["contamination"] = submission.contamination
-        directory = root / arm
-        directory.mkdir()
-        (directory / "submission.json").write_text(json.dumps(spec))
-        (directory / "scores.jsonl").write_bytes(fixture.read_bytes())
-        argv = ["bench", "check-causal", "--task", "synthetic", "--submission", arm,
-                "--submissions-root", str(root)]
-        assert cli.main(argv) == 0, arm
+    submission = tiny(discover(REPO / "submissions")[arm])
+    spec = {
+        "name": submission.name, "kind": submission.kind, "policy": submission.policy,
+        "params": submission.params, "trials": submission.trials,
+        "authors": list(submission.authors), "url": submission.url,
+        "description": submission.description, "tasks": list(submission.tasks),
+        "model_cutoffs": [dict(entry) for entry in submission.model_cutoffs],
+    }
+    if submission.info_sources:
+        spec["info_sources"] = [{"source": "jsonl", "path": "scores.jsonl"}]
+        spec["contamination"] = submission.contamination
+    directory = root / arm
+    directory.mkdir()
+    (directory / "submission.json").write_text(json.dumps(spec))
+    (directory / "scores.jsonl").write_bytes(fixture.read_bytes())
+    argv = ["bench", "check-causal", "--task", "synthetic", "--submission", arm,
+            "--submissions-root", str(root)]
+    assert cli.main(argv) == 0, arm
 
 
 # --- the score converter ---------------------------------------------------------------

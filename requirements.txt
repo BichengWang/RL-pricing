@@ -8,6 +8,7 @@ matplotlib==3.11.2
 numpy==2.5.3
 pandas==3.0.5
 pytest==9.1.1
+pytest-xdist==3.8.0
 stable-baselines3==2.9.0
 stockstats==0.6.9
 torch==2.14.1

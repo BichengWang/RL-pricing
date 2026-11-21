@@ -131,3 +131,35 @@ def test_open_and_close_must_be_missing_together(field):
     arrays[field][1, 0] = np.nan
     with pytest.raises(ValueError, match="same sessions"):
         MarketData(np.array(["2020-01-01", "2020-01-02"], dtype="datetime64[D]"), ("A",), **arrays)
+
+
+@pytest.mark.parametrize("cost", [float("nan"), float("inf"), -0.001, 1.0, 1.5])
+def test_account_rejects_a_transaction_cost_outside_zero_to_one(walk, cost):
+    with pytest.raises(ValueError, match=r"transaction_cost must be in \[0, 1\)"):
+        Account(walk, cost)
+
+
+@pytest.mark.parametrize("initial", [0.0, -1.0, float("nan"), float("inf")])
+def test_account_rejects_non_positive_or_non_finite_initial_capital(walk, initial):
+    with pytest.raises(ValueError, match="initial capital must be positive"):
+        Account(walk, 0.0, initial)
+
+
+@pytest.mark.parametrize(
+    "start, stop",
+    [
+        (0, None),  # the first decision would be at session -1, which wraps to the last close: look-ahead
+        (-1, None),
+        (60, None),  # nothing left to trade
+        (61, None),
+        (30, 30),
+        (30, 61),  # past the data
+    ],
+)
+def test_simulate_needs_a_session_before_start_and_a_window_inside_the_data(walk, start, stop):
+    def act(view):
+        raise AssertionError("no decision may be made before the window is validated")
+
+    expected = "Need 1 <= start < stop <= 60, got {} and {}".format(start, 60 if stop is None else stop)
+    with pytest.raises(ValueError, match=expected):
+        simulate(walk, act, start, 0.0, stop=stop)

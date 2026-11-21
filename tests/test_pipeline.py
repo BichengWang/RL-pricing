@@ -204,21 +204,22 @@ def test_ensemble_strategy_runs_walk_forward(tmp_path):
     cfg = small_config(
         tmp_path,
         agent="ensemble",
-        total_timesteps=200,
+        total_timesteps=64,
         start_trade_date="2017-06-01",
-        end_date="2017-09-15",
+        end_date="2017-07-28",
         rebalance_window=20,
         validation_window=20,
         model_kwargs=None,
     )
     result = run_training(cfg)
     summary = result["summary"]
+    assert len(summary) == 2  # two windows, so the stitching has a seam to get wrong
     assert set(summary["Model Used"]) <= {"A2C", "PPO", "DDPG"}
     account = result["account_value"]
     # Windows are stitched together without gaps or repeated dates.
     assert account.date.is_unique and account.date.is_monotonic_increasing
     assert account.date.iloc[0] == "2017-06-01"
-    expected = pd.bdate_range("2017-06-01", "2017-09-14").strftime("%Y-%m-%d").tolist()
+    expected = pd.bdate_range("2017-06-01", "2017-07-27").strftime("%Y-%m-%d").tolist()
     assert account.date.tolist() == expected
     assert summary.Transitions.sum() == len(expected) - 1
     assert summary["Val End"].lt(summary["Trade Start"]).all()
