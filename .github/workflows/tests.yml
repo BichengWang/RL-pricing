@@ -86,4 +86,4 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install -e ".[test]"
       - name: Run tests
-        run: python -m pytest -q
+        run: python -m pytest -q -n auto

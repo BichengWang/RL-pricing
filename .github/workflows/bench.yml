@@ -45,7 +45,7 @@ jobs:
         # So are changes to committed freezes (CI would publish an edited one
         # anew and restart its live track); a new submission may add its own.
         run: |
-          if git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^leaderboard/(publications\.json|historical/|live/|ledger/|reports/)|^submissions/[^/]+/ledger/' ||
+          if git diff --name-only --no-renames "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^leaderboard/(publications\.json|historical/|live/|ledger/|reports/)|^submissions/[^/]+/ledger/' ||
             git diff --name-only --no-renames --diff-filter=a "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^submissions/[^/]+/frozen/'; then
             echo "::error::these paths are written by CI only"
             exit 1
