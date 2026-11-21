@@ -27,7 +27,9 @@ Live results are grouped by publication date and ledger results by the date of
 the first verified decision, so every table covers the same window. A live or
 ledger table with fewer than ``scoring.MIN_SHARPE_SESSIONS`` sessions shows no
 annualised, regression or inferential statistics and is ranked by total return.
-Rows with exactly the same ranking value share a rank. Tasks are
+A record that ends before its table's last session (its update failed) is listed
+last, unranked and marked stale, and shows none of those statistics if its own
+window is that short. Rows with exactly the same ranking value share a rank. Tasks are
 ordered ranked first, then re-evaluations
 (``paper-2021``: a survivorship-biased universe, shown for comparison with a
 published setup, not as a ranking), then the synthetic demo.
@@ -48,6 +50,7 @@ from rl.bench import figures, scoring
 from rl.bench.runner import READABLE_SCHEMAS
 from rl.bench.submission import SUBMISSIONS_DIR, discover
 from rl.bench.tasks import TASKS
+from rl.trade import metrics as _m
 
 log = logging.getLogger(__name__)
 
@@ -109,8 +112,20 @@ def _nan_safe(function, *args, **kwargs):
 
 
 def _per_period_sharpe(returns: np.ndarray) -> float:
-    std = returns.std(ddof=1)
+    std = returns.std(ddof=1) if returns.size > 1 else 0.0
     return float(returns.mean() / std) if std > 0 else float("nan")
+
+
+def _metrics(returns: np.ndarray, ppy: float, **series) -> dict:
+    """``scoring.metrics``; a single session (a new live or ledger window) has only total return and drawdown."""
+    if returns.size > 1:
+        return scoring.metrics(returns, ppy, **series)
+    return {
+        "sharpe": float("nan"),
+        **{key: float("nan") for key in _METRICS},
+        "total_return": _m.cumulative_returns(returns),
+        "max_drawdown": _m.max_drawdown(returns),
+    }
 
 
 def _mean_sd(values) -> tuple[float, float]:
@@ -126,7 +141,7 @@ def _analyze_record(record: dict) -> dict:
     for run in record["runs"]:
         returns = _returns(run["equity"])
         seed_returns.append(returns)
-        per_seed.append(scoring.metrics(returns, ppy, benchmark=benchmark, turnover=run["turnover"]))
+        per_seed.append(_metrics(returns, ppy, benchmark=benchmark, turnover=run["turnover"]))
     row = {
         "id": record["submission"],
         "name": record["name"],
@@ -161,7 +176,7 @@ def _analyze_record(record: dict) -> dict:
 def _benchmark_row(record: dict) -> dict:
     ppy = record["periods_per_year"]
     benchmark = _returns(record["benchmark"]["equity"])
-    values = scoring.metrics(benchmark, ppy)
+    values = _metrics(benchmark, ppy)
     return {
         "id": None,
         "name": record["benchmark"]["name"],
@@ -213,18 +228,25 @@ def _sections(records: list[dict]) -> list[dict]:
     sections = []
     for key in sorted(groups):
         members = groups[key]
-        latest = max(members, key=lambda r: r["created"])
+        latest = max(members, key=lambda r: (r["dates"][-1], r["created"]))
         rows = [_analyze_record(record) for record in members]
-        n = min(len(row["_returns"]) for row in rows)
-        sharpes = np.array([_per_period_sharpe(row["_returns"]) for row in rows])
+        for record, row in zip(members, rows):
+            if record["dates"][-1] != latest["dates"][-1]:
+                # Its update failed: its own, shorter window is not ranked against the table's.
+                row["stale"] = record["dates"][-1]
+        current = [row for row in rows if "stale" not in row]
+        n = min(len(row["_returns"]) for row in current)
+        sharpes = np.array([_per_period_sharpe(row["_returns"]) for row in current])
         sharpes = sharpes[np.isfinite(sharpes)]
         variance = float(sharpes.var(ddof=1)) if sharpes.size > 1 else 0.0
         variance = max(variance, 1.0 / n)
-        for row in rows:
+        for record, row in zip(members, rows):
             dsr = _nan_safe(scoring.deflated_sharpe, row["_returns"], row["trials"], variance)
             row["dsr"] = float(dsr) if dsr is not None else float("nan")
             del row["_returns"], row["_benchmark"]
-        listed = [row for row in rows if row["id"] == BENCHMARK_SUBMISSION]
+            if _too_short(record):
+                _blank_short_window(row)
+        listed = [row for row in rows if row["id"] == BENCHMARK_SUBMISSION and "stale" not in row]
         if listed:
             listed[0]["benchmark"] = True
         else:
@@ -235,10 +257,16 @@ def _sections(records: list[dict]) -> list[dict]:
                 _blank_short_window(row)
         rows.sort(
             key=lambda r: (
-                not math.isfinite(r[ranked_by]), -r[ranked_by] if math.isfinite(r[ranked_by]) else 0.0, not r["benchmark"]
+                "stale" in r,
+                not math.isfinite(r[ranked_by]),
+                -r[ranked_by] if math.isfinite(r[ranked_by]) else 0.0,
+                not r["benchmark"],
             )
         )
         for index, row in enumerate(rows):
+            if "stale" in row:
+                row["rank"] = None  # listed last
+                continue
             # Rows with exactly the same value share a rank; the benchmark is listed first among them.
             tied = index > 0 and rows[index - 1][ranked_by] == row[ranked_by]
             row["rank"] = rows[index - 1]["rank"] if tied else index + 1
@@ -327,6 +355,8 @@ def _row_cells(row: dict, link_prefix: str | None, ranked: bool = True) -> list[
         name += " (code changed)"
     if row.get("policy_versions"):
         name += " (decisions span {} policy versions)".format(row["policy_versions"])
+    if row.get("stale"):
+        name += " (stale: last session {})".format(row["stale"])
     sharpe = _fmt(row["sharpe"], "{:.2f}")
     if row["sharpe"] is not None and math.isfinite(row["sharpe"]) and row.get("seeds", 1) > 1:
         sharpe += " ± {:.2f}".format(row["sharpe_sd"])
@@ -339,7 +369,7 @@ def _row_cells(row: dict, link_prefix: str | None, ranked: bool = True) -> list[
         shown_p = "p<0.001" if p_value is not None and p_value < 0.001 else "p=" + _fmt(p_value, "{:.3f}")
         delta = "{:+.2f} ({})".format(row["delta_sharpe"], shown_p)
     return [
-        str(row["rank"]) if ranked else "–",
+        str(row["rank"]) if ranked and row["rank"] is not None else "–",
         name,
         row["kind"],
         sharpe,
@@ -490,8 +520,8 @@ def render_markdown(summary: dict, link_prefix: str | None = "../submissions") -
         "per-seed Sharpe ratios. *Return* (total over the window, net of fees), *CAGR*, *Max DD* "
         "(peak-to-trough, including the starting value) and "
         "*Beta*/*Alpha* (OLS of daily returns on the benchmark's; alpha annualised, *t* is "
-        "Newey-West) are means across seeds. *Turnover/yr*: annualised one-way traded fraction of "
-        "equity. *ΔSharpe*: annualised Sharpe of the seed-averaged returns minus the benchmark's, "
+        "Newey-West) are means across seeds. *Turnover/yr*: annualised traded notional (buys plus sells) "
+        "over pre-trade equity. *ΔSharpe*: annualised Sharpe of the seed-averaged returns minus the benchmark's, "
         "with a one-sided paired stationary-bootstrap p-value (H1: better than 1/N). *DSR*: "
         "deflated Sharpe ratio of the seed-averaged returns, i.e. the probability the true Sharpe is "
         "positive after accounting for the submission's `trials` and for the dispersion of Sharpe "
