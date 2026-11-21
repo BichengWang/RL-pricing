@@ -112,6 +112,12 @@ def test_numbers_match_the_record_curves(board):
     )
 
 
+def test_footnote_says_seeds_are_averaged_unlike_the_leaderboard(board):
+    text = monthly.write_monthly_report(board, "2019-03").read_text()
+    assert json.loads((board / "reports" / "2019-03.json").read_text())["entries"]["live/synthetic-live/first"]["seeds"] > 1
+    assert "scored on its seed-averaged daily returns" in text and "the leaderboard's mean per-seed values" in text
+
+
 def test_short_window_shows_session_count_instead_of_sharpe(board):
     path = monthly.write_monthly_report(board, "2019-01")
     text = path.read_text()

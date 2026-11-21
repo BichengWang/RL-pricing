@@ -12,8 +12,9 @@ number is computed from the equity curves in the records. A record's window
 starts at its own publication (live) or first verified decision (ledger), so
 rows of one task can have different start dates; each row is compared with
 the 1/N benchmark over its own window. Strategies with several seeds are
-scored on the equal-weight average of their seeds' daily returns, as on the
-leaderboard.
+scored on the equal-weight average of their seeds' daily returns (the basis of
+the leaderboard's ΔSharpe; its Sharpe, return and drawdown are means of
+per-seed values, so they can differ).
 """
 
 from __future__ import annotations
@@ -295,7 +296,9 @@ def render_markdown(month: str, as_of: str, entries: list[dict], previous: dict 
         "*Return* is since the first scored session after publication (live) or after the first verified "
         "decision (ledger), net of fees. *1/N* is equal-weight buy and hold over the same sessions and "
         "*vs 1/N* is the difference of the two returns. *Sharpe* (daily returns, zero risk-free rate, "
-        "annualised) is shown from {} sessions. *Max DD* is peak-to-trough including the start.".format(
+        "annualised) is shown from {} sessions. *Max DD* is peak-to-trough including the start. A strategy "
+        "with several seeds is scored on its seed-averaged daily returns, so its numbers can differ from the "
+        "leaderboard's mean per-seed values.".format(
             MIN_SHARPE_SESSIONS
         ),
         "",

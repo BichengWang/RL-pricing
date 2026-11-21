@@ -81,7 +81,7 @@ def _paired(returns, benchmark) -> tuple[np.ndarray, np.ndarray]:
 def _sharpe(r: np.ndarray) -> float:
     """Per-period Sharpe ratio (mean / std with ddof=1); NaN when undefined."""
     std = r.std(ddof=1)
-    return float(r.mean() / std) if std > 0 else float("nan")
+    return float(r.mean() / std) if _m.has_variance(std, r.mean()) else float("nan")
 
 
 def annualised_sharpe(returns, periods_per_year: float) -> float:
@@ -125,8 +125,9 @@ def metrics(
     (Newey-West HAC t-statistic of the intercept, lag
     ``floor(4 (n/100)^(2/9))``), ``tracking_error`` (annualised std of active
     returns) and ``information_ratio`` (annualised mean active return over
-    tracking error).  With ``turnover`` (per-session one-way traded fraction of
-    equity, same length): ``turnover`` = mean * ``periods_per_year``.
+    tracking error).  With ``turnover`` (per-session traded notional, buys plus
+    sells, over pre-trade equity, same length): ``turnover`` = mean *
+    ``periods_per_year``.
     """
     r = _returns(returns)
     ppy = _periods(periods_per_year)
@@ -280,8 +281,8 @@ def sharpe_difference(
         d = np.zeros(rows)
         for series, sign in ((r, 1.0), (b, -1.0)):
             sample = series[idx]
-            std = sample.std(axis=1, ddof=1)
-            ratio = np.divide(sample.mean(axis=1), std, out=np.zeros(rows), where=std > 0)
+            mean, std = sample.mean(axis=1), sample.std(axis=1, ddof=1)
+            ratio = np.divide(mean, std, out=np.zeros(rows), where=_m.has_variance(std, mean))
             d += sign * ratio
         diffs[lo : lo + rows] = d * scale
     exceed = int(np.count_nonzero(diffs - observed >= observed))

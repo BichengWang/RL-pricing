@@ -45,7 +45,8 @@ def _panels(records: list[dict]) -> list[dict]:
             rows.append({"id": record["submission"], "name": record["name"], "kind": record["kind"], "sharpes": sharpes})
             benchmark = _equity_sharpe(record["benchmark"]["equity"], ppy)
         rows.sort(key=lambda row: np.nanmean(row["sharpes"]))
-        panels.append({"task": task_id, "rows": rows, "benchmark": benchmark})
+        last = max(record["dates"][-1] for record in by_task[task_id])
+        panels.append({"task": task_id, "rows": rows, "benchmark": benchmark, "last": last})
     return panels
 
 
@@ -78,7 +79,7 @@ def render_sharpe_figure(records: list[dict], path, reported: dict | None = None
         ax.set_yticks(range(len(panel["rows"])))
         ax.set_yticklabels([row["name"] for row in panel["rows"]], fontsize=8)
         task = TASKS[panel["task"]]
-        years = "{} to {}".format(task.test_start[:4], int(task.test_end[:4]) - 1)
+        years = "{} to {}".format(task.test_start[:4], panel["last"][:4])
         title = task.title if task.live else "{}, survivorship-biased".format(task.title)
         ax.set_title("{}\n{}".format(title, years), fontsize=9)
         ax.set_xlabel("Sharpe ratio (each dot is a seed)", fontsize=8)
