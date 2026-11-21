@@ -58,6 +58,9 @@ jobs:
           fi
           pip install "$(python -c 'from rl.bench.policies.tradingagents import INSTALL_REQUIREMENT; print(INSTALL_REQUIREMENT)')"
       - name: Record decisions
+        # Below the job's 60: a step timeout only fails this step, so the push step still commits the
+        # entries already written; a job timeout cancels the job and skips it.
+        timeout-minutes: 45
         env:
           # Off until the R6 pre-registration (with its recall probe) is merged
           # and the owner flips the repository variable.

@@ -42,8 +42,11 @@ jobs:
       - name: Reject edits to bot-owned results
         # Publication times, historical, live and ledger records, monthly
         # reports and ledger entries are written only by workflows on main.
+        # So are changes to committed freezes (CI would publish an edited one
+        # anew and restart its live track); a new submission may add its own.
         run: |
-          if git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^leaderboard/(publications\.json|historical/|live/|ledger/|reports/)|^submissions/[^/]+/ledger/'; then
+          if git diff --name-only "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^leaderboard/(publications\.json|historical/|live/|ledger/|reports/)|^submissions/[^/]+/ledger/' ||
+            git diff --name-only --no-renames --diff-filter=a "origin/${GITHUB_BASE_REF}...HEAD" | grep -E '^submissions/[^/]+/frozen/'; then
             echo "::error::these paths are written by CI only"
             exit 1
           fi
@@ -126,6 +129,9 @@ jobs:
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The branch tip at job start, not the trigger's commit: stale after queueing for bench-write.
+          ref: ${{ github.ref }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.13"
@@ -179,6 +185,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.ref }}  # the branch tip, as in freeze
           fetch-depth: 0  # ledger scoring reads the history that added each entry
       - uses: actions/setup-python@v5
         with:

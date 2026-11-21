@@ -33,11 +33,18 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const pr = await github.rest.pulls.get({
+            const get = () => github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.payload.pull_request.number,
             });
+            let pr = await get();
+            // `mergeable` is null while GitHub is still computing it (a few seconds after the PR
+            // opens or its base moves): ask again for up to 30 s before judging the PR.
+            for (let i = 0; i < 6 && pr.data.state === 'open' && pr.data.mergeable === null; i++) {
+              await new Promise(resolve => setTimeout(resolve, 5000));
+              pr = await get();
+            }
             if (pr.data.state !== 'open') {
               core.info(`PR is ${pr.data.merged ? 'already merged' : 'closed'}. Skipping automerge.`);
               core.setOutput('should_automerge', 'false');
@@ -50,7 +57,7 @@ jobs:
               return;
             }
             if (!pr.data.mergeable) {
-              core.setFailed('PR is not mergeable.');
+              core.setFailed(pr.data.mergeable === null ? 'GitHub has not computed whether the PR is mergeable.' : 'PR is not mergeable.');
             }
             core.setOutput('should_automerge', 'true')
 
