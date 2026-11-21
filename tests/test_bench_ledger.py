@@ -16,6 +16,7 @@ import pytest
 from rl.bench import cli, ledger, leaderboard, monthly, runner
 from rl.bench.data import DATA_ENV, load_task_data
 from rl.bench.engine import simulate
+from rl.bench.info import InfoPanel
 from rl.bench.market import FIELDS, MarketData
 from rl.bench.policies import tradingagents as ta
 from rl.bench.policy import Policy
@@ -983,6 +984,19 @@ def test_record_all_and_score_all(tmp_path, data):
     )
     assert scored == [tmp_path / "board" / "ledger" / "synthetic" / "alpha.json"]
     assert len(score_failures) == 1 and score_failures[0].startswith("nope/beta")
+
+
+def test_record_all_refresh_reaches_the_information_sources(tmp_path, data, monkeypatch):
+    root = tmp_path / "submissions"
+    make_submission(root, "alpha", info_sources=[{"source": "jsonl", "path": "news.jsonl"}])
+    refreshed = []
+    monkeypatch.setattr(
+        ledger, "load_task_info", lambda task, submission, refresh=False: refreshed.append(refresh) or InfoPanel()
+    )
+    written, failures = ledger.record_all(
+        root, data={"synthetic": data.rows(0, BASE + 1)}, now=NOW, run=identity(0), refresh=True
+    )
+    assert failures == [] and len(written) == 1 and refreshed == [True]
 
 
 def test_retired_submissions_are_not_recorded_after_their_date(tmp_path, data):
