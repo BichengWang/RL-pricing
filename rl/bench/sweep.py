@@ -471,11 +471,16 @@ def sweep(
     final = dataclasses.replace(
         final, description=_describe(base, grid, grid[best], [t.id for t in task_list])
     )
-    _write(out_dir / "submission.json", {
+    spec = {
         "name": final.name, "kind": final.kind, "policy": final.policy, "params": final.params,
         "trials": final.trials, "authors": list(final.authors), "url": final.url,
         "description": final.description,
-    })
+    }
+    # The records are computed from ``final``: the written definition must load back to it.
+    for name in ("tasks", "ledger", "info_sources", "model_cutoffs", "contamination", "retired"):
+        if getattr(final, name):
+            spec[name] = getattr(final, name)
+    _write(out_dir / "submission.json", spec)
     _write(out_dir / SWEEP_FILE, document)
     if failures:
         log.error("%d scoring jobs failed; incomplete configurations were excluded from selection", len(failures))

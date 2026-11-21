@@ -577,18 +577,31 @@ def publish(submissions_root, *, out_root=LEADERBOARD_DIR, now: dt.datetime | No
 
     Only the CI job on the main branch runs this, so a publication time is
     when the frozen policy became public; live scoring starts after it. A
-    re-frozen policy (a changed ``freeze.json``) is published anew. Returns
-    the ``submission/task`` keys stamped.
+    re-freeze is a new cohort with its own key; a published ``freeze.json``
+    that changed under the same key is refused, not stamped again, which
+    would restart its live track silently. Returns the ``submission/task``
+    keys stamped.
     """
     path = Path(out_root) / PUBLICATIONS_FILE
     publications = json.loads(path.read_text()) if path.exists() else {}
     stamped = []
     for marker in sorted(Path(submissions_root).glob("*/frozen/*/{}".format(FREEZE_FILE))):
         frozen = verify_freeze(marker.parent)
-        key = _publication_key(marker.parent.parent.parent.name, marker.parent.name, frozen.get("cohort", 1))
+        submission_id, task_id, cohort = marker.parent.parent.parent.name, marker.parent.name, frozen.get("cohort", 1)
+        key = _publication_key(submission_id, task_id, cohort)
         digest = _sha256_file(marker)
-        if publications.get(key, {}).get("freeze_sha256") == digest:
+        published = publications.get(key)
+        if published is not None and published["freeze_sha256"] == digest:
             continue
+        if published is not None:
+            raise ValueError(
+                "{} on {}: cohort {} was published on {} from a freeze.json with sha256 {}, but {} now has sha256 {}. "
+                "A published freeze is never re-stamped; restore it, and re-freeze deliberately with "
+                "`rl-pricing bench freeze --force` to start cohort {}".format(
+                    submission_id, task_id, cohort, published["published_at"], published["freeze_sha256"], marker,
+                    digest, cohort + 1,
+                )
+            )
         publications[key] = {"published_at": _utc(now), "freeze_sha256": digest}
         stamped.append(key)
     if stamped:
