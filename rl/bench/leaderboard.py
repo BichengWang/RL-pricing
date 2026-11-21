@@ -113,7 +113,7 @@ def _nan_safe(function, *args, **kwargs):
 
 def _per_period_sharpe(returns: np.ndarray) -> float:
     std = returns.std(ddof=1) if returns.size > 1 else 0.0
-    return float(returns.mean() / std) if std > 0 else float("nan")
+    return float(returns.mean() / std) if _m.has_variance(std, returns.mean()) else float("nan")
 
 
 def _metrics(returns: np.ndarray, ppy: float, **series) -> dict:

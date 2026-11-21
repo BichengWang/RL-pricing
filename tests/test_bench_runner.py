@@ -310,6 +310,12 @@ def test_readme_block_replacement_is_idempotent(board, tmp_path):
     assert plain.read_text() == "no markers\n"
 
 
+def test_a_constant_row_does_not_enter_the_dsr_dispersion():
+    # Its std is float residue, not 0; as a Sharpe of ~1e17 it would swamp the table's variance.
+    assert np.isnan(leaderboard._per_period_sharpe(np.full(30, 0.01)))
+    assert np.isnan(leaderboard._per_period_sharpe(np.array([0.01])))
+
+
 def test_sharpe_figure_title_ends_with_the_last_session_year(tmp_path, monkeypatch):
     from matplotlib.axes import Axes
 
