@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -115,6 +117,22 @@ def test_load_dataset_round_trip(tmp_path, raw_prices):
     loaded = load_dataset(file_name=str(path))
     assert list(loaded.columns) == list(raw_prices.columns)
     assert loaded.date.iloc[0] == raw_prices.date.iloc[0]
+
+
+def test_load_dataset_normalises_dates_and_rejects_ambiguous_ones(tmp_path, raw_prices):
+    path = tmp_path / "prices.csv"
+    raw_prices.to_csv(path, index=False)
+    iso = load_dataset(file_name=str(path))
+    pd.testing.assert_frame_equal(iso, pd.read_csv(path))
+    # Compared as strings, 20160701 sorts before 2016-07-01 and moves the split.
+    dates = pd.to_datetime(raw_prices.date)
+    raw_prices.assign(date=dates.dt.strftime("%Y%m%d")).to_csv(path, index=False)
+    pd.testing.assert_frame_equal(load_dataset(file_name=str(path)), iso)
+    for fmt in ("%m/%d/%Y", "%d/%m/%Y"):
+        bad = raw_prices.assign(date=dates.dt.strftime(fmt))
+        bad.to_csv(path, index=False)
+        with pytest.raises(ValueError, match="'date'.*" + re.escape(bad.date.iloc[0])):
+            load_dataset(file_name=str(path))
 
 
 @pytest.mark.parametrize("column", ["open", "close"])

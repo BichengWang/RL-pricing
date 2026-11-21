@@ -80,6 +80,8 @@ def test_validation_settings_are_checked():
         TrainConfig(eval_freq=0).validate()
     with pytest.raises(ValueError, match="validation_window"):
         TrainConfig(agent="ensemble", validation_days=20).validate()
+    with pytest.raises(ValueError, match="turbulence threshold"):
+        TrainConfig(agent="ensemble", turbulence_threshold=0.5).validate()
     with pytest.raises(ValueError, match="lstm_validation_fraction"):
         TrainConfig(agent="lstm", validation_days=20).validate()
 

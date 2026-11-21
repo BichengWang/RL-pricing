@@ -33,6 +33,8 @@ def test_backtest_preserves_saved_settings_when_options_are_omitted(backtest_cal
         ("--end-date", config.END_DATE, "end_date", config.END_DATE),
         ("--results-dir", config.RESULTS_DIR, "results_dir", config.RESULTS_DIR),
         ("--leverage", "1.0", "leverage", 1.0),
+        ("--initial-amount", "1000000", "initial_amount", 1_000_000.0),
+        ("--hmax", "100", "hmax", 100),
     ],
 )
 def test_explicit_parser_defaults_override_saved_settings(backtest_call, flag, value, field, expected):
@@ -68,6 +70,35 @@ def test_backtest_routes_data_benchmark_and_fee_overrides(backtest_call):
     }
 
 
+def test_backtest_routes_turbulence_switch_capital_and_trade_size(backtest_call):
+    cli.main([
+        "--mode", "backtest", "--model-dir", "saved",
+        "--no-turbulence", "--initial-amount", "50000", "--hmax", "10",
+    ])
+    assert backtest_call["overrides"] == {
+        "use_turbulence": False, "initial_amount": 50_000.0, "hmax": 10,
+    }
+
+
+def test_backtest_rejects_a_turbulence_quantile_it_cannot_refit(backtest_call):
+    with pytest.raises(SystemExit):
+        cli.main(["--mode", "backtest", "--model-dir", "saved", "--turbulence-quantile", "0.99"])
+    assert backtest_call == {}
+
+
+@pytest.mark.parametrize("flag", ["--turbulence-threshold", "--turbulence-quantile"])
+def test_ensemble_rejects_turbulence_settings_it_would_ignore(monkeypatch, flag):
+    configs = []
+    monkeypatch.setattr(
+        training, "run_training", lambda cfg: configs.append(cfg) or {"results_dir": "ensemble"}
+    )
+    with pytest.raises(SystemExit):
+        cli.main(["--mode", "ensemble", flag, "0.99"])
+    assert configs == []
+    cli.main(["--mode", "ensemble", "--no-turbulence"])
+    assert not configs[0].use_turbulence and configs[0].turbulence_threshold is None
+
+
 def test_training_keeps_its_default_settings(monkeypatch):
     configs = []
 
@@ -84,3 +115,4 @@ def test_training_keeps_its_default_settings(monkeypatch):
     assert cfg.results_dir == config.RESULTS_DIR
     assert cfg.leverage == 1.0
     assert cfg.buy_cost_pct == cfg.sell_cost_pct == 0.001
+    assert (cfg.hmax, cfg.initial_amount, cfg.turbulence_quantile) == (100, 1_000_000, 0.99)

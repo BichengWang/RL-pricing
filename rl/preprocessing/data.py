@@ -10,7 +10,21 @@ def load_dataset(*, file_name: str) -> pd.DataFrame:
     # Files written with DataFrame.to_csv() carry an unnamed index column.
     _data = _data.drop(columns=[c for c in _data.columns if str(c).startswith("Unnamed:")])
     if "date" in _data.columns:
-        _data["date"] = _data["date"].astype(str)
+        # Dates are compared as YYYY-MM-DD strings downstream, so YYYYMMDD is
+        # converted; slash dates are ambiguous (month or day first) and rejected.
+        dates = _data["date"].astype(str)
+        iso = pd.to_datetime(dates, format="%Y-%m-%d", errors="coerce")
+        compact = pd.to_datetime(
+            dates.where(dates.str.fullmatch(r"\d{8}")), format="%Y%m%d", errors="coerce"
+        )
+        parsed = iso.fillna(compact)
+        if parsed.isna().any():
+            raise ValueError(
+                "Column 'date' of {} must hold YYYY-MM-DD or YYYYMMDD dates, got {!r}".format(
+                    file_name, dates[parsed.isna()].iloc[0]
+                )
+            )
+        _data["date"] = parsed.dt.strftime("%Y-%m-%d")
     return _data
 
 

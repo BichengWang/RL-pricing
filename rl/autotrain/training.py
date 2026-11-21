@@ -164,6 +164,8 @@ class TrainConfig:
             raise ValueError("eval_freq must be at least 1")
         if self.validation_days and self.agent == "ensemble":
             raise ValueError("The ensemble strategy has its own validation_window")
+        if self.turbulence_threshold is not None and self.agent == "ensemble":
+            raise ValueError("The ensemble strategy sets its own turbulence threshold every window")
         for name in ("ensemble_timesteps", "ensemble_model_kwargs"):
             unknown = set(getattr(self, name) or {}) - set(ENSEMBLE_AGENTS)
             if unknown:
@@ -632,8 +634,10 @@ def run_backtest(model_dir, **overrides):
     cfg = dataclasses.replace(cfg, **{k: v for k, v in overrides.items() if v is not None})
     cfg.validate()
     threshold = saved.get("resolved_turbulence_threshold") if cfg.use_turbulence else None
-    if cfg.task == "trading" and overrides.get("turbulence_threshold") is not None:
-        threshold = float(overrides["turbulence_threshold"])
+    # As in training, use_turbulence=False wins over a fixed threshold.
+    fixed = overrides.get("turbulence_threshold")
+    if cfg.use_turbulence and cfg.task == "trading" and fixed is not None:
+        threshold = float(fixed)
     if cfg.agent == "lstm":
         result = _backtest_lstm(model_dir, cfg, saved)
     else:
