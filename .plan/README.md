@@ -16,6 +16,7 @@ Bicheng Wang. This directory is the source of truth for direction; change
 | [`phase-2-live-verdicts.md`](phase-2-live-verdicts.md) | 2027-01-01 → 2027-03-31: TradingAgents live verdict, fourth report, site |
 | [`phase-3-authority.md`](phase-3-authority.md) | 2027-04-01 → 2027-06-30: lab paper, paid audit pilot, community nominations |
 | [`v2.md`](v2.md) | v2.0.0: integrity core, point-in-time information, modern RL suite, FinRL-DeepSeek re-test (R5), live LLM portfolio agent |
+| [`paper-v2.md`](paper-v2.md) | P2.6 proposal (2026-11-22): arXiv v2 and v3 of Wang & Zhang 2609.31870, gates, experiments, timeline |
 
 ## Identity
 
