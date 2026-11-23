@@ -1,0 +1,120 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "3d3b390787eff1307e9e49d1a46d60380699d6d8",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-aapl",
+  "decision_date": "2026-11-20",
+  "weights": {
+    "AAPL": 1.0
+  },
+  "hold": false,
+  "reason": null,
+  "cost_usd": 0.601504,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "AAPL",
+    "trade_date": "2026-11-20",
+    "signal": "Overweight",
+    "weight": 1.0,
+    "decision_sha256": "624f9e62fe25e7009c95ec25051d9eb712cb34e502facb99b2349b4743136dd9",
+    "decision_head": "**Rating**: Overweight\n\n**Executive Summary**: Build AAPL exposure gradually instead of buying the full position now. Start with 25\u201330% of a full allocation at or near $342. Add another 25\u201330% only after 2\u20133 closes above the 50-day average ($341.59) with RSI back above 50 and the MACD histogram turning up. Add the last 20\u201330% only on a quieter, lower-volume stabilization day near the lower Bolling",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 133954,
+        "cached_input": 0,
+        "output": 20840,
+        "calls": 16
+      },
+      "claude-opus-5-5": {
+        "input": 13274,
+        "cached_input": 0,
+        "output": 3605,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "92037fe8dba5d7178e4fec29765fa265040dd863b7c8d71a47287bbb9e370e94",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "45195202661",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-23T14:33:06+00:00"
+  },
+  "created_at": "2026-11-23T14:33:06+00:00",
+  "decision_sha256": "e2e6a0c0842526fa2cb65f4216b5e1fd7911db705cb9c556d99fb7cc39582f50"
+}
