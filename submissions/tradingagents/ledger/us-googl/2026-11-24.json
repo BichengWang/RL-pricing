@@ -1,0 +1,118 @@
+{
+  "schema": 2,
+  "protocol_version": "2",
+  "code": {
+    "package_version": "2.0.0",
+    "git_commit": "a8725a2a6a2d213b0b8935a15bb271505bf21e30",
+    "code_sha256": "71426cbb5f7bb578df007b1b811ed302ea32bc8a0069be468c84fd93b67bd4d7"
+  },
+  "policy_sha256": "5161ef80668e98eb131282a79c5229428d75c6fb420eec645c84238187f074b4",
+  "submission": "tradingagents",
+  "task": "us-googl",
+  "decision_date": "2026-11-24",
+  "weights": null,
+  "hold": true,
+  "reason": null,
+  "cost_usd": 0.60832,
+  "reserved_cost_usd": 0.7,
+  "inputs": {
+    "agent": "TauricResearch/TradingAgents",
+    "agent_version": "0.6.0",
+    "agent_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972",
+    "llm_provider": "anthropic",
+    "deep_think_llm": "claude-opus-5-5",
+    "quick_think_llm": "claude-sonnet-5",
+    "max_debate_rounds": 1,
+    "max_risk_discuss_rounds": 1,
+    "analysts": [
+      "market",
+      "social",
+      "news",
+      "fundamentals"
+    ],
+    "data_vendors": {
+      "core_stock_apis": "yfinance",
+      "technical_indicators": "yfinance",
+      "fundamental_data": "sec_edgar,yfinance",
+      "news_data": "yfinance",
+      "macro_data": "fred",
+      "prediction_markets": "polymarket"
+    },
+    "config_overrides": {
+      "anthropic_effort": "medium"
+    },
+    "ticker": "GOOGL",
+    "trade_date": "2026-11-24",
+    "signal": "Hold",
+    "weight": null,
+    "decision_sha256": "76a1f3a8c7d8733c52f50e9cc2bfa3471a302b549c04013d089f9f0d937e627e",
+    "decision_head": "**Rating**: Hold\n\n**Executive Summary**: Hold GOOGL. Keep existing positions at about a standard (1.0x) allocation, and use a daily close below about $262.40 (the $264.22 low on heavy volume) as the point to cut down to 0.5\u20130.75x. If you have no position, you can open a starter of up to 0.25x near $279. Size it for an ATR of about 11.5 and use the same stop. Add toward 1.25\u20131.5x in 2\u20133 tranches on",
+    "token_usage": {
+      "claude-sonnet-5": {
+        "input": 126845,
+        "cached_input": 0,
+        "output": 21563,
+        "calls": 15
+      },
+      "claude-opus-5-5": {
+        "input": 13565,
+        "cached_input": 0,
+        "output": 4237,
+        "calls": 2
+      }
+    },
+    "unpriced_models": [],
+    "usage_reported": true,
+    "cost_basis": "usage",
+    "policy": "rl.bench.policies.tradingagents:TradingAgentsPolicy",
+    "params": {
+      "llm_provider": "anthropic",
+      "deep_think_llm": "claude-opus-5-5",
+      "quick_think_llm": "claude-sonnet-5",
+      "max_debate_rounds": 1,
+      "max_risk_discuss_rounds": 1,
+      "analysts": [
+        "market",
+        "social",
+        "news",
+        "fundamentals"
+      ],
+      "data_vendors": {
+        "core_stock_apis": "yfinance",
+        "technical_indicators": "yfinance",
+        "fundamental_data": "sec_edgar,yfinance",
+        "news_data": "yfinance",
+        "macro_data": "fred",
+        "prediction_markets": "polymarket"
+      },
+      "config_overrides": {
+        "anthropic_effort": "medium"
+      },
+      "prices_usd_per_mtok": {
+        "claude-opus-5-5": {
+          "input": 4.0,
+          "cached_input": 0.2,
+          "output": 20.0
+        },
+        "claude-sonnet-5": {
+          "input": 2.0,
+          "cached_input": 0.2,
+          "output": 10.0
+        }
+      },
+      "max_age_days": 7,
+      "expected_commit": "1394a3f72aa4393e1a98f51b382434c4b4c2d972"
+    }
+  },
+  "data_sha256": "bd0b2a6319e2e96a076636fd9f645af2f91569d715177818c6395389f7e57913",
+  "run": {
+    "repository": "BichengWang/RL-pricing",
+    "run_id": "45632159733",
+    "run_attempt": "1",
+    "workflow": "BichengWang/RL-pricing/.github/workflows/ledger.yml@refs/heads/main",
+    "started_at": "2026-11-25T14:20:20+00:00"
+  },
+  "created_at": "2026-11-25T14:20:20+00:00",
+  "decision_sha256": "34b8307e1c8f5d3149b8ecc80bc439fef8018df4f6465cc53b03aeca14f0e348"
+}
